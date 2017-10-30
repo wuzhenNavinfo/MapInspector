@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="./javascripts/libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="./javascripts/libs/bootstrap-3.3.5/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css"/>
+    <script src="./javascripts/libs/jquery/jquery-1.11.1.js"></script>
+    <script src="./javascripts/libs/angularjs/angular.js"></script>
+    <script src="./javascripts/libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+    <script src="./app.js"></script>
+</head>
+<body ng-app="app">
+<div style="margin: 50px 0" class="container-fluid" ng-controller="AppCtrl">
+    <h1 style="margin: 10px 0" class="form-inline pull-left">{{test}}</h1>
+    <form style="margin: 10px 0" class="form-inline pull-right">
+        <div class="form-group">
+            <label class="sr-only" for="exampleInputEmail1">名称</label>
+            <input type="text" ng-model="listModel.name" class="form-control" id="exampleInputEmail1" placeholder="名称">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword2">国家</label>
+            <input type="text" ng-model="listModel.country" class="form-control" id="exampleInputPassword2" placeholder="国家">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword3">网址</label>
+            <input type="text" ng-model="listModel.url" class="form-control" id="exampleInputPassword3" placeholder="网址">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword4">排名</label>
+            <input type="number" ng-model="listModel.alexa" class="form-control" id="exampleInputPassword4" placeholder="排名">
+        </div>
+        <button type="submit" ng-click="addList()" class="btn btn-primary">增加</button>
+    </form>
+    <!-- 表格展示 -->
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>ID</th><th>名称</th><th>国家</th><th>网址</th><th>排名</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in list">
+                <th scope="row">{{item.id}}</th>
+                <td>{{item.name}}</td>
+                <td>{{item.country}}</td>
+                <td>{{item.url}}</td>
+                <td>{{item.alexa}}</td>
+                <td><button class="btn btn-danger" ng-click="deleteList(item.id)">删除</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <!--分页-->
+    <div>
+        <ul class="pagination pull-right">
+            <li ng-repeat="pageItem in pageArray"><a ng-click="getList(pageItem)">{{pageItem}}</a></li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
