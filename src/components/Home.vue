@@ -14,7 +14,6 @@
 		top: 0px;
 		bottom: 0px;
 		width: 100%;
-		background-color: red;
 	}
   .container .header {
     height: 60px;

@@ -54,7 +54,7 @@ export default {
           login(loginParams).then(function (data) {
             console.info(that);
             console.info(data);
-            // let { msg, code, user } = data;
+            // let { errmsg, errcode, data } = data;
             if (data) {
               that.logining = false;
               sessionStorage.setItem('user',data)
