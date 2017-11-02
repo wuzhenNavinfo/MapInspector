@@ -53,8 +53,8 @@ export default {
           loginParams = { pageSize: 2, pageNum: 1 };
           login(loginParams).then(function (data) {
             console.info(that);
-            console.info(this);
-            let { msg, code, user } = data;
+            console.info(data);
+            // let { msg, code, user } = data;
             if (data) {
               that.logining = false;
               sessionStorage.setItem('user',data)
