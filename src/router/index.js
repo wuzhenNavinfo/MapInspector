@@ -1,5 +1,8 @@
 import Login from '@/components/Login'
 import Home from '@/components/Home'
+import TableView from '@/components/TableView'
+import Where from '@/components/404'
+
 
 let routes = [
   {
@@ -15,7 +18,12 @@ let routes = [
   {
     path: '/home',
     component: Home,
-    name: 'Home'
+    name: 'Home',
+    children: [
+      { path: '/tableView', component: TableView, name: 'tableView'},
+      { path: '/where', component: Where, name: 'Where'},
+
+    ]
   }
 ];
 

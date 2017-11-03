@@ -99,6 +99,6 @@ export default {
     color: #505458;
   }
   .login-container .remember {
-        margin: 0px 0px 15px 0px;
-      }
+    margin: 0px 0px 15px 0px;
+  }
 </style>
