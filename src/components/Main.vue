@@ -24,26 +24,23 @@
     </el-col>
     <el-col :span="24" class="main">
       <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-        <el-menu default-active="1-1" :collapse="collapsed" @select="handleSelect">
+        <el-menu default-active="/tableView" :unique-opened="true" :collapse="collapsed" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span slot="title">导航一</span>
+              <span slot="title">导航菜单</span>
             </template>
-            <el-menu-item index="1-1">选项1</el-menu-item>
-            <el-menu-item index="/tableView">选项2</el-menu-item>
+            <el-menu-item index="where">待审核</el-menu-item>
+            <el-menu-item index="/tableView">已审核</el-menu-item>
+            <el-menu-item index="/manager/waitWork" >案例列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="3">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航三</span>
+            <span slot="title">导航其他</span>
           </el-menu-item>
         </el-menu>
       </aside>
-      <section class="content-container">
+      <section class="content-container" style="overflow-y:auto">
         <!-- <table-view></table-view> -->
         <router-view></router-view>
       </section>
@@ -82,12 +79,7 @@ import TableView from './TableView'
         });
       },
       handleSelect: function (index, indexPath) {
-        console.info(indexPath);
-        if (index == '/tableView') {
-          this.$router.push(index);
-        } else {
-          this.$router.push('where');
-        }
+        this.$router.push(indexPath[1]);
       }
     }
   }
