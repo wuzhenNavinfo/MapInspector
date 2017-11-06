@@ -79,7 +79,9 @@ import TableView from './TableView'
         });
       },
       handleSelect: function (index, indexPath) {
-        this.$router.push(indexPath[1]);
+        if (indexPath[1]) {
+          this.$router.push(indexPath[1]);
+        }
       }
     }
   }
