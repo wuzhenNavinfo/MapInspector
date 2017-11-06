@@ -6,8 +6,8 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
-var Sequelize = require('sequelize');
-var db = require('../dataBase');
+const Sequelize = require('sequelize');
+const db = require('../dataBase');
 
 // 创建 model
 var User = db.define('om_user', {
@@ -29,7 +29,8 @@ var User = db.define('om_user', {
             field: 'full_name'
         },
         password: {
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            allowNull: false
         },
         email: {
             type: Sequelize.STRING
@@ -59,13 +60,7 @@ var User = db.define('om_user', {
 
 // 添加新用户
 exports.addUser = function(userObj) {
-    return User.create({
-        userName: userObj.userName,
-        password: userObj.fullName,
-        fullName: userObj.password,
-        email: userObj.email,
-        cellPhone: userObj.cellPhone
-    });
+    return User.create(userObj);
 };
 
 // 查找用户（支持查询所有和分页查询）
