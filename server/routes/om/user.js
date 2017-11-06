@@ -12,27 +12,27 @@ var omController = require('../../controller/om/om_controller');
 
 // 用户注册（增加用户）
 router.post('/register', function (req, res) {
-    omController(req.body).register(req, res)
+    new omController(req, res).register()
 });
 
 // 用户登陆
 router.post('/login', function (req, res) {
-    omController(req.body).login(req, res)
+    new omController(req, res).login()
 });
 
 // 查找用户;
 router.get('/find', function (req, res) {
-    omController(req.body).find(req, res)
+    new omController(req, res).find()
 });
 
 // 更新用户;
 router.post('/update', function (req, res) {
-    omController(req.body).update(req, res)
+    new omController(req, res).update()
 });
 
 // 删除用户;
 router.get('/delete', function (req, res) {
-    omController(req.body).delete(req, res)
+    new omController(req, res).delete()
 });
 
 module.exports = router;
