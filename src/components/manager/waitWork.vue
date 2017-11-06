@@ -1,6 +1,6 @@
 <template>
   <el-row :gutter="20" style="padding:20px;">
-    <el-col :span="6" v-for="o in 17" :key="o">
+    <el-col :span="6" v-for="o in 7" :key="o">
       <el-card style="margin-top:20px;">
         <el-progress type="circle" :percentage="25" :width="80" style="float:right;"></el-progress>
         <div slot="header" class="clearfix">

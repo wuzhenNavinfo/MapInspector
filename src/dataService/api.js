@@ -14,11 +14,11 @@ var baseUrl = appConfig.serviceUrl; // 服务的地址
 
 // 统一增加token
 var postReq = function (url, param) {
-    let token = appUtil.getCurrentUser().token;
     if (!param) {
       param = {};
     }
     if (url != '/api/om/user/login') {
+      let token = appUtil.getCurrentUser().token;
       param.token = token;
     }
     return axios.post(`${baseUrl + url}`, param)
