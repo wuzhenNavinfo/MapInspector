@@ -3,7 +3,8 @@
     <el-col :span="24" class="header">
       <el-col :span="6" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
         <transition name="fade">
-          <div v-if='sysNameShow'>{{sysName}}</div>
+          <div v-if='sysNameShow'>审图项目</div>
+          <div v-if='!sysNameShow'>审</div>
         </transition>
       </el-col>
       <el-col :span="14">
@@ -24,15 +25,15 @@
     </el-col>
     <el-col :span="24" class="main">
       <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-        <el-menu default-active="/tableView" :unique-opened="true" :collapse="collapsed" @select="handleSelect">
+        <el-menu default-active="/manager/caseList" :unique-opened="true" :collapse="collapsed" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span slot="title">导航菜单</span>
             </template>
-            <el-menu-item index="where">待审核</el-menu-item>
+            <el-menu-item index="/manager/waitWork">待审核</el-menu-item>
             <el-menu-item index="/tableView">已审核</el-menu-item>
-            <el-menu-item index="/manager/waitWork" >案例列表</el-menu-item>
+            <el-menu-item index="/manager/caseList" >案例列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
@@ -40,7 +41,7 @@
           </el-menu-item>
         </el-menu>
       </aside>
-      <section class="content-container" style="overflow-y:auto">
+      <section class="content-container">
         <!-- <table-view></table-view> -->
         <router-view></router-view>
       </section>
@@ -54,15 +55,17 @@ import TableView from './TableView'
   export default {
     data() {
       return {
-        sysName:'图审项目',
-        sysNameShow:true,
-        collapsed:false,
+        sysNameShow:false,
+        collapsed:true,
         sysUserName: '吴振',
         sysUserAvatar: '',
       }
     },
     components: {
       TableView
+    },
+    created: function () {
+      this.handleSelect(1, [1, '/manager/caseList']);
     },
     methods: {
       collapse: function() {
@@ -127,7 +130,7 @@ import TableView from './TableView'
     width: 230px;
   }
   .container .header .logo.logo-collapse-width{
-    width:66px
+    width:64px
   }
   .container .header .tools{
     padding: 0px 23px;
@@ -168,8 +171,8 @@ import TableView from './TableView'
     height: 100%;
   }
   .container .main .menu-collapsed{
-    flex:0 0 60px;
-    width: 60px;
+    flex:0 0 64px;
+    width: 64px;
   }
 	.container .main .menu-expanded{
     flex:0 0 230px;
@@ -178,7 +181,6 @@ import TableView from './TableView'
 
   .content-container {
     flex:1;
-    padding: 10px;
   }
 
 </style>

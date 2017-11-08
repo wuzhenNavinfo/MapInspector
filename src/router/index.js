@@ -3,6 +3,7 @@ import Main from '@/components/Main'
 import TableView from '@/components/TableView'
 import Where from '@/components/404'
 import WaitWork from '@/components/manager/waitWork'
+import CaseList from '@/components/manager/caseList'
 
 
 let routes = [
@@ -24,6 +25,7 @@ let routes = [
       { path: '/tableView', component: TableView, name: 'tableView'},
       { path: '/where', component: Where, name: 'Where'},
       { path: '/manager/waitWork', component: WaitWork, name: 'WaitWork'},
+      { path: '/manager/caseList', component: CaseList, name: 'CaseList'}
     ]
   }
 ];
