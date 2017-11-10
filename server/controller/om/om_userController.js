@@ -71,13 +71,11 @@ UserController.prototype.register = function () {
 UserController.prototype.login = function () {
 	tool.extend(this.model, this.req.body);
 	if (!this.model.userName || !this.model.password) {
-		this.res.json({errorCode: -1, message: '参数不完整!'});
-		return;
+    return this.res.json({errorCode: -1, message: '参数不完整!'});
 	}
 	userModel.findOneUser({userName: this.model.userName}).then(result => {
 		if (!result) {
-			this.res.json({errorCode: -1, message: '登陆失败，该用户不存在!'});
-			return;
+      return this.res.json({errorCode: -1, message: '登陆失败，该用户不存在!'});
 		} else {
 			// 判断登陆密码
 			var password = crypto.createHash('sha1').update(this.model.password).digest('hex');

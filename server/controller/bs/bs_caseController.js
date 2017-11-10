@@ -123,6 +123,8 @@ caseController.prototype.create = function () {
   if (!this.req.body.createUser || isNaN(this.req.body.createUser)) {
     return this.res.json({errorCode: -1, message: '参数错误,createUser不合法!'});
   }
+  this.req.body.images = this.req.body.images.join(',');
+  this.req.body.videos = this.req.body.videos.join(',');
   tool.extend(this.model, this.req.body);
   caseModel.addCase(this.model).then(result => {
     if (result) {
@@ -149,6 +151,8 @@ caseController.prototype.update = function () {
     return this.res.json({errorCode: -1, message: '参数错误id值不合法!'});
   }
   this.req.body.createUser = parseInt(this.req.body.createUser);
+  this.req.body.images = this.req.body.images.join(',');
+  this.req.body.videos = this.req.body.videos.join(',');
   tool.extend(this.model, this.req.body);
   delete this.model.id;
   var updateData = this.model;
