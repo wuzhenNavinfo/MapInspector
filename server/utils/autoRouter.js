@@ -7,10 +7,12 @@
  * @copyright @Navinfo, all rights reserved.
  */
 var fs = require('fs');
+var path = require('path');
 var loadRoute = {
-    path: './routes/',
+    path: path.join(__dirname, '../routes/'),
     app: null,
     listDir: function (dir) {
+        dir = dir ? dir : this.path;
         var fileList = fs.readdirSync(dir, 'utf-8');
         for (var i = 0; i < fileList.length; i++) {
             var stat = fs.lstatSync(dir + fileList[i]);
@@ -19,12 +21,14 @@ var loadRoute = {
             } else {
                 this.loadRoute(dir + fileList[i]);
             }
+
         }
     },
+
     loadRoute: function (routeFile) {
-        var route = require('.' + routeFile.substring(0, routeFile.lastIndexOf('.')));
-        //完整的请求路径
-        var routePath = routeFile.substring(8, routeFile.lastIndexOf('.'));
+        var route = require(routeFile.substring(0, routeFile.lastIndexOf('.')));
+        // //完整的请求路径
+        var routePath = '/' + routeFile.substring(this.path.length, routeFile.lastIndexOf('.'));
         if (routePath.length >= 5) {
             //除去index的有效路径
             if (routePath.substring(routePath.length - 5) == "index") {
@@ -45,7 +49,7 @@ var loadRoute = {
         }
         this.app = app;
         this.path = path ? path : this.path;
-        this.listDir(this.path);
+        this.listDir();
     }
 };
 module.exports = loadRoute;
