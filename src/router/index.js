@@ -1,5 +1,9 @@
 import Login from '@/components/Login'
-import Home from '@/components/Home'
+import Main from '@/components/Main'
+import TableView from '@/components/TableView'
+import Where from '@/components/404'
+import WaitWork from '@/components/manager/waitWork'
+
 
 let routes = [
   {
@@ -13,9 +17,14 @@ let routes = [
     name: 'Login'
   },
   {
-    path: '/home',
-    component: Home,
-    name: 'Home'
+    path: '/main',
+    component: Main,
+    name: 'Main',
+    children: [
+      { path: '/tableView', component: TableView, name: 'tableView'},
+      { path: '/where', component: Where, name: 'Where'},
+      { path: '/manager/waitWork', component: WaitWork, name: 'WaitWork'},
+    ]
   }
 ];
 

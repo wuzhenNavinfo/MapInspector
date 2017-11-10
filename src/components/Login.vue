@@ -22,6 +22,7 @@
 
 <script>
 import { login } from '../dataService/api';
+import { appUtil } from '../config';
 
 export default {
   name: 'Login',
@@ -29,8 +30,8 @@ export default {
     return {
       logining: false,
       ruleForm: {
-        account: 'wuzhen',
-        checkPass: ''
+        account: 'root',
+        checkPass: '123'
       },
       rules: {
         account: [
@@ -49,16 +50,18 @@ export default {
       this.$refs.ruleForm.validate(function (valid) {
         if (valid) {
           that.logining = true;
-          var loginParams = { username: that.ruleForm.account, password: that.ruleForm.checkPass };
-          loginParams = { pageSize: 2, pageNum: 1 };
+          var loginParams = { userName: that.ruleForm.account, password: that.ruleForm.checkPass };
           login(loginParams).then(function (data) {
-            console.info(that);
-            console.info(this);
-            let { msg, code, user } = data;
-            if (data) {
-              that.logining = false;
-              sessionStorage.setItem('user',data)
-              that.$router.push('/home');
+            that.logining = false;
+            let { errorCode, message,  result } = data;
+            if (errorCode == 0) {
+              appUtil.setCurrentUser(result);
+              that.$router.push('/main');
+            } else {
+              that.$message({
+                message: message,
+                type: 'error'
+              });
             }
           })
         }
@@ -99,6 +102,6 @@ export default {
     color: #505458;
   }
   .login-container .remember {
-        margin: 0px 0px 15px 0px;
-      }
+    margin: 0px 0px 15px 0px;
+  }
 </style>

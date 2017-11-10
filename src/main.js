@@ -4,8 +4,10 @@ import Vue from 'vue'
 import App from './App'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import 'font-awesome/css/font-awesome.min.css'
 import VueRouter from 'vue-router'
 import routes from './router'
+import { appUtil } from './config';
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -15,18 +17,16 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // console.info('sss', to);
-  // //NProgress.start();
-  // if (to.path == '/login') {
-  //   sessionStorage.removeItem('user');
-  // }
-  // let user = JSON.parse(sessionStorage.getItem('user'));
-  // if (!user && to.path != '/login') {
-  //   next({ path: '/login' })
-  // } else {
-  //   next()
-  // }
-  next()
+  if (to.path == '/login') {
+    appUtil.removeCurrentUser();
+  }
+
+  let user = appUtil.getCurrentUser();
+  if (!user && to.path != '/login') {
+    next({ path: '/login' })
+  } else {
+    next()
+  }
 })
 
 
