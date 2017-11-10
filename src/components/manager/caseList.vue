@@ -58,8 +58,8 @@
           <el-input type="textarea" v-model="caseForm.caseMethod"></el-input>
         </el-form-item>
         <el-form-item prop="location" disabled label="点位信息">
-          <el-input disabled v-model="caseForm.location" style="width:140px;"></el-input>
-          <el-button icon="el-icon-location" size="mini" type="danger" @click="addLocation">标记</el-button>
+          <el-input disabled v-model="caseForm.location" style="width:210px;"></el-input>
+          <i class="el-icon-location" @click="addLocation" style="cursor:pointer;"></i>
         </el-form-item>
         <el-row style="padding-left:10px;">
           <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
@@ -69,7 +69,7 @@
         </el-row>
         <el-upload
           class="my-upload" multiple
-          :action="ctrl.baseUrl+'/api/bs/case/upload'" :before-upload="handleBeforeUpload"
+          :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
           :on-success="handlesuccess" :show-file-list="false">
           <el-button size="small" type="primary">点击上传图片</el-button>
         </el-upload>
@@ -88,11 +88,11 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
-import { queryCaseList, queryCaseById, saveCase } from '../../dataService/api';
+import { queryCaseList, queryCaseById, saveCaseInfo } from '../../dataService/api';
 import mapMarker from '../../assets/marker.gif'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
-import { appConfig } from '../../config';
+import { appConfig, appUtil } from '../../config';
 
 export default {
   name: 'CaseList',
@@ -101,6 +101,7 @@ export default {
       mapHeight: '0px',
       currentPage1: 1,
       ctrl: {
+        curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
         caseCreate: false,
         addLocation: false, // 增加点位的标识
@@ -201,17 +202,34 @@ export default {
       this.rightPanelCtrl('open');
     },
     addLocation () {
-      this.caseForm.location = '111.2221,39.988'
+      this.caseForm.location = ''
       this.ctrl.addLocation = true;
     },
     saveCase() {
       let that = this;
       this.$refs.caseForm.validate(function (valid) {
         if(valid) {
+          let loc = that.caseForm.location.split(',');
+          let param = {
+            createUser: that.ctrl.curentUser.userId,
+            caseSnap: that.caseForm.caseSnap,
+            caseDesc: that.caseForm.caseDesc,
+            caseMethod: that.caseForm.caseMethod,
+            images: that.caseForm.images,
+            videos:[],
+            marker: { type: 'Point', coordinates: [loc[0], loc[1]]}
+          };
+          if (that.caseForm.id) { // 修改
+            param.id = that.caseForm.id;
+          }
           that.ctrl.saving = true;
-          let param = {};
-          saveCase(param).then(data => {
-
+          saveCaseInfo(param).then(data => {
+            that.ctrl.saving = false;
+            if (data.errorCode == 0){
+              that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 1000});
+            } else {
+              that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 1000});
+            }
           });
         }
       });
@@ -220,13 +238,15 @@ export default {
       this.caseForm.images.splice(index, 1)
     },
     selectedRow(row, event) {
+      let that = this;
       queryCaseById({id: row.id}).then(data => {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
-          this.caseForm = result.data;
+          that.caseForm = result.data;
+          that.caseForm.location = result.data.marker.coordinates[0]+","+result.data.marker.coordinates[1];
         }
       })
-      this.rightPanelCtrl('open');
+      that.rightPanelCtrl('open');
     },
     queryCaseList() {
       let that = this;
@@ -251,8 +271,9 @@ export default {
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
+          console.info(point.pid)
           that.caseForm.location = point.pid;
-
+          console.info(that.caseForm.location,'------------')
           window.maplet.clearOverlays();
           let poi = point.pid.split(',');
           window.marker = new MMarker(
@@ -345,7 +366,7 @@ export default {
   margin-bottom: 10px;
   padding-right:10px;
 }
-.my-from .el-form-item .el-input__inner{
+.my-from .el-form-item .el-input.el-input__inner{
   padding-left: 6px;
 }
 

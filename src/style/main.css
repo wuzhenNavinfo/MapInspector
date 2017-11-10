@@ -1,0 +1,9 @@
+html, body, a, input, select, textarea, div{
+  font-size: 12px;
+}
+
+/* 重写部分组件的样式 */
+
+.el-pagination .el-pagination__total{
+  font-size: 12px !important;
+}
