@@ -14,6 +14,12 @@ var loadRoute = {
     listDir: function (dir) {
         dir = dir ? dir : this.path;
         var fileList = fs.readdirSync(dir, 'utf-8');
+        var mainNum = fileList.indexOf('index.js');
+        if (mainNum > 0) {
+          var first = fileList[0];
+          fileList[0] = fileList[mainNum];
+          fileList[mainNum] = first;
+        }
         for (var i = 0; i < fileList.length; i++) {
             var stat = fs.lstatSync(dir + fileList[i]);
             if (stat.isDirectory()) {
@@ -21,7 +27,6 @@ var loadRoute = {
             } else {
                 this.loadRoute(dir + fileList[i]);
             }
-
         }
     },
 

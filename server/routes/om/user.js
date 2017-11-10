@@ -8,7 +8,7 @@
  */
 var express = require('express');
 var router = express.Router();
-var omController = require('../../controller/om/om_controller');
+var omController = require('../../controller/om/om_userController');
 
 // 用户注册（增加用户）
 router.post('/register', function (req, res) {
