@@ -7,7 +7,7 @@
           <div v-if='!sysNameShow'>审</div>
         </transition>
       </el-col>
-      <el-col :span="14">
+      <el-col :span="14" :style="backgroundImage">
         <div class="tools" @click.prevent="collapse">
           <i class="fa fa-align-justify"></i>
         </div>
@@ -32,7 +32,7 @@
               <span slot="title">导航菜单</span>
             </template>
             <el-menu-item index="/manager/waitWork">待审核</el-menu-item>
-            <el-menu-item index="/tableView">已审核</el-menu-item>
+            <!-- <el-menu-item index="/tableView">已审核</el-menu-item> -->
             <el-menu-item index="/manager/caseList" >案例列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
@@ -55,9 +55,14 @@ import TableView from './TableView'
   export default {
     data() {
       return {
+        backgroundImage: {
+          'background-image': "url(" + require("../assets/logo.png") + ")",
+          'background-repeat': 'no-repeat',
+          'background-position': '50px'
+        },
         sysNameShow:false,
         collapsed:true,
-        sysUserName: '吴振',
+        sysUserName: 'root管理员',
         sysUserAvatar: '',
       }
     },

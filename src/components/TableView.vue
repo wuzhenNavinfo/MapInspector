@@ -1,52 +1,51 @@
 <template>
-  <div>
-    <el-table
-      :data="tableData"
-      style="width: 100%">
-      <el-table-column
-        prop="date"
-        label="日期"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="姓名"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="address"
-        label="地址">
-      </el-table-column>
-    </el-table>
+  <div style="border:solid red 1px;height:100%;">
+    <div id="allmap" style="border:solid red 1px;height:100%;"></div>
   </div>
 </template>
 
 <script>
+// import {MP, MapBar} from '../map'
+// import BMap from 'BMap'
+import Maplet from 'Maplet'
 
 export default {
-  name: 'Table',
+  name: 'Map',
   data () {
     return {
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+
     }
   },
   methods: {
+    initBMap() {
+      MP("GseQ0VeRd8fyD1pE3q0wP3jD").then( BMap => {
+        var th = this
+        var map = new BMap.Map("allmap");            // 创建Map实例
+        var point = new BMap.Point(116.404, 39.915); // 创建点坐标
+        map.centerAndZoom(point,15);
+        map.enableScrollWheelZoom();
+      })
+    },
+    initBMap2() {
+      var map = new BMap.Map('allmap')
+      var point = new BMap.Point(114.0552, 22.55) // 创建点坐标
+      map.centerAndZoom(point, 12)
+      map.enableScrollWheelZoom()    // 启用滚轮放大缩小，默认禁用
+      map.enableContinuousZoom()    // 启用地图惯性拖拽，默认禁用
+    },
+    initMapbar() {
+      console.info('=========');
+      console.info(Maplet);
+      window.maplet = new Maplet("allmap");
+      window.maplet.centerAndZoom(new MPoint(116.38672,39.90805), 8);
+    }
+  },
+  mounted() {
+    this.$nextTick(function () {
+      // this.initBMap();
+      // this.initBMap2();
+      this.initMapbar();
+    });
   }
 }
 </script>

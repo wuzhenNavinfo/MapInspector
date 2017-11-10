@@ -63,5 +63,8 @@ module.exports = {
         }
       }
     ]
+  },
+  externals: {
+    'Maplet': 'Maplet'
   }
 }
