@@ -28,7 +28,7 @@
     <frame-title :titleCtrl="pageCtrl"></frame-title>
     <el-col :span="24" class="main">
       <aside :class="pageCtrl.collapsed?'menu-collapsed':'menu-expanded'">
-        <el-menu default-active="/manager/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+        <el-menu v-if="userRole == 'manager'" default-active="/manager/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -37,6 +37,19 @@
             <el-menu-item index="/manager/waitWork">待审核</el-menu-item>
             <!-- <el-menu-item index="/tableView">已审核</el-menu-item> -->
             <el-menu-item index="/manager/caseList" >案例列表</el-menu-item>
+          </el-submenu>
+          <el-menu-item index="2">
+            <i class="el-icon-menu"></i>
+            <span slot="title">导航其他</span>
+          </el-menu-item>
+        </el-menu>
+        <el-menu v-if="userRole == 'worker'" default-active="/worker/working" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span slot="title">导航菜单</span>
+            </template>
+            <el-menu-item index="/worker/working">作业中</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
@@ -54,6 +67,7 @@
 <script>
 import TableView from './TableView'
 import FrameTitle from './FrameTitle'
+import {appUtil} from '../config.js'
 
   export default {
     data() {
@@ -64,8 +78,8 @@ import FrameTitle from './FrameTitle'
           'background-position': '50px'
         },
         sysNameShow:false,
-        sysUserName: 'root管理员',
-        sysUserAvatar: '',
+        sysUserName: '未知',
+        userRole: 'worker',
         pageCtrl: {
           collapsed: true,
         }
@@ -76,7 +90,18 @@ import FrameTitle from './FrameTitle'
       FrameTitle
     },
     created: function () {
-      this.handleSelect(1, [1, '/manager/waitWork']);
+      let role = appUtil.getCurrentUser().role;
+      console.info(appUtil.getCurrentUser());
+      console.info(role);
+      role = "worker";
+      if (role == 'manager') {
+        this.handleSelect(1, [1, '/manager/waitWork']);
+        return;
+      }
+      if (role == 'worker') {
+        this.handleSelect(1, [1, '/worker/working']);
+        return;
+      }
     },
     methods: {
       collapse: function() {
@@ -96,16 +121,6 @@ import FrameTitle from './FrameTitle'
         if (indexPath[1]) {
           this.$router.push(indexPath[1]);
         }
-      }
-    },
-    watch: {
-      poiData: {
-        handler(curVal,oldVal){
-          this.$nextTick(function() {
-            this.drawGraph()
-          })
-  　　　　},
-  　　　　deep:true //当单观察数据poiData为对象时,需要添加deep:true参数，否则监听不到方法
       }
     }
   }
