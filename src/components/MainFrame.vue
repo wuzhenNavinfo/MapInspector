@@ -10,7 +10,7 @@
         </el-col>
         <el-col :span="14" :style="backgroundImage">
           <div class="tools" @click.prevent="collapse">
-            <i class="fa fa-align-justify"></i>
+            <i style="font-size:14px;" class="fa fa-align-justify"></i>
           </div>
         </el-col>
         <el-col :span="4" class="userinfo">
@@ -28,7 +28,7 @@
     <frame-title :titleCtrl="pageCtrl"></frame-title>
     <el-col :span="24" class="main">
       <aside :class="pageCtrl.collapsed?'menu-collapsed':'menu-expanded'">
-        <el-menu default-active="/manager/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+        <el-menu v-if="userRole == 'manager'" default-active="/manager/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -37,6 +37,21 @@
             <el-menu-item index="/manager/waitWork">待审核</el-menu-item>
             <!-- <el-menu-item index="/tableView">已审核</el-menu-item> -->
             <el-menu-item index="/manager/caseList" >案例列表</el-menu-item>
+          </el-submenu>
+          <el-menu-item index="2">
+            <i class="el-icon-menu"></i>
+            <span slot="title">导航其他</span>
+          </el-menu-item>
+        </el-menu>
+        <el-menu v-if="userRole == 'worker'" default-active="/worker/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span slot="title">导航菜单</span>
+            </template>
+            <el-menu-item index="/worker/waitWork">待作业</el-menu-item>
+            <el-menu-item index="/worker/submited">已提交</el-menu-item>
+            <el-menu-item index="/worker/completed">已完成</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
@@ -54,6 +69,7 @@
 <script>
 import TableView from './TableView'
 import FrameTitle from './FrameTitle'
+import {appUtil} from '../config.js'
 
   export default {
     data() {
@@ -64,8 +80,8 @@ import FrameTitle from './FrameTitle'
           'background-position': '50px'
         },
         sysNameShow:false,
-        sysUserName: 'root管理员',
-        sysUserAvatar: '',
+        sysUserName: '未知',
+        userRole: 'worker',
         pageCtrl: {
           collapsed: true,
         }
@@ -76,7 +92,15 @@ import FrameTitle from './FrameTitle'
       FrameTitle
     },
     created: function () {
-      this.handleSelect(1, [1, '/manager/waitWork']);
+      this.userRole = appUtil.getCurrentUser().role;
+      if (this.userRole == 'manager') {
+        this.handleSelect(1, [1, '/manager/waitWork']);
+        return;
+      }
+      if (this.userRole == 'worker') {
+        this.handleSelect(1, [1, '/worker/waitWork']);
+        return;
+      }
     },
     methods: {
       collapse: function() {
@@ -96,16 +120,6 @@ import FrameTitle from './FrameTitle'
         if (indexPath[1]) {
           this.$router.push(indexPath[1]);
         }
-      }
-    },
-    watch: {
-      poiData: {
-        handler(curVal,oldVal){
-          this.$nextTick(function() {
-            this.drawGraph()
-          })
-  　　　　},
-  　　　　deep:true //当单观察数据poiData为对象时,需要添加deep:true参数，否则监听不到方法
       }
     }
   }

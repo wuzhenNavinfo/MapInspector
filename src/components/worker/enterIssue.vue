@@ -4,7 +4,7 @@
     <div class="left-open-icon" @click="leftPanelCtrl('open')" title="展开">
        <i class="el-icon-caret-right" style="cursor:pointer;" ></i>
     </div>
-    <div class="left" :class="leftCollapsed?'open-panel':'close-panel'">
+    <div class="left scroll_style" :class="leftCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>案例列表
         <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:2px;" @click="leftPanelCtrl('close')"></i>
       </div>
@@ -24,8 +24,8 @@
             label="附件数">
           </el-table-column>
           <el-table-column
-            prop="createdAt"
-            label="创建时间">
+            prop="detailStatus"
+            label="处理状态">
           </el-table-column>
         </el-table>
         <el-pagination small
@@ -39,57 +39,58 @@
         </el-pagination>
       </div>
     </div>
-    <div class="map_operate_tool">
-       <el-button size="mini" type="danger" @click="createCase()">创 建</el-button>
-    </div>
     <div class="right-open-icon" @click="rightPanelCtrl('open')" title="展开">
        <i class="el-icon-caret-left" style="cursor:pointer;" ></i>
     </div>
     <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
        <i class="el-icon-back" style="cursor:pointer;" ></i>
     </div>
-    <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
-      <div class='my-panel'>
-        <i class="el-icon-caret-right" style="cursor:pointer;" @click="rightPanelCtrl('close')"></i>案例详情
-        <el-button style="float:right;margin-left:10px;" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
-        <el-button style="float:right;"  size="mini" type="warning" :loading="ctrl.deleteing" @click="deleteCase()">删除</el-button>
-      </div>
-      <div class="scroll_style" :style="{'max-height': panelHeight}">
-        <el-form ref="caseForm" :model="caseForm" class="my-from" :rules="rules" :show-message="false" :status-icon="true"  label-width="80px">
-          <el-form-item label="问题编号">
-            <el-input disabled v-model="caseForm.id"></el-input>
-          </el-form-item>
-          <el-form-item prop="caseSnap" label="问题概述">
-            <el-input v-model="caseForm.caseSnap"></el-input>
-          </el-form-item>
-          <el-form-item prop="caseDesc" label="详细描述">
-            <el-input type="textarea" v-model="caseForm.caseDesc"></el-input>
-          </el-form-item>
-          <el-form-item prop="caseMethod" label="处理方法">
-            <el-input type="textarea" v-model="caseForm.caseMethod"></el-input>
-          </el-form-item>
-          <el-form-item prop="location" disabled label="点位信息">
-            <el-input disabled v-model="caseForm.location" style="width:200px;"></el-input>
-            <i class="el-icon-location" @click="addLocation" style="cursor:pointer;"></i>
-          </el-form-item>
-          <el-row style="padding-left:10px;">
+    <div class="right scroll_style" :class="rightCollapsed?'open-panel':'close-panel'">
+      <div>
+        <div class='my-panel'>
+          <i class="el-icon-caret-right" style="cursor:pointer;" @click="rightPanelCtrl('close')"></i>问题详情
+        </div>
+        <div class="scroll_style list-group">
+          <ul>
+            <li>
+              <label>问题编号:</label><div>{{caseForm.id}}</div>
+            </li>
+            <li>
+              <label>问题概述:</label><div>{{caseForm.caseSnap}}</div>
+            </li>
+            <li>
+              <label>问题描述:</label><div>{{caseForm.caseDesc}}</div>
+            </li>
+            <li>
+              <label>处理方法:</label><div>{{caseForm.caseMethod}}</div>
+            </li>
+          </ul>
+          <el-row style="padding-left:6px;">
             <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
+              <img :src="ctrl.baseUrl+'/'+image" class="img-list">
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+      <div>
+        <div class='my-panel'>
+          问题处理
+          <el-button style="float:right;margin-left:10px;" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
+        </div>
+        <div class="scroll_style">
+          <el-row style="padding:6px;">
+            <el-col :span="6" v-for="(image, index) in issueDetailImages" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list">
               <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
           <el-upload
             class="my-upload" multiple
-            :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
+            :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token"
             :on-success="handlesuccess" :show-file-list="false">
             <el-button size="small" type="primary">点击上传图片</el-button>
           </el-upload>
-          <el-row>
-            <el-col :span="18" width="260px;">
-              <!-- <my-video width="260px;" :sources="video.sources" :options="video.options"></my-video> -->
-            </el-col>
-          </el-row>
-        </el-form>
+        </div>
       </div>
     </div>
   </div>
@@ -101,7 +102,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
-import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
+import { queryCaseList, queryCaseById, saveCaseInfo} from '../../dataService/api';
 import mapMarker from '../../assets/marker.gif'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
@@ -111,6 +112,7 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      issueDetailImages: [],
       rightCollapsed: false,
       leftCollapsed: true,
       currentPage1: 1,
@@ -121,7 +123,6 @@ export default {
         caseCreate: false,
         addLocation: false, // 增加点位的标识
         saving: false,
-        deleteing: false,
         pageSize: 10,
         pageNum:1
       },
@@ -138,10 +139,6 @@ export default {
       },
       imgUpload: {
         imgSrc: imgSrc,
-        file: {
-          precent: 0
-        },
-        isShowPrecent: false
       },
       caseForm: {
         images:[ ],
@@ -180,17 +177,8 @@ export default {
     },
     handlesuccess(res, file, fileList) {
       if (res.errorCode == 0) {
-        if (!this.caseForm.images) {
-          this.caseForm.images = [];
-        }
-        this.caseForm.images = this.caseForm.images.concat(res.result.data);
+        this.issueDetailImages = this.issueDetailImages.concat(res.result.data);
       }
-    },
-    handleProgress(event, file, fileList) {
-      this.imgUpload.file = file;
-    },
-    handleBeforeUpload(file) {
-      this.imgUpload.isShowPrecent = true;
     },
     rightPanelCtrl(flag) {
       if (flag == 'close') {
@@ -208,19 +196,6 @@ export default {
       if (flag == 'open') {
         this.leftCollapsed = true;
       }
-    },
-    createCase() {
-      this.clearCase();
-      this.rightPanelCtrl('open');
-    },
-    clearCase() {
-      this.caseForm.id = '';
-      this.caseForm.caseSnap = '';
-      this.caseForm.caseDesc = '';
-      this.caseForm.caseMethod = '';
-      this.caseForm.location = '';
-      this.caseForm.images = [];
-      this.caseForm.videos = [];
     },
     addLocation () {
       this.caseForm.location = ''
@@ -256,19 +231,8 @@ export default {
         }
       });
     },
-    deleteCase() {
-      this.ctrl.deleteing = false;
-      if (!this.caseForm.id) {
-        return;
-      }
-      let that = this;
-      deleteCaseById({id: this.caseForm.id}).then(res => {
-        that.createCase();
-        that.queryCaseList();
-      });
-    },
     deleteImage(index) {
-      this.caseForm.images.splice(index, 1)
+      this.issueDetailImages.splice(index, 1)
     },
     selectedRow(row, event) {
       let that = this;
@@ -432,23 +396,18 @@ export default {
   border-radius: 8px 8px 8px 8px;
 }
 
-.map_operate_tool {
-  position: absolute;
-  z-index: 10;
-  top: 10px;
-  left: 48%;
-}
-.my-from .img_delete{
+.img_delete{
   position: relative;
   top: -70px;
   left: 52px;
   cursor: pointer;
 }
-.my-from .img_delete:hover {
+.img_delete:hover {
   background: #CCC;
   border-radius: 2px
 }
-.my-from .el-form-item{
+
+.my-from .el-form-item {
   margin-top: 10px;
   margin-bottom: 10px;
   padding-right:10px;
@@ -466,6 +425,23 @@ export default {
   padding: 10px;
   padding-top: 0px;
 }
+
+.list-group ul {
+  list-style-type: none;
+  padding: 0px;
+}
+.list-group ul li{
+  padding: 10px;
+  font-size: 14px;
+}
+.list-group ul li > label{
+  width: 80px;
+  float: left;
+}
+.list-group ul li > div{
+  margin-left: 80px;
+}
+
 
 /*********************************滚动条样式************************************/
 .scroll_style {

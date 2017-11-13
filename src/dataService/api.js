@@ -35,16 +35,14 @@ var getReq = function (url, param) {
   return axios.get(`${baseUrl + url}`, {params: param}).then(res => res.data).catch(res => ({errcode: null}));
 }
 
+// -- 用户相关  --
 export const login = param => { return postReq('/api/om/user/login', param) }; // 登录接口, 注意箭头函数返回对象是要加小括号的知识点
-
 export const findUser = param => { return axios.get(`${baseUrl}/api/om/user/find`, {params: param}).then(res => res.data).catch(res => ({errcode: null})); }; // 注意get和post的传递参数方式的不同
 
+// -- 案例相关  --
 export const queryCaseList = param => { return getReq('/api/bs/case/list', param)};
-
 export const queryCaseById = param => { return getReq('/api/bs/case/query', param)};
-
 export const saveCaseInfo1 = param => { return postReq('/api/bs/case/create', param).then(res => res.data).catch(res => ({errcode: null})); };
-
 export const saveCaseInfo = param => {
   if (!param.id) {
     return postReq('/api/bs/case/create', param);
@@ -52,5 +50,7 @@ export const saveCaseInfo = param => {
     return postReq('/api/bs/case/update', param);
   }
 };
-
 export const deleteCaseById = param => { return getReq('/api/bs/case/delete', param)};
+
+// -- 项目相关  --
+export const saveIssue = param => { return saveIssue('/api/bs/project/save', param)};

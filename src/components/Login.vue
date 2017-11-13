@@ -57,6 +57,12 @@ export default {
             that.logining = false;
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
+              console.info('==========',result);
+              if (result.userName == 'root') {
+                result.role = 'manager'
+              }else {
+                result.role = 'worker'
+              }
               appUtil.setCurrentUser(result);
               that.$router.push('/mainFrame');
             } else {
