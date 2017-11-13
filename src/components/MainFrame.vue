@@ -10,7 +10,7 @@
         </el-col>
         <el-col :span="14" :style="backgroundImage">
           <div class="tools" @click.prevent="collapse">
-            <i class="fa fa-align-justify"></i>
+            <i style="font-size:14px;" class="fa fa-align-justify"></i>
           </div>
         </el-col>
         <el-col :span="4" class="userinfo">
@@ -92,15 +92,12 @@ import {appUtil} from '../config.js'
       FrameTitle
     },
     created: function () {
-      let role = appUtil.getCurrentUser().role;
-      console.info(appUtil.getCurrentUser());
-      console.info(role);
-      role = "worker";
-      if (role == 'manager') {
+      this.userRole = appUtil.getCurrentUser().role;
+      if (this.userRole == 'manager') {
         this.handleSelect(1, [1, '/manager/waitWork']);
         return;
       }
-      if (role == 'worker') {
+      if (this.userRole == 'worker') {
         this.handleSelect(1, [1, '/worker/waitWork']);
         return;
       }

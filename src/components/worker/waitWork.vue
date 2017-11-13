@@ -10,7 +10,7 @@
       </el-col>
       <el-col :span="6" v-for="item in cardDataList" :key="item.id">
         <el-card style="margin-top:20px;cursor:pointer;">
-          <el-progress type="circle" :percentage="40" :width="80" style="float:right;"></el-progress>
+          <el-progress type="circle" :percentage="item.progress" :width="80" style="float:right;"></el-progress>
           <div slot="header" class="clearfix" >
             <span>{{item.projectName}}</span>
             <el-button style="float:right;"  size="mini" type="danger" @click="enterIssue()">录入问题</el-button>
@@ -67,35 +67,40 @@ export default {
         createDate: '2017-02-12',
         issueCount: '2',
         worked: '12',
-        waitWork: '22'
+        waitWork: '22',
+        progress: 90
       },{
         projectName:'奔驰',
         projectStatus: 2,
         createDate: '2017-02-12',
         issueCount: '2',
         worked: '12',
-        waitWork: '22'
+        waitWork: '22',
+        progress: 10
       },{
         projectName:'奥迪',
         projectStatus: 2,
         createDate: '2017-02-12',
         issueCount: '2',
         worked: '12',
-        waitWork: '22'
+        waitWork: '22',
+        progress: 70
       },{
         projectName:'大众',
         projectStatus: 2,
         createDate: '2017-02-12',
         issueCount: '2',
         worked: '12',
-        waitWork: '22'
+        waitWork: '22',
+        progress: 40
       },{
         projectName:'现代',
         projectStatus: 2,
         createDate: '2017-02-12',
         issueCount: '2',
         worked: '12',
-        waitWork: '22'
+        waitWork: '22',
+        progress: 10
       }]
     }
   },

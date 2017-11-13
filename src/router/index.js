@@ -28,6 +28,8 @@ let routes = [
       { path: '/where', component: Where, name: 'Where'},
       { path: '/manager/waitWork', component: ManagerWaitWork, name: 'ManagerWaitWork'},
       { path: '/worker/waitWork', component: WaitWork, name: 'WaitWork'},
+      { path: '/worker/submited', component: Where, name: 'Where'},
+      { path: '/worker/completed', component: Where, name: 'Where'},
     ]
   },
   {
