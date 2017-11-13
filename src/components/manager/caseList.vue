@@ -1,94 +1,107 @@
 <template>
-  <div class="parent">
-    <div class="stable left scroll_style">
-      <div class='my-panel'>案例列表</div>
-      <el-table stripe border highlight-current-row
-        :data="tableData.data" @row-dblclick="selectedRow">
-        <el-table-column
-          type="index" width="50px"
-          label="序号">
-        </el-table-column>
-        <el-table-column
-          prop="caseSnap"
-          label="问题描述">
-        </el-table-column>
-        <el-table-column width="70px"
-          prop="mediaLength"
-          label="附件数">
-        </el-table-column>
-        <el-table-column
-          prop="createdAt"
-          label="创建时间">
-        </el-table-column>
-      </el-table>
-      <el-pagination small
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="ctrl.pageNum"
-        :page-sizes="[10, 30, 50, 100]"
-        :page-size="ctrl.pageSize"
-        layout="total, sizes, prev, next"
-        :total="tableData.total">
-      </el-pagination>
+  <div class="layout-container" >
+    <div id="map" :style="{height: mapHeight}"></div>
+    <div class="left-open-icon" @click="leftPanelCtrl('open')" title="展开">
+       <i class="el-icon-caret-right" style="cursor:pointer;" ></i>
     </div>
-    <div class="change">
-      <div class="my_map_operate_tool">
-        <el-button icon="el-icon-circle-plus" size="mini" type="danger" @click="createCase">创建</el-button>
+    <div class="left" :class="leftCollapsed?'open-panel':'close-panel'">
+      <div class='my-panel'>案例列表
+        <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:2px;" @click="leftPanelCtrl('close')"></i>
       </div>
-      <div>
-        <div id="map" :style="{height: mapHeight}"></div>
+      <div style="overflow:auto;" class="scroll_style" :style="{'max-height': panelHeight}">
+        <el-table stripe border highlight-current-row max-height="100%"
+          :data="tableData.data" @row-dblclick="selectedRow">
+          <el-table-column
+            type="index" width="50px"
+            label="序号">
+          </el-table-column>
+          <el-table-column
+            prop="caseSnap"
+            label="问题描述">
+          </el-table-column>
+          <el-table-column width="70px"
+            prop="mediaLength"
+            label="附件数">
+          </el-table-column>
+          <el-table-column
+            prop="createdAt"
+            label="创建时间">
+          </el-table-column>
+        </el-table>
+        <el-pagination small
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="ctrl.pageNum"
+          :page-sizes="[10, 30, 50, 100]"
+          :page-size="ctrl.pageSize"
+          layout="total, sizes, prev, next"
+          :total="tableData.total">
+        </el-pagination>
       </div>
     </div>
-    <div class="stable right scroll_style" :class="{close: !ctrl.caseCreate, open: ctrl.caseCreate}">
+    <div class="map_operate_tool">
+       <el-button size="mini" type="danger" @click="createCase()">创 建</el-button>
+    </div>
+    <div class="right-open-icon" @click="rightPanelCtrl('open')" title="展开">
+       <i class="el-icon-caret-left" style="cursor:pointer;" ></i>
+    </div>
+    <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
+       <i class="el-icon-back" style="cursor:pointer;" ></i>
+    </div>
+    <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>
         <i class="el-icon-caret-right" style="cursor:pointer;" @click="rightPanelCtrl('close')">案例详情</i>
-        <el-button style="float:right" size="mini" type="primary" :loading="ctrl.saving" @click="saveCase()">保 存</el-button>
+        <el-button style="float:right;margin-left:10px;" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
+        <el-button style="float:right;"  size="mini" type="warning" :loading="ctrl.deleteing" @click="deleteCase()">删除</el-button>
       </div>
-      <el-form ref="caseForm" :model="caseForm" class="my-from" :rules="rules" :show-message="false" :status-icon="true"  label-width="80px">
-        <el-form-item label="问题编号">
-          <el-input disabled v-model="caseForm.id"></el-input>
-        </el-form-item>
-        <el-form-item prop="caseSnap" label="问题概述">
-          <el-input v-model="caseForm.caseSnap"></el-input>
-        </el-form-item>
-        <el-form-item prop="caseDesc" label="详细描述">
-          <el-input type="textarea" v-model="caseForm.caseDesc"></el-input>
-        </el-form-item>
-        <el-form-item prop="caseMethod" label="处理方法">
-          <el-input type="textarea" v-model="caseForm.caseMethod"></el-input>
-        </el-form-item>
-        <el-form-item prop="location" disabled label="点位信息">
-          <el-input disabled v-model="caseForm.location" style="width:210px;"></el-input>
-          <i class="el-icon-location" @click="addLocation" style="cursor:pointer;"></i>
-        </el-form-item>
-        <el-row style="padding-left:10px;">
-          <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
-            <img :src="ctrl.baseUrl+'/'+image" class="img-list">
-            <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
-          </el-col>
-        </el-row>
-        <el-upload
-          class="my-upload" multiple
-          :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
-          :on-success="handlesuccess" :show-file-list="false">
-          <el-button size="small" type="primary">点击上传图片</el-button>
-        </el-upload>
-        <el-row>
-          <el-col :span="18" width="260px;">
-            <!-- <my-video width="260px;" :sources="video.sources" :options="video.options"></my-video> -->
-          </el-col>
-        </el-row>
-      </el-form>
+      <div class="scroll_style" :style="{'max-height': panelHeight}">
+        <el-form ref="caseForm" :model="caseForm" class="my-from" :rules="rules" :show-message="false" :status-icon="true"  label-width="80px">
+          <el-form-item label="问题编号">
+            <el-input disabled v-model="caseForm.id"></el-input>
+          </el-form-item>
+          <el-form-item prop="caseSnap" label="问题概述">
+            <el-input v-model="caseForm.caseSnap"></el-input>
+          </el-form-item>
+          <el-form-item prop="caseDesc" label="详细描述">
+            <el-input type="textarea" v-model="caseForm.caseDesc"></el-input>
+          </el-form-item>
+          <el-form-item prop="caseMethod" label="处理方法">
+            <el-input type="textarea" v-model="caseForm.caseMethod"></el-input>
+          </el-form-item>
+          <el-form-item prop="location" disabled label="点位信息">
+            <el-input disabled v-model="caseForm.location" style="width:200px;"></el-input>
+            <i class="el-icon-location" @click="addLocation" style="cursor:pointer;"></i>
+          </el-form-item>
+          <el-row style="padding-left:10px;">
+            <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
+              <img :src="ctrl.baseUrl+'/'+image" class="img-list">
+              <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
+            </el-col>
+          </el-row>
+          <el-upload
+            class="my-upload" multiple
+            :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
+            :on-success="handlesuccess" :show-file-list="false">
+            <el-button size="small" type="primary">点击上传图片</el-button>
+          </el-upload>
+          <el-row>
+            <el-col :span="18" width="260px;">
+              <!-- <my-video width="260px;" :sources="video.sources" :options="video.options"></my-video> -->
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
-import { queryCaseList, queryCaseById, saveCaseInfo } from '../../dataService/api';
+import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
 import mapMarker from '../../assets/marker.gif'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
@@ -98,14 +111,17 @@ export default {
   name: 'CaseList',
   data () {
     return {
-      mapHeight: '0px',
+      rightCollapsed: false,
+      leftCollapsed: true,
       currentPage1: 1,
+      pageCtrl:{},
       ctrl: {
         curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
         caseCreate: false,
         addLocation: false, // 增加点位的标识
         saving: false,
+        deleteing: false,
         pageSize: 10,
         pageNum:1
       },
@@ -177,21 +193,27 @@ export default {
       this.imgUpload.isShowPrecent = true;
     },
     rightPanelCtrl(flag) {
-      let mapWidth = window.maplet.width;
-      let mapHeith = window.maplet.height;
-      if (flag === 'open' && !this.ctrl.caseCreate) {
-        mapWidth = mapWidth - 320;
-        this.ctrl.caseCreate = true;
+      if (flag == 'close') {
+        this.rightCollapsed = false;
       }
-      if (flag === 'close' && this.ctrl.caseCreate) {
-        mapWidth = mapWidth + 320;
-        this.ctrl.caseCreate = false;
+      if (flag == 'open') {
+        this.rightCollapsed = true;
       }
-      window.maplet.resize(mapWidth, mapHeith);
-
-
+    },
+    leftPanelCtrl(flag) {
+      console.info(flag);
+      if (flag == 'close') {
+        this.leftCollapsed = false;
+      }
+      if (flag == 'open') {
+        this.leftCollapsed = true;
+      }
     },
     createCase() {
+      this.clearCase();
+      this.rightPanelCtrl('open');
+    },
+    clearCase() {
       this.caseForm.id = '';
       this.caseForm.caseSnap = '';
       this.caseForm.caseDesc = '';
@@ -199,7 +221,6 @@ export default {
       this.caseForm.location = '';
       this.caseForm.images = [];
       this.caseForm.videos = [];
-      this.rightPanelCtrl('open');
     },
     addLocation () {
       this.caseForm.location = ''
@@ -226,12 +247,24 @@ export default {
           saveCaseInfo(param).then(data => {
             that.ctrl.saving = false;
             if (data.errorCode == 0){
+              that.queryCaseList();
               that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 1000});
             } else {
               that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 1000});
             }
           });
         }
+      });
+    },
+    deleteCase() {
+      this.ctrl.deleteing = false;
+      if (!this.caseForm.id) {
+        return;
+      }
+      let that = this;
+      deleteCaseById({id: this.caseForm.id}).then(res => {
+        that.createCase();
+        that.queryCaseList();
       });
     },
     deleteImage(index) {
@@ -247,6 +280,9 @@ export default {
         }
       })
       that.rightPanelCtrl('open');
+    },
+    backPrev() {
+      this.$router.push('/mainFrame');
     },
     queryCaseList() {
       let that = this;
@@ -267,6 +303,7 @@ export default {
       let that = this;
       window.maplet = new Maplet("map");
       window.maplet.centerAndZoom(new MPoint(116.38749,39.90515), 8);
+      window.maplet.clickToCenter = false;
       window.maplet.showScale(false);
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
@@ -299,8 +336,8 @@ export default {
   },
   created: function () {
     let clientHeight = window.innerHeight || document.documentElement.clientHeight;
-    this.mapHeight = clientHeight - 60 + 'px';
-
+    this.mapHeight = clientHeight + 'px';
+    this.panelHeight = clientHeight - 50 + 'px'; // 后续改善
   },
   mounted: function () {
     this.queryCaseList();
@@ -311,56 +348,106 @@ export default {
 </script>
 
 <style scoped>
-.parent{
-  height:100%;
-  display:flex;/*设为伸缩容器*/
-  flex-flow:row;/*伸缩项目单行排列*/
+.layout-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
-.parent .stable{
-  width:320px; /*固定宽度*/
+.layout-container .map {
+  width: 100%;
+  height: 100%;
 }
-.parent .stable.left {
-  border-right: solid #e6e6e6 1px;
-}
-.parent .stable.right.open {
-  border-left: solid #e6e6e6 1px;
-  overflow-y: auto;
-  width: 320px;
-}
-.parent .stable.right.close {
-  border-left: solid #e6e6e6 1px;
-  overflow-y: auto;
-  width: 1px;
-}
-.parent .stable.right .img_delete{
-  position: relative;
-  top: -70px;
-  left: 52px;
-  cursor: pointer;
-}
-.parent .stable.right .img_delete:hover {
-  background: #CCC;
-  border-radius: 2px
-}
-
-.parent .change{
-  flex:1;/*这里设置为占比1，填充满剩余空间*/
-}
-
-.parent .my-panel{
+.layout-container .my-panel{
   padding: 10px;
-  background: #D8DCE5;
+  background: #20a0ff;
   text-align: left;
   line-height:26px;
   font-size: 18px;
+  color: #FFFFFF;
+  font-weight: bold;
 }
-.my_map_operate_tool {
+.layout-container .left {
+  height:100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 320px;
+  background-color: #FFFFFF;
+}
+.layout-container .right {
+  height:100%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 320px;
+  background-color: #FFFFFF;
+  overflow: auto;
+}
+.layout-container .right.open-panel, .layout-container .left.open-panel {
+  display: block;
+}
+.layout-container .right.close-panel, .layout-container .left.close-panel {
+  display: none;
+}
+.layout-container .right-open-icon {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  color: #FFFFFF;
+}
+.layout-container .return-page-icon {
+  position: absolute;
+  right: 40px;
+  top: 0px;
+  color: #FFFFFF;
+}
+.layout-container .left-open-icon {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  color: #FFFFFF;
+}
+.layout-container .right-open-icon i{
+  background-color:#20a0ff;
+  padding:10px;
+  margin-top: 10px;
+  border-radius: 8px 0px 0px 8px
+}
+.layout-container .left-open-icon i{
+  background-color:#20a0ff;
+  padding:10px;
+  margin-top: 10px;
+  border-radius: 0px 8px 8px 0px;
+}
+.layout-container .return-page-icon.open-return-page {
+   right: 330px;
+}
+.layout-container .return-page-icon.close-return-page {
+  right: 40px;
+}
+.layout-container .return-page-icon i{
+  background-color:#20a0ff;
+  padding:10px;
+  margin-top: 10px;
+  border-radius: 8px 8px 8px 8px;
+}
+
+.map_operate_tool {
   position: absolute;
   z-index: 10;
   top: 10px;
   left: 48%;
 }
-
+.my-from .img_delete{
+  position: relative;
+  top: -70px;
+  left: 52px;
+  cursor: pointer;
+}
+.my-from .img_delete:hover {
+  background: #CCC;
+  border-radius: 2px
+}
 .my-from .el-form-item{
   margin-top: 10px;
   margin-bottom: 10px;

@@ -58,7 +58,7 @@ export default {
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
               appUtil.setCurrentUser(result);
-              that.$router.push('/main');
+              that.$router.push('/mainFrame');
             } else {
               that.$message({
                 message: message,

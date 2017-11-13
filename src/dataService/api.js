@@ -52,3 +52,5 @@ export const saveCaseInfo = param => {
     return postReq('/api/bs/case/update', param);
   }
 };
+
+export const deleteCaseById = param => { return getReq('/api/bs/case/delete', param)};
