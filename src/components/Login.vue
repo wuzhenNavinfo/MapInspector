@@ -2,8 +2,10 @@
   <div class="parent">
     <div class="change"></div>
     <div class="stable">
+      <img height="60px" src="../assets/logo.png">
       <el-form :model="ruleForm" :rules="rules" :status-icon="true" ref="ruleForm" class="login-container">
-        <h3 class="title">系统登录</h3>
+
+        <h3 class="title" >系统登录</h3>
         <el-form-item prop="account">
           <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
@@ -56,7 +58,7 @@ export default {
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
               appUtil.setCurrentUser(result);
-              that.$router.push('/main');
+              that.$router.push('/mainFrame');
             } else {
               that.$message({
                 message: message,
