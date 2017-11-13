@@ -7,7 +7,7 @@
  * @copyright @Navinfo, all rights reserved.
  */
 const Sequelize = require('sequelize');
-const db = require('../dataBase');
+const db = require('../../dataBase');
 
 // 创建 model
 var User = db.define('om_user', {
@@ -15,13 +15,13 @@ var User = db.define('om_user', {
             type: Sequelize.INTEGER,
             field: 'user_id',
             autoIncrement: true,
+            primaryKey: true,
             allowNull: false
         },
         userName: {
             type: Sequelize.STRING,
             field: 'user_name',
             unique: true,
-            primaryKey: true,
             allowNull: false
         },
         fullName: {
@@ -73,4 +73,23 @@ exports.findOneUser = function (params) {
     return User.findOne({
         where: params
     })
+};
+
+// 更新用户;
+exports.upDateOneUser = function (params, conditions) {
+  return User.update(params, conditions)
+};
+
+// 根据用户名删除用户;
+exports.deleteOneUser = function (params) {
+    return User.destroy({
+        where: params
+    });
+};
+
+// 返回总记录数；
+exports.getTotalRowNum = function (tableField, showField) {
+  return User.findAll({
+      attributes: [[Sequelize.fn('COUNT', Sequelize.col(tableField)), showField]]
+  });
 };
