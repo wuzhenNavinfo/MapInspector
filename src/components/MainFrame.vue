@@ -43,13 +43,15 @@
             <span slot="title">导航其他</span>
           </el-menu-item>
         </el-menu>
-        <el-menu v-if="userRole == 'worker'" default-active="/worker/working" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+        <el-menu v-if="userRole == 'worker'" default-active="/worker/waitWork" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span slot="title">导航菜单</span>
             </template>
-            <el-menu-item index="/worker/working">作业中</el-menu-item>
+            <el-menu-item index="/worker/waitWork">待作业</el-menu-item>
+            <el-menu-item index="/worker/submited">已提交</el-menu-item>
+            <el-menu-item index="/worker/completed">已完成</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
@@ -99,7 +101,7 @@ import {appUtil} from '../config.js'
         return;
       }
       if (role == 'worker') {
-        this.handleSelect(1, [1, '/worker/working']);
+        this.handleSelect(1, [1, '/worker/waitWork']);
         return;
       }
     },

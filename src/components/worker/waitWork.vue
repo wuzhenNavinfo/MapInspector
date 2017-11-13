@@ -9,10 +9,11 @@
         </el-card>
       </el-col>
       <el-col :span="6" v-for="item in cardDataList" :key="item.id">
-        <el-card style="margin-top:20px;">
+        <el-card style="margin-top:20px;cursor:pointer;">
           <el-progress type="circle" :percentage="40" :width="80" style="float:right;"></el-progress>
-          <div slot="header" class="clearfix">
+          <div slot="header" class="clearfix" >
             <span>{{item.projectName}}</span>
+            <el-button style="float:right;"  size="mini" type="danger" @click="enterIssue()">录入问题</el-button>
           </div>
           <div>状态：{{item.projectStatus}}</div>
           <div>创建时间：{{item.createDate}}</div>
@@ -115,7 +116,9 @@ export default {
           this.centerDialogVisible = false;
         }
       })
-
+    },
+    enterIssue() {
+      this.$router.push('/worker/enterIssue');
     }
   }
 }
