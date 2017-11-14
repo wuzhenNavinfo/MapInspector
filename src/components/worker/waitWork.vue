@@ -4,7 +4,9 @@
       <el-col :span="6">
         <el-card style="margin-top:20px;">
           <div class="addPanel">
-            <el-button icon="el-icon-circle-plus" type="primary" @click="addProject();">添加项目</el-button>
+            <div class="el-upload el-upload--picture-card" @click="addProject();">
+              <i class="el-icon-plus"></i>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -72,6 +74,8 @@ export default {
   methods: {
     addProject() {
       this.centerDialogVisible = true;
+      this.issueForm.projectName = '';
+      this.issueForm.projectDesc = '';
     },
     saveIssue() {
       let that = this;
@@ -130,7 +134,7 @@ export default {
 
 <style scoped>
   .addPanel {
-    padding: 70px 0px;
+    padding: 17px 0px;
     text-align: center;
   }
   .my-card {

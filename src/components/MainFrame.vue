@@ -101,7 +101,7 @@ import {appUtil} from '../config.js'
 
 </script>
 
-<style scoped>
+<style scoped lang="less">
   // 过渡状态
   .fade-enter-active {
     transition: all 1.3s ease-out;
@@ -120,75 +120,29 @@ import {appUtil} from '../config.js'
 		top: 0px;
 		bottom: 0px;
 		width: 100%;
+		.main {
+      display: flex;
+      position: absolute;
+      top: 60px;
+      bottom: 0px;
+      overflow: hidden;
+      aside{
+        flex:0 0 230px;
+        width: 230px;
+        .el-menu {
+          height: 100%;
+        }
+      }
+      .menu-collapsed{
+        flex:0 0 64px;
+        width: 64px;
+      }
+      .menu-expanded{
+        flex:0 0 230px;
+        width: 230px;
+      }
+    }
 	}
-  .container .header {
-    height: 60px;
-    line-height: 60px;
-    background: #20a0ff;
-    color:#fff;
-  }
-  .container .header .logo{
-    height:60px;
-    font-size: 22px;
-    padding-left:20px;
-    padding-right:20px;
-    border-color: rgba(238,241,146,0.3);
-    border-right-width: 1px;
-    border-right-style: solid;
-  }
-  .container .header .logo.logo-width{
-    width: 230px;
-  }
-  .container .header .logo.logo-collapse-width{
-    width:64px
-  }
-  .container .header .tools{
-    padding: 0px 23px;
-    width:14px;
-    height: 60px;
-    line-height: 60px;
-    cursor: pointer;
-  }
-  .container .header .userinfo {
-    text-align: right;
-    padding-right: 35px;
-    float: right;
-    cursor: pointer;
-  }
-  .container .header .userinfo .userinfo-inner {
-    color:#fff;
-  }
-  .container .header .userinfo .userinfo-inner img{
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-    margin: 10px 0px 10px 10px;
-    float: right;
-  }
-
-  .container .main {
-    display: flex;
-    position: absolute;
-    top: 60px;
-    bottom: 0px;
-    overflow: hidden;
-  }
-  .container .main aside{
-    flex:0 0 230px;
-    width: 230px;
-  }
-  .container .main aside .el-menu {
-    height: 100%;
-  }
-  .container .main .menu-collapsed{
-    flex:0 0 64px;
-    width: 64px;
-  }
-	.container .main .menu-expanded{
-    flex:0 0 230px;
-    width: 230px;
-  }
-
   .content-container {
     flex:1;
   }

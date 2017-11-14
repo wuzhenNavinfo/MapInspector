@@ -347,89 +347,95 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .layout-container {
   position: absolute;
   width: 100%;
   height: 100%;
-}
-.layout-container .map {
-  width: 100%;
-  height: 100%;
-}
-.layout-container .my-panel{
-  padding: 10px;
-  background: #20a0ff;
-  text-align: left;
-  line-height:26px;
-  font-size: 18px;
-  color: #FFFFFF;
-  font-weight: bold;
-}
-.layout-container .left {
-  height:100%;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 320px;
-  background-color: #FFFFFF;
-}
-.layout-container .right {
-  height:100%;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: 320px;
-  background-color: #FFFFFF;
-  overflow: auto;
-}
-.layout-container .right.open-panel, .layout-container .left.open-panel {
-  display: block;
-}
-.layout-container .right.close-panel, .layout-container .left.close-panel {
-  display: none;
-}
-.layout-container .right-open-icon {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  color: #FFFFFF;
-}
-.layout-container .return-page-icon {
-  position: absolute;
-  right: 40px;
-  top: 0px;
-  color: #FFFFFF;
-}
-.layout-container .left-open-icon {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  color: #FFFFFF;
-}
-.layout-container .right-open-icon i{
-  background-color:#20a0ff;
-  padding:10px;
-  margin-top: 10px;
-  border-radius: 8px 0px 0px 8px
-}
-.layout-container .left-open-icon i{
-  background-color:#20a0ff;
-  padding:10px;
-  margin-top: 10px;
-  border-radius: 0px 8px 8px 0px;
-}
-.layout-container .return-page-icon.open-return-page {
-   right: 330px;
-}
-.layout-container .return-page-icon.close-return-page {
-  right: 40px;
-}
-.layout-container .return-page-icon i{
-  background-color:#20a0ff;
-  padding:10px;
-  margin-top: 10px;
-  border-radius: 8px 8px 8px 8px;
+  .map {
+    width: 100%;
+    height: 100%;
+  }
+  .my-panel{
+    padding: 10px;
+    background: #20a0ff;
+    text-align: left;
+    line-height:26px;
+    font-size: 18px;
+    color: #FFFFFF;
+    font-weight: bold;
+  }
+  .left {
+    height:100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 320px;
+    background-color: #FFFFFF;
+    &.open-panel{
+      display: block;
+    }
+    &.close-panel {
+      display: none;
+    }
+  }
+  .right {
+    height:100%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 320px;
+    background-color: #FFFFFF;
+    overflow: auto;
+    &.open-panel{
+      display: block;
+    }
+    &.close-panel {
+      display: none;
+    }
+  }
+  .right-open-icon {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: #FFFFFF;
+    i {
+      background-color:#20a0ff;
+      padding:10px;
+      margin-top: 10px;
+      border-radius: 8px 0px 0px 8px
+    }
+  }
+  .return-page-icon {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    color: #FFFFFF;
+    &.open-return-page {
+      right: 330px;
+    }
+    &.close-return-page {
+      right: 40px;
+    }
+    i{
+      background-color:#20a0ff;
+      padding:10px;
+      margin-top: 10px;
+      border-radius: 8px 8px 8px 8px;
+    }
+  }
+  .left-open-icon {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    color: #FFFFFF;
+    i {
+      background-color:#20a0ff;
+      padding:10px;
+      margin-top: 10px;
+      border-radius: 0px 8px 8px 0px;
+    }
+  }
 }
 
 .map_operate_tool {
@@ -438,23 +444,22 @@ export default {
   top: 10px;
   left: 48%;
 }
-.my-from .img_delete{
-  position: relative;
-  top: -70px;
-  left: 52px;
-  cursor: pointer;
-}
-.my-from .img_delete:hover {
-  background: #CCC;
-  border-radius: 2px
-}
-.my-from .el-form-item{
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-right:10px;
-}
-.my-from .el-form-item .el-input.el-input__inner{
-  padding-left: 6px;
+.my-from {
+  .img_delete{
+    position: relative;
+    top: -70px;
+    left: 52px;
+    cursor: pointer;
+  }
+  .img_delete:hover {
+    background: #CCC;
+    border-radius: 2px
+  }
+  .el-form-item{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-right:10px;
+  }
 }
 
 .img-list {
