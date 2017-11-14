@@ -21,16 +21,16 @@ const caseModel = require('../../models/bs/caseModel');
  * @constructor
  */
 function caseController(req, res) {
-	this.model = {};
-	this.model.createUser = '';
-	this.model.caseSnap = '';
-	this.model.caseDesc = '';
-	this.model.caseMethod = '';
-	this.model.images = '';
-	this.model.videos = '';
+  this.model = {};
+  this.model.createUser = '';
+  this.model.caseSnap = '';
+  this.model.caseDesc = '';
+  this.model.caseMethod = '';
+  this.model.images = '';
+  this.model.videos = '';
   this.model.marker = {type: 'Point', coordinates: [0, 0]};
-	this.req = req;
-	this.res = res;
+  this.req = req;
+  this.res = res;
 }
 
 /**

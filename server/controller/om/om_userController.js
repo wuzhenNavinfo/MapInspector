@@ -54,7 +54,7 @@ UserController.prototype.register = function () {
 			userModel.addUser(this.model).then(result => {
         if (result) {
           // 创建用户时默认为用户分配的角色是“游客”;
-          userRoleModel.addURRelation(result.userId, 1).then(res => {
+          userRoleModel.create({userId: result.userId, roleCode: 1}).then(res => {
             result.dataValues.role = res.roleCode;
             this.res.json(result);
           });
@@ -80,21 +80,24 @@ UserController.prototype.login = function () {
 			// 判断登陆密码
 			var password = crypto.createHash('sha1').update(this.model.password).digest('hex');
 			if (password != result.password) {
-				this.res.json({errorCode: -1, message: '登陆失败，密码错误'});
-				return;
+        return this.res.json({errorCode: -1, message: '登陆失败，密码错误'});
 			}
-
-			result.dataValues.token = jwt.sign({
-				data: {name: result.userName, password: result.password}
-			}, config.SECRET, {expiresIn: 60 * 60 * 24});
-
-			this.res.json({
-				errorCode: 0,
-				message: '已获得认证，登陆成功!',
-				result: result
-			});
+      // 查询角色;
+      userRoleModel.findOne({where: {userId: result.userId}}).then(res => {
+        var resultCopy = tool.clone(result.dataValues);
+        resultCopy.role = res.dataValues.roleCode === 2 ? 'worker' : res.dataValues.roleCode === 3 ? 'manager': 'visitor';
+        resultCopy.token = jwt.sign({
+          data: {name: result.userName, password: result.password}
+        }, config.SECRET, {expiresIn: 60 * 60 * 24});
+        delete resultCopy.password;
+        return this.res.json({errorCode: 0, message: '已获得认证，登陆成功!', result: resultCopy});
+      }).catch(err => {
+        return this.res.json({errorCode: -1, message: err.message});
+      });
 		}
-	});
+	}).catch(err => {
+    return this.res.json({errorCode: -1, message: err.message});
+  });
 };
 
 /**
