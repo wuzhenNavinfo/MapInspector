@@ -39,9 +39,6 @@
         </el-pagination>
       </div>
     </div>
-    <div class="right-open-icon" @click="rightPanelCtrl('open')" title="展开">
-       <i class="el-icon-caret-left" style="cursor:pointer;" ></i>
-    </div>
     <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
        <i class="el-icon-back" style="cursor:pointer;" ></i>
     </div>
@@ -98,8 +95,6 @@
 
 <script>
 
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import { queryCaseList, queryCaseById, saveCaseInfo} from '../../dataService/api';
@@ -268,7 +263,7 @@ export default {
       window.maplet = new Maplet("map");
       window.maplet.centerAndZoom(new MPoint(116.38749,39.90515), 8);
       window.maplet.clickToCenter = false;
-      window.maplet.showScale(false);
+      // window.maplet.showScale(false);
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
@@ -284,18 +279,6 @@ export default {
           window.maplet.addOverlay(marker);
         }
       })
-    },
-    initMapboxgl() {
-      mapboxgl.accessToken="pk.eyJ1IjoiZmFuZ2xhbmsiLCJhIjoiY2lpcjc1YzQxMDA5NHZra3NpaDAyODB4eSJ9.z6uZHccXvtyVqA5zmalfGg"
-      var map = new mapboxgl.Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/streets-v9',
-          center: [116.403909,39.915212],
-          zoom: 10,
-          maxZoom: 17,
-          minZoom: 5,
-          pitch: 0
-      });
     }
   },
   created: function () {
@@ -305,7 +288,6 @@ export default {
   },
   mounted: function () {
     this.queryCaseList();
-    // this.initMapboxgl();
     this.initMapbar();
   }
 }
@@ -387,13 +369,13 @@ export default {
    right: 330px;
 }
 .layout-container .return-page-icon.close-return-page {
-  right: 40px;
+  right: 0px;
 }
 .layout-container .return-page-icon i{
   background-color:#20a0ff;
   padding:10px;
   margin-top: 10px;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 8px 0px 0px 8px;
 }
 
 .img_delete{

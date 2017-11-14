@@ -10,7 +10,7 @@
           <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
         <el-form-item prop="checkPass">
-          <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off" placeholder="密码"></el-input>
+          <el-input type="password" v-model="ruleForm.checkPass" @keyup.enter.native="handleSubmit()" auto-complete="off" placeholder="密码"></el-input>
         </el-form-item>
         <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
         <el-form-item style="width:100%;">
@@ -57,7 +57,6 @@ export default {
             that.logining = false;
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
-              console.info('==========',result);
               if (result.userName == 'root') {
                 result.role = 'manager'
               }else {

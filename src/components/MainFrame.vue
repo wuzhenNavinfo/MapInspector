@@ -10,7 +10,7 @@
         </el-col>
         <el-col :span="14" :style="backgroundImage">
           <div class="tools" @click.prevent="collapse">
-            <i style="font-size:14px;" class="fa fa-align-justify"></i>
+            <i class="fa fa-align-justify"></i>
           </div>
         </el-col>
         <el-col :span="4" class="userinfo">
@@ -83,7 +83,7 @@ import {appUtil} from '../config.js'
         sysUserName: '未知',
         userRole: 'worker',
         pageCtrl: {
-          collapsed: true,
+          collapsed: false,
         }
       }
     },

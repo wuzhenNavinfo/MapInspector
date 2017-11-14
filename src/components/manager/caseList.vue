@@ -304,7 +304,7 @@ export default {
       window.maplet = new Maplet("map");
       window.maplet.centerAndZoom(new MPoint(116.38749,39.90515), 8);
       window.maplet.clickToCenter = false;
-      window.maplet.showScale(false);
+      // window.maplet.showScale(false);
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
