@@ -10,37 +10,28 @@ const Sequelize = require('sequelize');
 const db = require('../../dataBase');
 
 // 创建 model
-var User = db.define('om_user', {
-        userId: {
+module.exports = db.define('om_role', {
+        id: {
             type: Sequelize.INTEGER,
-            field: 'user_id',
             autoIncrement: true,
             primaryKey: true,
             allowNull: false
         },
-        userName: {
+        roleCode: {
             type: Sequelize.STRING,
-            field: 'user_name',
+            field: 'role_code',
             unique: true,
             allowNull: false
         },
-        fullName: {
+        roleName: {
             type: Sequelize.STRING,
-            field: 'full_name'
-        },
-        password: {
-            type: Sequelize.STRING,
+            unique: true,
+            field: 'role_name',
             allowNull: false
         },
-        email: {
-            type: Sequelize.STRING
-        },
-        cellPhone: {
+        roleDesc: {
             type: Sequelize.STRING,
-            field: 'cell_phone'
-        },
-        status: {
-            type: Sequelize.INTEGER
+            field: 'role_desc'
         },
         createdAt: {
             type: Sequelize.DATE,
@@ -54,42 +45,3 @@ var User = db.define('om_user', {
         freezeTableName: true
     }
 );
-
-// 如果 force = true 则会把存在的表（如果 users 表已存在）先销毁再创建表
-// var user = User.sync({ force: false });
-
-// 添加新用户
-exports.addUser = function(userObj) {
-    return User.create(userObj);
-};
-
-// 查找用户（支持查询所有和分页查询）
-exports.findAllUser = function(params) {
-    return User.findAll(params);
-};
-
-// 通过用户名查找用户;
-exports.findOneUser = function (params) {
-    return User.findOne({
-        where: params
-    })
-};
-
-// 更新用户;
-exports.upDateOneUser = function (params, conditions) {
-  return User.update(params, conditions)
-};
-
-// 根据用户名删除用户;
-exports.deleteOneUser = function (params) {
-    return User.destroy({
-        where: params
-    });
-};
-
-// 返回总记录数；
-exports.getTotalRowNum = function (tableField, showField) {
-  return User.findAll({
-      attributes: [[Sequelize.fn('COUNT', Sequelize.col(tableField)), showField]]
-  });
-};

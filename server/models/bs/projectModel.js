@@ -10,31 +10,34 @@ const Sequelize = require('sequelize');
 const db = require('../../dataBase');
 
 // 创建 model
-module.exports = db.define('om_user_role', {
+module.exports = db.define('bb_project', {
         id: {
             type: Sequelize.INTEGER,
-            field: 'pid',
             autoIncrement: true,
             primaryKey: true,
             allowNull: false
         },
-        userId: {
+        projectName: {
+          type: Sequelize.STRING,
+          field: 'pro_name',
+          allowNull: false
+        },
+        projectDesc: {
+          type: Sequelize.STRING,
+          field: 'pro_desc',
+          allowNull: false
+        },
+        createUser: {
           type: Sequelize.INTEGER,
-          field: 'user_id',
-          allowNull: false,
+          field: 'create_person',
           references: {
             model: 'om_user',
             key: 'user_id'
           }
         },
-        roleCode: {
+        projectStatus: {
           type: Sequelize.INTEGER,
-          field: 'role_code',
-          allowNull: false,
-          references: {
-            model: 'om_role',
-            key: 'role_code'
-          }
+          field: 'pro_status'
         },
         createdAt: {
             type: Sequelize.DATE,
