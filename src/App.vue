@@ -19,6 +19,15 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
+/*****全局取消地图logo的样式*****/
+#ImgCopyright{
+  display: none;
+}
+#ImgCopyright + div {
+  display: none;
+}
+
+
 #app {
 	position: absolute;
 	top: 0px;
