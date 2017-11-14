@@ -42,7 +42,6 @@ export const findUser = param => { return axios.get(`${baseUrl}/api/om/user/find
 // -- 案例相关  --
 export const queryCaseList = param => { return getReq('/api/bs/case/list', param)};
 export const queryCaseById = param => { return getReq('/api/bs/case/query', param)};
-export const saveCaseInfo1 = param => { return postReq('/api/bs/case/create', param).then(res => res.data).catch(res => ({errcode: null})); };
 export const saveCaseInfo = param => {
   if (!param.id) {
     return postReq('/api/bs/case/create', param);
@@ -53,4 +52,7 @@ export const saveCaseInfo = param => {
 export const deleteCaseById = param => { return getReq('/api/bs/case/delete', param)};
 
 // -- 项目相关  --
+export const queryIssueList = param => { return getReq('/api/bs/project/list', param)};
 export const saveIssue = param => { return saveIssue('/api/bs/project/save', param)};
+export const createProject = param => { return postReq('/api/bs/project/create', param)};
+export const deleteProject = param => { return getReq('/api/bs/project/delete', param)};

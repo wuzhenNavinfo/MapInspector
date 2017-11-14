@@ -466,24 +466,4 @@ export default {
   padding: 10px;
   padding-top: 0px;
 }
-
-/*********************************滚动条样式************************************/
-.scroll_style {
-  overflow: auto;
-  height: 100%;
-}
-.scroll_style::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.1);
-}
-.scroll_style::-webkit-scrollbar-thumb {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  background: #c1c1c1;
-}
-.scrollDiy::-webkit-scrollbar {
-  width: 0 !important;
-}
 </style>
