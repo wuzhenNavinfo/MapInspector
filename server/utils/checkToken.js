@@ -7,8 +7,9 @@
  * @copyright @Navinfo, all rights reserved.
  */
 
-var jwt = require('jsonwebtoken');
-var config = require('../config');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const userModel = require('../models/om/userModel');
 // 检查用户会话
 module.exports = function(req, res, next) {
     //检查post,get的信息或者参数或者头信息
@@ -19,10 +20,14 @@ module.exports = function(req, res, next) {
           if (err) {
             return res.json({ errorCode: -1, message: err.message });
           } else {
-            // 获得解码后的用户信息;
-            req.loginUser = decoded;
-            // 供后面的路由使用
-            next();
+            userModel.findOneUser({user_name: decoded.data.name}).then(result => {
+              // 获得解码后的用户信息;
+              req.loginUser = result.dataValues;
+              // 供后面的路由使用
+              next();
+            }).catch(err => {
+              return res.json({errorCode: -1, message: err.message});
+            });
           }
         });
       } else {

@@ -36,14 +36,14 @@ function caseController(req, res) {
 caseController.prototype.list = function () {
   let requestParam = null;
   if (!this.req.query.pageSize && !this.req.query.pageNum) {
-    requestParam = {};
+    requestParam = {where: {createUser: this.req.loginUser.userId}};
   } else if (this.req.query.pageSize && this.req.query.pageNum) {
     let pageSize = parseInt(this.req.query.pageSize);
     let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
     if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
       return this.res.json({errorCode: -1, message: '查询参数有误'});
     }
-    requestParam = { limit: pageSize, offset: startIndex };
+    requestParam = { limit: pageSize, offset: startIndex, where: {createUser: this.req.loginUser.userId} };
   } else {
     return this.res.json({errorCode: -1, message: '查询参数有误'});
   }
@@ -102,7 +102,7 @@ caseController.prototype.delete = function () {
       return this.res.json({errorCode: -1, message: '删除失败'});
     }
   }).catch(err => {
-    throw err;
+    return this.res.json({errorCode: -1, message: err.message});
   });
 };
 
