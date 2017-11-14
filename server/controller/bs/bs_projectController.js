@@ -34,12 +34,19 @@ function caseController(req, res) {
  * @method list
  */
 caseController.prototype.list = function () {
-  let pageSize = parseInt(this.req.query.pageSize);
-  let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
-  if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
+  let requestParam = null;
+  if (!this.req.query.pageSize && !this.req.query.pageNum) {
+    requestParam = {};
+  } else if (this.req.query.pageSize && this.req.query.pageNum) {
+    let pageSize = parseInt(this.req.query.pageSize);
+    let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
+    if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
+      return this.res.json({errorCode: -1, message: '查询参数有误'});
+    }
+    requestParam = { limit: pageSize, offset: startIndex };
+  } else {
     return this.res.json({errorCode: -1, message: '查询参数有误'});
   }
-  let requestParam = { limit: pageSize, offset: startIndex };
   projectModel.findAndCountAll (requestParam).then (result => {
     let rowNum = result.count;
     let dataList = result.rows;
