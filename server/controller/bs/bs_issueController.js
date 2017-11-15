@@ -99,6 +99,7 @@ issueController.prototype.find = function () {
       issueResultCopy.caseMethod = caseResultCopy.caseMethod;
       issueResultCopy.caseImages = caseResultCopy.images ? caseResultCopy.images.split(',') : [];
       issueResultCopy.caseVideos = caseResultCopy.videos ? caseResultCopy.videos.split(',') : [];
+      issueResultCopy.caseMarker = caseResultCopy.marker;
       return this.res.json({errorCode: 0, result: issueResultCopy, message: '问题查询成功'});
     })
   })
