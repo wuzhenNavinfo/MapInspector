@@ -100,7 +100,7 @@ exports.findCombinaionIssue = function (obj) {
   }
   var cond = obj.condition;
   var sql = 'SELECT ' +
-    'c.case_snap as caseSnap, c.case_desc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.createdAt, ' +
+    'c.id as caseCode, c.case_snap as caseSnap, c.case_desc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.createdAt, ' +
     'i.pro_code as proCode, i.case_code as proCaseCode, i.images as proImages, i.videos as proVideos ' +
     'FROM bb_case AS c LEFT JOIN bb_issue As i ' +
     'ON (c.id=i.case_code) AND i.pro_code='+ cond + limit;

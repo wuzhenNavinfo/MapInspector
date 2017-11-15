@@ -13,6 +13,7 @@
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
 const issueModel = require('../../models/bs/issueModel');
+const caseModel = require('../../models/bs/caseModel');
 
 /**
  * 用户管理控制器;
@@ -83,12 +84,25 @@ issueController.prototype.find = function () {
   }
   let requestData = {where: {proCode: projectId, caseCode: caseId }};
   issueModel.findOne(requestData).then(result => {
-    let videos = result.dataValues.videos;
-    let images = result.dataValues.images;
-    result.dataValues.videos = videos ? videos.split(',') : [];
-    result.dataValues.images = images ? images.split(',') : [];
-    return this.res.json({errorCode: 0, result: result, message: '问题查询成功'});
-  }).catch(err => {
+    return result;
+  })
+  .then(result => {
+    caseModel.findOneCase({ where: { id: result.dataValues.caseCode } }).then(res => {
+      let issueResultCopy = tool.clone(result.dataValues);
+      let caseResultCopy = tool.clone(res.dataValues);
+      let videos = issueResultCopy.videos;
+      let images = issueResultCopy.images;
+      issueResultCopy.issueVideos = videos ? videos.split(',') : [];
+      issueResultCopy.issueImages = images ? images.split(',') : [];
+      issueResultCopy.caseSnap = caseResultCopy.caseSnap;
+      issueResultCopy.caseDesc = caseResultCopy.caseDesc;
+      issueResultCopy.caseMethod = caseResultCopy.caseMethod;
+      issueResultCopy.caseImages = caseResultCopy.images ? caseResultCopy.images.split(',') : [];
+      issueResultCopy.caseVideos = caseResultCopy.videos ? caseResultCopy.videos.split(',') : [];
+      return this.res.json({errorCode: 0, result: issueResultCopy, message: '问题查询成功'});
+    })
+  })
+  .catch(err => {
     return this.res.json({errorCode: -1, message: err.message});
   });
 };

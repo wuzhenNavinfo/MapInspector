@@ -118,6 +118,8 @@ caseController.prototype.listDetail = function () {
         data.caseSnap = result[i].caseSnap;
         data.caseMediaLength = caseImageLength + caseVideoLength;
         data.proMediaLength = proImageLength + proVideoLength;
+        data.proCode = result[i].proCode;
+        data.caseCode = result[i].caseCode;
         data.createdAt = result[i].createdAt;
         dataList.push(data);
       }
