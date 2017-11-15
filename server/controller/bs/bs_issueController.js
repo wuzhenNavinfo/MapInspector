@@ -62,13 +62,9 @@ issueController.prototype.create = function () {
   tool.extend(this.model, this.req.body);
   issueModel.upsert(this.model).then(result => {
     if (result) {
-      let videos = result.dataValues.videos;
-      let images = result.dataValues.images;
-      result.dataValues.videos = videos ? videos.split(',') : [];
-      result.dataValues.images = images ? images.split(',') : [];
-      return this.res.json({errorCode: 0, result: { data: result }, message: '问题创建成功'});
+      return this.res.json({errorCode: 0, message: '问题创建成功'});
     } else {
-      return this.res.json({errorCode: -1, message: '问题创建失败!'});
+      return this.res.json({errorCode: 0, message: '问题更新成功!'});
     }
   }).catch(err => {
     return this.res.json({errorCode: -1, message: err.message});
@@ -87,20 +83,18 @@ issueController.prototype.find = function () {
     return result;
   })
   .then(result => {
-    caseModel.findOneCase({ where: { id: result.dataValues.caseCode } }).then(res => {
-      let issueResultCopy = tool.clone(result.dataValues);
-      let caseResultCopy = tool.clone(res.dataValues);
-      let videos = issueResultCopy.videos;
-      let images = issueResultCopy.images;
-      issueResultCopy.issueVideos = videos ? videos.split(',') : [];
-      issueResultCopy.issueImages = images ? images.split(',') : [];
-      issueResultCopy.caseSnap = caseResultCopy.caseSnap;
-      issueResultCopy.caseDesc = caseResultCopy.caseDesc;
-      issueResultCopy.caseMethod = caseResultCopy.caseMethod;
-      issueResultCopy.caseImages = caseResultCopy.images ? caseResultCopy.images.split(',') : [];
-      issueResultCopy.caseVideos = caseResultCopy.videos ? caseResultCopy.videos.split(',') : [];
-      issueResultCopy.caseMarker = caseResultCopy.marker;
-      return this.res.json({errorCode: 0, result: issueResultCopy, message: '问题查询成功'});
+    caseModel.findOneCase({ where: { id: caseId } }).then(res => {
+      let tempResult = {};
+      tempResult.caseCode = res.dataValues.id;
+      tempResult.caseSnap =  res.dataValues.caseSnap;
+      tempResult.caseDesc =  res.dataValues.caseDesc;
+      tempResult.caseMethod =  res.dataValues.caseMethod;
+      tempResult.caseImages =  res.dataValues.images ?  res.dataValues.images.split(',') : [];
+      tempResult.caseVideos =  res.dataValues.videos ?  res.dataValues.videos.split(',') : [];
+      tempResult.caseMarker =  res.dataValues.marker;
+      tempResult.issueVideos = result ? result.dataValues.videos.split(',') : [];
+      tempResult.issueImages = result ? result.dataValues.images.split(',') : [];
+      return this.res.json({errorCode: 0, result: tempResult, message: '问题查询成功'});
     })
   })
   .catch(err => {

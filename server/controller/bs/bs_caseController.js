@@ -118,7 +118,7 @@ caseController.prototype.listDetail = function () {
         data.caseSnap = result[i].caseSnap;
         data.caseMediaLength = caseImageLength + caseVideoLength;
         data.proMediaLength = proImageLength + proVideoLength;
-        data.proCode = result[i].proCode;
+        data.proCode = result[i].proCode ? result[i].proCode : parseInt(this.req.query.projectCode);
         data.caseCode = result[i].caseCode;
         data.createdAt = result[i].createdAt;
         dataList.push(data);
