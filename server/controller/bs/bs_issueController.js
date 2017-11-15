@@ -56,8 +56,8 @@ issueController.prototype.upload = function () {
  * @method create
  */
 issueController.prototype.create = function () {
-  // this.req.body.images = this.req.body.images.join(',');
-  // this.req.body.videos = this.req.body.videos.join(',');
+  this.req.body.images = this.req.body.images.join(',');
+  this.req.body.videos = this.req.body.videos.join(',');
   tool.extend(this.model, this.req.body);
   issueModel.upsert(this.model).then(result => {
     if (result) {
