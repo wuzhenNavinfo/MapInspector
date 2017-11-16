@@ -19,6 +19,8 @@
     "es2015": "0.0.0",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
+    "less": "^2.7.3",
+    "less-loader": "^4.0.5",
     "mapbox-gl": "^0.41.0",
     "nprogress": "^0.2.0",
     "vue": "^2.5.2",

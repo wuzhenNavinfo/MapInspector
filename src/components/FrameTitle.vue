@@ -3,8 +3,8 @@
     <el-col :span="24" class="header">
       <el-col :span="6" class="logo" :class="titleCtrl.collapsed?'logo-collapse-width':'logo-width'">
         <transition name="fade">
-          <div v-if='sysNameShow'>审图项目</div>
-          <div v-if='!sysNameShow'>审</div>
+          <div v-if='!sysNameShow'>审图项目</div>
+          <div v-if='sysNameShow'>审</div>
         </transition>
       </el-col>
       <el-col :span="14" :style="backgroundImage">
@@ -63,7 +63,7 @@ import {appUtil} from '../config'
 
 </script>
 
-<style scoped>
+<style scoped lang="less">
   // 过渡状态
   .fade-enter-active {
     transition: all 1.3s ease-out;
@@ -76,56 +76,55 @@ import {appUtil} from '../config'
     opacity: 0;
   }
 
-
   .container {
 		position: absolute;
 		top: 0px;
 		bottom: 0px;
 		width: 100%;
+		.header {
+      height: 60px;
+      line-height: 60px;
+      background: #20a0ff;
+      color:#fff;
+      .logo{
+        height:60px;
+        font-size: 22px;
+        padding-left:20px;
+        padding-right:20px;
+        border-color: rgba(238,241,146,0.3);
+        border-right-width: 1px;
+        border-right-style: solid;
+        &.logo-width{
+          width: 230px;
+        }
+        &.logo-collapse-width{
+          width:64px
+        }
+      }
+      .tools{
+        padding: 0px 23px;
+        width:14px;
+        height: 60px;
+        line-height: 60px;
+        cursor: pointer;
+      }
+      .userinfo {
+        text-align: right;
+        padding-right: 35px;
+        float: right;
+        cursor: pointer;
+        .userinfo-inner {
+          color:#fff;
+          img{
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin: 10px 0px 10px 10px;
+            float: right;
+          }
+        }
+      }
+    }
 	}
-  .container .header {
-    height: 60px;
-    line-height: 60px;
-    background: #20a0ff;
-    color:#fff;
-  }
-  .container .header .logo{
-    height:60px;
-    font-size: 22px;
-    padding-left:20px;
-    padding-right:20px;
-    border-color: rgba(238,241,146,0.3);
-    border-right-width: 1px;
-    border-right-style: solid;
-  }
-  .container .header .logo.logo-width{
-    width: 230px;
-  }
-  .container .header .logo.logo-collapse-width{
-    width:64px
-  }
-  .container .header .tools{
-    padding: 0px 23px;
-    width:14px;
-    height: 60px;
-    line-height: 60px;
-    cursor: pointer;
-  }
-  .container .header .userinfo {
-    text-align: right;
-    padding-right: 35px;
-    float: right;
-    cursor: pointer;
-  }
-  .container .header .userinfo .userinfo-inner {
-    color:#fff;
-  }
-  .container .header .userinfo .userinfo-inner img{
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-    margin: 10px 0px 10px 10px;
-    float: right;
-  }
 
 </style>

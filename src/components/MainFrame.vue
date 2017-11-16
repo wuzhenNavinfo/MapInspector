@@ -1,30 +1,5 @@
 <template>
   <el-row class="container">
-    <!--
-      <el-col :span="24" class="header">
-        <el-col :span="6" class="logo" :class="pageCtrl.collapsed?'logo-collapse-width':'logo-width'">
-          <transition name="fade">
-            <div v-if='sysNameShow'>审图项目</div>
-            <div v-if='!sysNameShow'>审</div>
-          </transition>
-        </el-col>
-        <el-col :span="14" :style="backgroundImage">
-          <div class="tools" @click.prevent="collapse">
-            <i class="fa fa-align-justify"></i>
-          </div>
-        </el-col>
-        <el-col :span="4" class="userinfo">
-          <el-dropdown trigger="hover">
-            <span class="el-dropdown-link userinfo-inner"><img src="./assets/user.png" /> {{sysUserName}}</span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>我的消息</el-dropdown-item>
-              <el-dropdown-item>设置</el-dropdown-item>
-              <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </el-col>
-      </el-col>
-     -->
     <frame-title :titleCtrl="pageCtrl"></frame-title>
     <el-col :span="24" class="main">
       <aside :class="pageCtrl.collapsed?'menu-collapsed':'menu-expanded'">
@@ -59,7 +34,7 @@
           </el-menu-item>
         </el-menu>
       </aside>
-      <section class="content-container">
+      <section class="content-container scroll_style" style='over-flow:auto;'>
         <router-view></router-view>
       </section>
     </el-col>
@@ -126,7 +101,7 @@ import {appUtil} from '../config.js'
 
 </script>
 
-<style scoped>
+<style scoped lang="less">
   // 过渡状态
   .fade-enter-active {
     transition: all 1.3s ease-out;
@@ -145,75 +120,29 @@ import {appUtil} from '../config.js'
 		top: 0px;
 		bottom: 0px;
 		width: 100%;
+		.main {
+      display: flex;
+      position: absolute;
+      top: 60px;
+      bottom: 0px;
+      overflow: hidden;
+      aside{
+        flex:0 0 230px;
+        width: 230px;
+        .el-menu {
+          height: 100%;
+        }
+      }
+      .menu-collapsed{
+        flex:0 0 64px;
+        width: 64px;
+      }
+      .menu-expanded{
+        flex:0 0 230px;
+        width: 230px;
+      }
+    }
 	}
-  .container .header {
-    height: 60px;
-    line-height: 60px;
-    background: #20a0ff;
-    color:#fff;
-  }
-  .container .header .logo{
-    height:60px;
-    font-size: 22px;
-    padding-left:20px;
-    padding-right:20px;
-    border-color: rgba(238,241,146,0.3);
-    border-right-width: 1px;
-    border-right-style: solid;
-  }
-  .container .header .logo.logo-width{
-    width: 230px;
-  }
-  .container .header .logo.logo-collapse-width{
-    width:64px
-  }
-  .container .header .tools{
-    padding: 0px 23px;
-    width:14px;
-    height: 60px;
-    line-height: 60px;
-    cursor: pointer;
-  }
-  .container .header .userinfo {
-    text-align: right;
-    padding-right: 35px;
-    float: right;
-    cursor: pointer;
-  }
-  .container .header .userinfo .userinfo-inner {
-    color:#fff;
-  }
-  .container .header .userinfo .userinfo-inner img{
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-    margin: 10px 0px 10px 10px;
-    float: right;
-  }
-
-  .container .main {
-    display: flex;
-    position: absolute;
-    top: 60px;
-    bottom: 0px;
-    overflow: hidden;
-  }
-  .container .main aside{
-    flex:0 0 230px;
-    width: 230px;
-  }
-  .container .main aside .el-menu {
-    height: 100%;
-  }
-  .container .main .menu-collapsed{
-    flex:0 0 64px;
-    width: 64px;
-  }
-	.container .main .menu-expanded{
-    flex:0 0 230px;
-    width: 230px;
-  }
-
   .content-container {
     flex:1;
   }

@@ -19,14 +19,16 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-/*****全局取消地图logo的样式*****/
-#ImgCopyright{
+/*****地图样式重写*****/
+#ImgCopyright{ // 取消地图logo
   display: none;
 }
 #ImgCopyright + div {
   display: none;
 }
-
+#LayerScale { // 比例尺放置在中间
+  left: 50% !important;
+}
 
 #app {
 	position: absolute;

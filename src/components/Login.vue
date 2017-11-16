@@ -57,11 +57,6 @@ export default {
             that.logining = false;
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
-              if (result.userName == 'root') {
-                result.role = 'manager'
-              }else {
-                result.role = 'worker'
-              }
               appUtil.setCurrentUser(result);
               that.$router.push('/mainFrame');
             } else {
@@ -79,7 +74,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="less">
   .parent{
     height: 100%;
     display:flex; /*设为伸缩容器*/
@@ -88,13 +83,14 @@ export default {
     background-image: url(../assets/bg.jpg);
     background-size: 100% 100%;
     background-position: 50%;
+    .stable{
+      width:450px; /*固定宽度*/
+    }
+    .change{
+      flex:1; /*这里设置为占比1，填充满剩余空间*/
+    }
   }
-  .stable{
-    width:450px; /*固定宽度*/
-  }
-  .change{
-    flex:1; /*这里设置为占比1，填充满剩余空间*/
-  }
+
   .login-container {
     border-radius: 5px;
     width: 350px;
@@ -102,13 +98,13 @@ export default {
     background: #fff;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;
-  }
-  .login-container .title {
-    margin: 0px auto 30px auto;
-    text-align: center;
-    color: #505458;
-  }
-  .login-container .remember {
-    margin: 0px 0px 15px 0px;
+    .title {
+      margin: 0px auto 30px auto;
+      text-align: center;
+      color: #505458;
+    }
+    .remember {
+      margin: 0px 0px 15px 0px;
+    }
   }
 </style>
