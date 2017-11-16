@@ -24,7 +24,7 @@
           <div class="label">已作业：{{item.worked}}</div>
           <div class="label">待作业：{{item.unworked}}</div>
           <div style="text-align:center;padding-top:10px">
-            <el-button type="primary" size="mini">通过</el-button>
+            <el-button type="primary" size="mini">提交</el-button>
           </div>
         </el-card>
       </el-col>

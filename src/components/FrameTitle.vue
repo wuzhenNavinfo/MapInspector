@@ -3,7 +3,7 @@
     <el-col :span="24" class="header">
       <el-col :span="6" class="logo" :class="titleCtrl.collapsed?'logo-collapse-width':'logo-width'">
         <transition name="fade">
-          <div v-if='!sysNameShow'>审图项目</div>
+          <div v-if='!sysNameShow'>审图系统</div>
           <div v-if='sysNameShow'>审</div>
         </transition>
       </el-col>

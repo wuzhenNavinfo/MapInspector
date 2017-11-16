@@ -20,13 +20,14 @@ body {
 }
 
 /*****地图样式重写*****/
-#ImgCopyright{ // 取消地图logo
-  display: none;
+
+#ImgCopyright{
+  display: none !important;
 }
 #ImgCopyright + div {
-  display: none;
+  display: none !important;
 }
-#LayerScale { // 比例尺放置在中间
+#LayerScale {
   left: 50% !important;
 }
 
