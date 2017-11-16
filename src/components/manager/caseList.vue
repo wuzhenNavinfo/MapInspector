@@ -93,10 +93,10 @@
       </div>
     </div>
     <div>
-      <el-dialog :visible.sync="imageDialogVisible">
+      <el-dialog :custom-class="myDialog" :visible.sync="imageDialogVisible">
          <el-carousel ref="imagesCarousel" indicator-position="outside" :autoplay="false">
             <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
-              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
+              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;height:500px;">
             </el-carousel-item>
           </el-carousel>
       </el-dialog>
@@ -288,7 +288,6 @@ export default {
       this.caseForm.images.splice(index, 1)
     },
     showImages(index) {
-      console.info(this.$refs);
       this.imageDialogVisible = true;
       let that = this;
       setTimeout(function(){
@@ -377,6 +376,11 @@ export default {
     this.queryCaseList();
     // this.initMapboxgl();
     this.initMapbar();
+  },
+  computed: {
+    myDialog() {
+      return `my-dialog`;
+    },
   }
 }
 </script>
@@ -504,5 +508,9 @@ export default {
 .my-upload {
   padding: 10px;
   padding-top: 0px;
+}
+
+.my-dialog{
+  background-color: red !important;
 }
 </style>
