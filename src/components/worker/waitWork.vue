@@ -15,7 +15,7 @@
           <el-progress type="circle" :percentage="item.progress" :width="80" style="float:right;"></el-progress>
           <div slot="header" class="clearfix" >
             <span>{{item.projectName}}</span>
-            <el-button style="float:right;"  size="mini" type="danger" @click="enterIssue()">录问题</el-button>
+            <el-button style="float:right;"  size="mini" type="danger" @click="enterIssue(item.id)">录问题</el-button>
             <el-button style="float:right;margin-right:10px;"  size="mini" type="danger" @click="deleteIssue(item.id)">删除</el-button>
           </div>
           <div class="label">状态：{{item.projectStatusLabel}} </div>
@@ -95,8 +95,13 @@ export default {
         }
       })
     },
-    enterIssue() {
-      this.$router.push('/worker/enterIssue');
+    enterIssue(id) {
+      this.$router.push({
+        name: 'enterIssue', // 和router/index.js保持一致
+        params: {
+          projectCode: id
+        }
+      });
     },
     deleteIssue(id) {
       let that = this;

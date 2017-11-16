@@ -59,10 +59,10 @@
           <el-form-item label="问题编号">
             <el-input disabled v-model="caseForm.id"></el-input>
           </el-form-item>
-          <el-form-item prop="caseSnap" label="问题概述">
+          <el-form-item prop="caseSnap" label="案例概述">
             <el-input v-model="caseForm.caseSnap"></el-input>
           </el-form-item>
-          <el-form-item prop="caseDesc" label="详细描述">
+          <el-form-item prop="caseDesc" label="案例描述">
             <el-input type="textarea" v-model="caseForm.caseDesc"></el-input>
           </el-form-item>
           <el-form-item prop="caseMethod" label="处理方法">
@@ -74,7 +74,7 @@
           </el-form-item>
           <el-row style="padding-left:10px;">
             <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
-              <img :src="ctrl.baseUrl+'/'+image" class="img-list">
+              <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showImages(index)">
               <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
@@ -91,6 +91,15 @@
           </el-row>
         </el-form>
       </div>
+    </div>
+    <div>
+      <el-dialog :visible.sync="imageDialogVisible">
+         <el-carousel ref="imagesCarousel" indicator-position="outside" :autoplay="false">
+            <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
+              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
+            </el-carousel-item>
+          </el-carousel>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -111,6 +120,7 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      imageDialogVisible: false,
       rightCollapsed: false,
       leftCollapsed: true,
       currentPage1: 1,
@@ -248,6 +258,9 @@ export default {
             that.ctrl.saving = false;
             if (data.errorCode == 0){
               that.queryCaseList();
+              if (!that.caseForm.id) { // 修改
+                that.caseForm.id = data.result.data.id;
+              }
               that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 1000});
             } else {
               that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 1000});
@@ -263,12 +276,24 @@ export default {
       }
       let that = this;
       deleteCaseById({id: this.caseForm.id}).then(res => {
-        that.createCase();
-        that.queryCaseList();
+        let {errorCode} = res;
+        if (errorCode === 0) {
+          window.maplet.clearOverlays();
+          that.createCase();
+          that.queryCaseList();
+        }
       });
     },
     deleteImage(index) {
       this.caseForm.images.splice(index, 1)
+    },
+    showImages(index) {
+      console.info(this.$refs);
+      this.imageDialogVisible = true;
+      let that = this;
+      setTimeout(function(){
+        that.$refs.imagesCarousel.setActiveItem(index);
+      })
     },
     selectedRow(row, event) {
       let that = this;
@@ -276,7 +301,16 @@ export default {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.caseForm = result.data;
-          that.caseForm.location = result.data.marker.coordinates[0]+","+result.data.marker.coordinates[1];
+          let lon = result.data.marker.coordinates[0];
+          let lat = result.data.marker.coordinates[1];
+          that.caseForm.location = lon + "," + lat;
+          window.maplet.setCenter(new MPoint (lon, lat));
+          window.maplet.clearOverlays();
+          window.marker = new MMarker(
+              new MPoint(lon, lat),
+              new MIcon(mapMarker,32,32)
+          );
+          window.maplet.addOverlay(marker);
         }
       })
       that.rightPanelCtrl('open');

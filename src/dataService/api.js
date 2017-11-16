@@ -56,3 +56,7 @@ export const queryIssueList = param => { return getReq('/api/bs/project/list', p
 export const saveIssue = param => { return saveIssue('/api/bs/project/save', param)};
 export const createProject = param => { return postReq('/api/bs/project/create', param)};
 export const deleteProject = param => { return getReq('/api/bs/project/delete', param)};
+export const queryCaseListDetail = param => { return getReq('/api/bs/case/listDetail', param)};
+export const queryIssue = param => { return getReq('/api/bs/issue/find', param)};
+export const createIssue = param => { return postReq('/api/bs/issue/create', param)};
+

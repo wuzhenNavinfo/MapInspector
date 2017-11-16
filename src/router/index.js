@@ -12,7 +12,7 @@ let routes = [
   {
     path: '/',
     component: Login,
-    name: 'Login'
+    name: 'Login' // name需要保持唯一,通过router.push({name:'Login'})方式切换路由
   },
   {
     path: '/login',
