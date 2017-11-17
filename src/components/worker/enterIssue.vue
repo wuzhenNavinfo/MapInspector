@@ -6,33 +6,21 @@
     </div>
     <div class="left scroll_style" :class="leftCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>案例列表
-        <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:2px;" @click="leftPanelCtrl('close')"></i>
+        <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:6px;" @click="leftPanelCtrl('close')"></i>
       </div>
       <div style="overflow:auto;" class="scroll_style" :style="{'max-height': panelHeight}">
         <el-table stripe border highlight-current-row max-height="100%"
-          :data="tableData.data" @row-dblclick="selectedRow">
-          <el-table-column
-            type="index" width="50px"
-            label="序号">
-          </el-table-column>
-          <el-table-column
-            prop="caseSnap"
-            label="问题描述">
-          </el-table-column>
-          <el-table-column width="70px"
-            prop="caseMediaLength"
-            label="附件数">
-          </el-table-column>
-          <el-table-column
-            prop="proMediaLength"
-            label="处理">
-          </el-table-column>
+          :data="tableData.data" @row-click="selectedRow">
+          <el-table-column type="index" width="50px" label="序号"> </el-table-column>
+          <el-table-column prop="caseSnap" label="问题描述"> </el-table-column>
+          <el-table-column width="64px" prop="caseMediaLength" label="附件数"> </el-table-column>
+          <el-table-column width="50px" prop="proMediaLength" label="处理"> </el-table-column>
         </el-table>
         <el-pagination small
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="ctrl.pageNum"
-          :page-sizes="[10, 30, 50, 100]"
+          :page-sizes="[20, 30, 50, 100]"
           :page-size="ctrl.pageSize"
           layout="total, sizes, prev, next"
           :total="tableData.total">
@@ -98,7 +86,8 @@
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import { queryCaseListDetail, queryCaseById, queryIssue, createIssue} from '../../dataService/api';
-import mapMarker from '../../assets/marker.gif'
+// import mapMarker from '../../assets/marker.png'
+import mapMarker from '../../assets/poi.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -118,7 +107,7 @@ export default {
         caseCreate: false,
         addLocation: false, // 增加点位的标识
         saving: false,
-        pageSize: 10,
+        pageSize: 20,
         pageNum:1
       },
       video: {
@@ -223,7 +212,7 @@ export default {
           window.maplet.clearOverlays();
           window.marker = new MMarker(
               new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32)
+              new MIcon(mapMarker,32,32,16,26)
           );
           window.maplet.addOverlay(marker);
         }
@@ -262,7 +251,7 @@ export default {
           let poi = point.pid.split(',');
           window.marker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32)
+              new MIcon(mapMarker,32,32,16,26)
           );
           window.maplet.addOverlay(marker);
         }
@@ -291,11 +280,11 @@ export default {
     height: 100%;
   }
   .my-panel{
-    padding: 10px;
+    padding: 6px;
     background: #20a0ff;
     text-align: left;
-    line-height:26px;
-    font-size: 18px;
+    line-height:28px;
+    font-size: 16px;
     color: #FFFFFF;
     font-weight: bold;
   }
