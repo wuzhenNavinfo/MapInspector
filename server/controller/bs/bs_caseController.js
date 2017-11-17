@@ -38,12 +38,19 @@ function caseController(req, res) {
  * @method list
  */
 caseController.prototype.list = function () {
-  let pageSize = parseInt(this.req.query.pageSize);
-  let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
-  if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
+  let requestParam = null;
+  if (!this.req.query.pageSize && !this.req.query.pageNum) {
+    requestParam = {};
+  } else if (this.req.query.pageSize && this.req.query.pageNum) {
+    let pageSize = parseInt(this.req.query.pageSize);
+    let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
+    if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
+      return this.res.json({errorCode: -1, message: '查询参数有误'});
+    }
+    requestParam = { limit: pageSize, offset: startIndex };
+  } else {
     return this.res.json({errorCode: -1, message: '查询参数有误'});
   }
-  let requestParam = { limit: pageSize, offset: startIndex };
   caseModel.multiFind (requestParam).then (result => {
     let rowNum = result.count;
     let dataList = [];
@@ -65,6 +72,59 @@ caseController.prototype.list = function () {
       dataList.push(data);
     }
     return this.res.json ({errorCode: 0, result: {data: dataList, total: rowNum}, message: '查找成功'});
+  }).catch(err => {
+    throw err;
+  });
+};
+
+/**
+ * 案例列表
+ * @method list
+ */
+caseController.prototype.listDetail = function () {
+  let requestParam = null;
+  if (!this.req.query.pageSize && !this.req.query.pageNum) {
+    requestParam = {};
+  } else if (this.req.query.pageSize && this.req.query.pageNum) {
+    let pageSize = parseInt(this.req.query.pageSize);
+    let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
+    if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
+      return this.res.json({errorCode: -1, message: '查询参数有误'});
+    }
+    requestParam = { limit: pageSize, offset: startIndex };
+  } else {
+    return this.res.json({errorCode: -1, message: '查询参数有误'});
+  }
+  requestParam.condition = parseInt(this.req.query.projectCode);
+  caseModel.findCombinaionIssue (requestParam).then (result => {
+    caseModel.getCount().then(countRes => {
+      let rowNum = countRes;
+      let dataList = [];
+      for (let i = 0; i < result.length; i++) {
+        let data = {};
+        let caseImageLength = caseVideoLength = proImageLength = proVideoLength = 0;
+        if (result[i].caseImages) {
+          caseImageLength = result[i].caseImages.split(',').length;
+        }
+        if (result.caseVideos) {
+          caseVideoLength = result[i].caseVideos.split(',').length;
+        }
+        if (result[i].proImages) {
+          proImageLength = result[i].proImages.split(',').length;
+        }
+        if (result.proVideos) {
+          proVideoLength = result[i].proVideos.split(',').length;
+        }
+        data.caseSnap = result[i].caseSnap;
+        data.caseMediaLength = caseImageLength + caseVideoLength;
+        data.proMediaLength = proImageLength + proVideoLength;
+        data.proCode = result[i].proCode ? result[i].proCode : parseInt(this.req.query.projectCode);
+        data.caseCode = result[i].caseCode;
+        data.createdAt = result[i].createdAt;
+        dataList.push(data);
+      }
+      return this.res.json ({errorCode: 0, result: {data: dataList, total: rowNum}, message: '查找成功'});
+    });
   }).catch(err => {
     throw err;
   });
