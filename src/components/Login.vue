@@ -2,9 +2,8 @@
   <div class="parent">
     <div class="change"></div>
     <div class="stable">
-      <img height="60px" src="../assets/logo.png">
+      <img style="height:60px;margin-bottom:20px;" src="../assets/logo.png">
       <el-form :model="ruleForm" :rules="rules" :status-icon="true" ref="ruleForm" class="login-container">
-
         <h3 class="title" >系统登录</h3>
         <el-form-item prop="account">
           <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>

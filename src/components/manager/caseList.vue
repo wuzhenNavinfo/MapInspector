@@ -6,33 +6,21 @@
     </div>
     <div class="left" :class="leftCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>案例列表
-        <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:2px;" @click="leftPanelCtrl('close')"></i>
+        <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:6px;" @click="leftPanelCtrl('close')"></i>
       </div>
       <div style="overflow:auto;" class="scroll_style" :style="{'max-height': panelHeight}">
         <el-table stripe border highlight-current-row max-height="100%"
-          :data="tableData.data" @row-dblclick="selectedRow">
-          <el-table-column
-            type="index" width="50px"
-            label="序号">
-          </el-table-column>
-          <el-table-column
-            prop="caseSnap"
-            label="问题描述">
-          </el-table-column>
-          <el-table-column width="70px"
-            prop="mediaLength"
-            label="附件数">
-          </el-table-column>
-          <el-table-column
-            prop="createdAt"
-            label="创建时间">
-          </el-table-column>
+          :data="tableData.data" @row-click="selectedRow">
+          <el-table-column type="index" width="50px" label="序号"> </el-table-column>
+          <el-table-column prop="caseSnap" label="案例概述"> </el-table-column>
+          <el-table-column width="64px" prop="mediaLength" label="附件数"> </el-table-column>
+          <el-table-column width="92px" prop="createdAt" label="创建时间"> </el-table-column>
         </el-table>
         <el-pagination small
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="ctrl.pageNum"
-          :page-sizes="[10, 30, 50, 100]"
+          :page-sizes="[20, 30, 50, 100]"
           :page-size="ctrl.pageSize"
           layout="total, sizes, prev, next"
           :total="tableData.total">
@@ -40,19 +28,27 @@
       </div>
     </div>
     <div class="map_operate_tool">
-       <el-button size="mini" type="danger" @click="createCase()">创 建</el-button>
+       <el-button size="mini" type="danger" icon="el-icon-circle-plus" @click="createCase()">创 建</el-button>
     </div>
-    <div class="right-open-icon" @click="rightPanelCtrl('open')" title="展开">
-       <i class="el-icon-caret-left" style="cursor:pointer;" ></i>
+    <div class="right-open-icon" title="展开">
+       <i class="el-icon-caret-left" :class="operationed?'enabled':'disabled'" @click="rightPanelCtrl('open')" ></i>
     </div>
-    <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
+    <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'">
        <i class="el-icon-back" style="cursor:pointer;" ></i>
+       <!-- <el-dropdown trigger="hover">
+                      <i class="el-icon-date" style="cursor:pointer;" ></i>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>我的消息</el-dropdown-item>
+                        <el-dropdown-item>设置</el-dropdown-item>
+                        <el-dropdown-item divided >退出登录</el-dropdown-item>
+                      </el-dropdown-menu>
+                   </el-dropdown> -->
     </div>
     <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>
         <i class="el-icon-caret-right" style="cursor:pointer;" @click="rightPanelCtrl('close')"></i>案例详情
-        <el-button style="float:right;margin-left:10px;" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
-        <el-button style="float:right;"  size="mini" type="warning" :loading="ctrl.deleteing" @click="deleteCase()">删除</el-button>
+        <el-button style="float:right;margin-left:10px;" icon="el-icon-check" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
+        <el-button style="float:right;" icon="el-icon-delete"  size="mini" type="warning" :loading="ctrl.deleteing" @click="deleteCase()">删除</el-button>
       </div>
       <div class="scroll_style" :style="{'max-height': panelHeight}">
         <el-form ref="caseForm" :model="caseForm" class="my-from" :rules="rules" :show-message="false" :status-icon="true"  label-width="80px">
@@ -70,19 +66,19 @@
           </el-form-item>
           <el-form-item prop="location" disabled label="点位信息">
             <el-input disabled v-model="caseForm.location" style="width:200px;"></el-input>
-            <i class="el-icon-location" @click="addLocation" style="cursor:pointer;"></i>
+            <i class="el-icon-location" @click="addLocation" style="cursor:pointer;font-size:24px;"></i>
           </el-form-item>
           <el-row style="padding-left:10px;">
             <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showImages(index)">
-              <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
+              <div class="el-icon-circle-close-outline img_delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
           <el-upload
             class="my-upload" multiple
             :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
             :on-success="handlesuccess" :show-file-list="false">
-            <el-button size="small" type="primary">点击上传图片</el-button>
+            <el-button size="small" icon="el-icon-upload" type="primary">点击上传图片</el-button>
           </el-upload>
           <el-row>
             <el-col :span="18" width="260px;">
@@ -93,7 +89,7 @@
       </div>
     </div>
     <div>
-      <el-dialog :custom-class="myDialog" :visible.sync="imageDialogVisible">
+      <el-dialog custom-class="myDialog" :visible.sync="imageDialogVisible">
          <el-carousel ref="imagesCarousel" indicator-position="outside" :autoplay="false">
             <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
               <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;height:500px;">
@@ -111,7 +107,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
-import mapMarker from '../../assets/marker.gif'
+import mapMarker from '../../assets/poi_black.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -120,6 +116,7 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      operationed: false,
       imageDialogVisible: false,
       rightCollapsed: false,
       leftCollapsed: true,
@@ -132,7 +129,7 @@ export default {
         addLocation: false, // 增加点位的标识
         saving: false,
         deleteing: false,
-        pageSize: 10,
+        pageSize: 20,
         pageNum:1
       },
       video: {
@@ -207,7 +204,9 @@ export default {
         this.rightCollapsed = false;
       }
       if (flag == 'open') {
-        this.rightCollapsed = true;
+        if (this.operationed) {
+          this.rightCollapsed = true;
+        }
       }
     },
     leftPanelCtrl(flag) {
@@ -220,8 +219,12 @@ export default {
       }
     },
     createCase() {
+      this.operationed = true;
       this.clearCase();
       this.rightPanelCtrl('open');
+      if (this.$refs.caseForm && this.$refs.caseForm.clearValidate) {
+        this.$refs.caseForm.clearValidate();
+      }
     },
     clearCase() {
       this.caseForm.id = '';
@@ -295,6 +298,10 @@ export default {
       })
     },
     selectedRow(row, event) {
+      if (this.$refs.caseForm && this.$refs.caseForm.clearValidate) {
+        this.$refs.caseForm.clearValidate();
+      }
+      this.operationed = true;
       let that = this;
       queryCaseById({id: row.id}).then(data => {
         let { errorCode, message, result } = data;
@@ -307,7 +314,7 @@ export default {
           window.maplet.clearOverlays();
           window.marker = new MMarker(
               new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32)
+              new MIcon(mapMarker,32,32,16,26)
           );
           window.maplet.addOverlay(marker);
         }
@@ -348,7 +355,7 @@ export default {
           let poi = point.pid.split(',');
           window.marker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32)
+              new MIcon(mapMarker,32,32,16,26)
           );
           window.maplet.addOverlay(marker);
         }
@@ -377,11 +384,6 @@ export default {
     // this.initMapboxgl();
     this.initMapbar();
   },
-  computed: {
-    myDialog() {
-      return `my-dialog`;
-    },
-  }
 }
 </script>
 
@@ -395,11 +397,11 @@ export default {
     height: 100%;
   }
   .my-panel{
-    padding: 10px;
+    padding: 6px;
     background: #20a0ff;
     text-align: left;
-    line-height:26px;
-    font-size: 18px;
+    line-height:28px;
+    font-size: 16px;
     color: #FFFFFF;
     font-weight: bold;
   }
@@ -441,7 +443,12 @@ export default {
       background-color:#20a0ff;
       padding:10px;
       margin-top: 10px;
-      border-radius: 8px 0px 0px 8px
+      border-radius: 8px 0px 0px 8px;
+      cursor:pointer;
+    }
+    .disabled {
+      cursor: not-allowed;
+      background-color: #ccc;
     }
   }
   .return-page-icon {
@@ -451,9 +458,15 @@ export default {
     color: #FFFFFF;
     &.open-return-page {
       right: 330px;
+      :hover{
+        background-color: #55A1EF;
+      }
     }
     &.close-return-page {
       right: 40px;
+      :hover{
+        background-color: #55A1EF;
+      }
     }
     i{
       background-color:#20a0ff;
@@ -485,9 +498,10 @@ export default {
 .my-from {
   .img_delete{
     position: relative;
-    top: -70px;
-    left: 52px;
+    top: -73px;
+    left: 54px;
     cursor: pointer;
+    font-size: 16px;
   }
   .img_delete:hover {
     background: #CCC;
