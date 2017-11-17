@@ -212,7 +212,7 @@ export default {
           window.maplet.clearOverlays();
           window.marker = new MMarker(
               new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32,16,26)
+              new MIcon(mapMarker,32,32,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -251,7 +251,7 @@ export default {
           let poi = point.pid.split(',');
           window.marker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32,16,26)
+              new MIcon(mapMarker,32,32,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -284,7 +284,7 @@ export default {
     background: #20a0ff;
     text-align: left;
     line-height:28px;
-    font-size: 16px;
+    font-size: 14px;
     color: #FFFFFF;
     font-weight: bold;
   }

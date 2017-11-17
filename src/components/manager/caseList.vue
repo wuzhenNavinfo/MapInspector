@@ -89,7 +89,7 @@
       </div>
     </div>
     <div>
-      <el-dialog custom-class="myDialog" :visible.sync="imageDialogVisible">
+      <el-dialog custom-class="my-dialog" :visible.sync="imageDialogVisible">
          <el-carousel ref="imagesCarousel" indicator-position="outside" :autoplay="false">
             <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
               <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;height:500px;">
@@ -107,7 +107,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
-import mapMarker from '../../assets/poi_black.png'
+import mapMarker from '../../assets/poi.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -314,7 +314,7 @@ export default {
           window.maplet.clearOverlays();
           window.marker = new MMarker(
               new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32,16,26)
+              new MIcon(mapMarker,32,32,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -355,7 +355,7 @@ export default {
           let poi = point.pid.split(',');
           window.marker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32,16,26)
+              new MIcon(mapMarker,32,32,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -401,7 +401,7 @@ export default {
     background: #20a0ff;
     text-align: left;
     line-height:28px;
-    font-size: 16px;
+    font-size: 14px;
     color: #FFFFFF;
     font-weight: bold;
   }
@@ -528,3 +528,4 @@ export default {
   background-color: red !important;
 }
 </style>
+
