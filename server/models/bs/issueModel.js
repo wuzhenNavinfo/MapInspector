@@ -10,34 +10,50 @@ const Sequelize = require('sequelize');
 const db = require('../../dataBase');
 
 // 创建 model
-module.exports = db.define('bb_project', {
+module.exports = db.define('bb_issue', {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false
     },
-    projectName: {
-      type: Sequelize.STRING,
-      field: 'pro_name',
-      allowNull: false
-    },
-    projectDesc: {
-      type: Sequelize.STRING,
-      field: 'pro_desc',
-      allowNull: false
-    },
     createUser: {
       type: Sequelize.INTEGER,
-      field: 'create_person',
+      allowNull: false,
       references: {
         model: 'om_user',
         key: 'user_id'
       }
     },
-    projectStatus: {
+    proCode: {
       type: Sequelize.INTEGER,
-      field: 'pro_status'
+      field: 'pro_code',
+      allowNull: false,
+      unique: 'compositeIndex',
+      references: {
+        model: 'bb_project',
+        key: 'id'
+      }
+    },
+    caseCode: {
+      type: Sequelize.INTEGER,
+      field: 'case_code',
+      allowNull: false,
+      unique: 'compositeIndex',
+      references: {
+        model: 'bb_case',
+        key: 'id'
+      }
+    },
+    images: {
+      type: Sequelize.STRING
+    },
+    videos: {
+      type: Sequelize.STRING
+    },
+    issueStatus: {
+      type: Sequelize.INTEGER,
+      field: 'issue_status'
     },
     createdAt: {
       type: Sequelize.DATE,

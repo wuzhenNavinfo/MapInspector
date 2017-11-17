@@ -25,6 +25,11 @@ router.get('/list', function (req, res) {
     new bs_caseController(req, res).list()
 });
 
+// 案例列表与问题的联合查询
+router.get('/listDetail', function (req, res) {
+  new bs_caseController(req, res).listDetail()
+});
+
 // 案例详情
 router.get('/query', function (req, res) {
     new bs_caseController(req, res).query()

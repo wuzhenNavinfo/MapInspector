@@ -11,6 +11,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
+    "express-validator": "^4.3.0",
     "formidable": "^1.1.1",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.1.0",
