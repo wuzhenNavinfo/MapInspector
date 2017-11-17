@@ -10,8 +10,11 @@
 /**
  * 引入相关模块
  */
+const async = require('async');
 const tool = require('../../utils/publicTool');
 const projectModel = require('../../models/bs/projectModel');
+const issueModel = require('../../models/bs/issueModel');
+const caseModel = require('../../models/bs/caseModel');
 
 /**
  * 用户管理控制器;
@@ -36,26 +39,42 @@ function caseController(req, res) {
 caseController.prototype.list = function () {
   let requestParam = null;
   if (!this.req.query.pageSize && !this.req.query.pageNum) {
-    requestParam = {where: {createUser: this.req.loginUser.userId}};
+    requestParam = {where: {createUser: this.req.loginUser.userId},order: [["createdAt", "DESC"]]};
   } else if (this.req.query.pageSize && this.req.query.pageNum) {
     let pageSize = parseInt(this.req.query.pageSize);
     let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
     if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
       return this.res.json({errorCode: -1, message: '查询参数有误'});
     }
-    requestParam = { limit: pageSize, offset: startIndex, where: {createUser: this.req.loginUser.userId} };
+    requestParam = {
+      limit: pageSize,
+      offset: startIndex,
+      where: {createUser: this.req.loginUser.userId},
+      order: [["createdAt", "DESC"]]
+    };
   } else {
     return this.res.json({errorCode: -1, message: '查询参数有误'});
   }
-  projectModel.findAndCountAll (requestParam).then (result => {
+  projectModel.findAndCountAll(requestParam).then (result => {
     let rowNum = result.count;
-    let dataList = result.rows;
-    dataList.forEach(function (item) {
-      item.dataValues.issueTotal = 100;
-      item.dataValues.worked = 20;
-      item.dataValues.unworked = 80;
+    let dataList = tool.clone(result.rows);
+    caseModel.getCount().then(count => {
+      async.mapLimit(dataList, 10, (item, callback)=>{
+        issueModel.findAll({where: {proCode: item.dataValues.id, createUser: this.req.loginUser.userId}})
+        .then(result => {
+          item.dataValues.issueTotal = count;
+          item.dataValues.worked = result.length;
+          item.dataValues.unworked = count - result.length;
+          callback(null, item);
+        })
+        .catch(err => {
+          throw err;
+        });
+      }, (err, results) => {
+        if (err) throw err;
+        return this.res.json ({errorCode: 0, result: {data: results, total: rowNum}, message: '查找成功'});
+      });
     });
-    return this.res.json ({errorCode: 0, result: {data: dataList, total: rowNum}, message: '查找成功'});
   }).catch(err => {
     return this.res.json ({errorCode: -1, message: err.message});
   });
@@ -87,23 +106,23 @@ caseController.prototype.create = function () {
  * @method delete
  */
 caseController.prototype.delete = function () {
-  let deleteId =  0;
-  let requestParam = {};
-  if (this.req.query.id) {
+  let deleteId;
+  try {
     deleteId = parseInt(this.req.query.id);
-  } else {
-    return this.res.json({errorCode: -1, message: '参数错误!'});
+  }catch (err) {
+    throw new Error('缺少项目id');
   }
-  requestParam.where = { id: deleteId };
-  projectModel.destroy(requestParam).then(result => {
-    if (result) {
-      return this.res.json({errorCode: 0, message: '删除成功'});
-    } else {
-      return this.res.json({errorCode: -1, message: '删除失败'});
-    }
-  }).catch(err => {
-    return this.res.json({errorCode: -1, message: err.message});
-  });
+  projectModel.destroy({where: {id: deleteId}})
+    .then(result => {
+      if (result) {
+        return this.res.json({errorCode: 0, message: '删除成功'});
+      } else {
+        return this.res.json({errorCode: -1, message: '删除失败,id为${deleteId}的项目不存在'});
+      }
+    })
+    .catch(err => {
+      return this.res.json({errorCode: -1, message: err.message});
+    });
 };
 
 

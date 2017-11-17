@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
           if (err) {
             return res.json({ errorCode: -1, message: err.message });
           } else {
-            userModel.findOneUser({user_name: decoded.data.name}).then(result => {
+            userModel.findOne({where: {user_name: decoded.data.name}}).then(result => {
               // 获得解码后的用户信息;
               req.loginUser = result.dataValues;
               // 供后面的路由使用

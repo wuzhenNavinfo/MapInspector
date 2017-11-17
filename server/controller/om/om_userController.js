@@ -22,7 +22,7 @@ const userRoleModel = require('../../models/om/user_roleModel');
  * @param res
  * @constructor
  */
-function UserController(req, res) {
+function UserController(req, res, next) {
 	this.model = {};
 	this.model.userName = '';
 	this.model.password = '';
@@ -32,6 +32,7 @@ function UserController(req, res) {
 	this.model.status = 0;
 	this.req = req;
 	this.res = res;
+  this.next = next;
 }
 
 /**
@@ -40,28 +41,37 @@ function UserController(req, res) {
  */
 UserController.prototype.register = function () {
 	tool.extend(this.model, this.req.body);
-	if (!this.model.userName || !this.model.password) {
-    this.res({errorCode: -1, message: '参数不完整!'});
-		return;
-	}
 	// 对密码进行加密处理;
 	this.model.password = crypto.createHash('sha1').update(this.model.password).digest('hex');
 	// 判断用户是否存在；
-	userModel.findOneUser({userName: this.model.userName}).then(result => {
-		if(result) {
-			this.res.json({errorCode: -1, message: '该用户已存在!'});
-		} else {
-			userModel.addUser(this.model).then(result => {
-        if (result) {
-          // 创建用户时默认为用户分配的角色是“游客”;
-          userRoleModel.create({userId: result.userId, roleCode: 1}).then(res => {
-            result.dataValues.role = res.roleCode;
-            this.res.json(result);
-          });
-        }
-			});
-		}
-	});
+  let requestData = {where: {
+    $or: [{userName: this.model.userName}, {email: this.model.email}]
+  }};
+	userModel.findOne(requestData)
+    .then(result => {
+      if(result) throw new Error('该用户/邮箱已存在!');
+      userModel.create(this.model)
+        .then(userData => {
+          if (userData) {
+            // 创建用户时先默认分配用户为作业员;
+            userRoleModel.create({userId: userData.userId, roleCode: 2})
+              .then(roleData => {
+                userData.dataValues.role = roleData.roleCode;
+                return this.res.json({errorCode: 0, result: userData, message: '用户创建成功,并为用户分配角色为作业员'});
+              })
+              .catch(err => {
+                throw new Error(err.message);
+              });
+          } else {
+            throw new Error('创建用户失败');
+          }
+        })
+        .catch(err => {
+          this.next(err);
+        });
+    }).catch(err => {
+      this.next(err);
+    });
 };
 
 /**
@@ -69,35 +79,39 @@ UserController.prototype.register = function () {
  * @method login
  */
 UserController.prototype.login = function () {
-	tool.extend(this.model, this.req.body);
-	if (!this.model.userName || !this.model.password) {
-    return this.res.json({errorCode: -1, message: '参数不完整!'});
-	}
-	userModel.findOneUser({userName: this.model.userName}).then(result => {
-		if (!result) {
-      return this.res.json({errorCode: -1, message: '登陆失败，该用户不存在!'});
-		} else {
-			// 判断登陆密码
-			var password = crypto.createHash('sha1').update(this.model.password).digest('hex');
-			if (password != result.password) {
-        return this.res.json({errorCode: -1, message: '登陆失败，密码错误'});
-			}
-      // 查询角色;
-      userRoleModel.findOne({where: {userId: result.userId}}).then(res => {
-        var resultCopy = tool.clone(result.dataValues);
-        resultCopy.role = res.dataValues.roleCode === 2 ? 'worker' : res.dataValues.roleCode === 3 ? 'manager': 'visitor';
-        resultCopy.token = jwt.sign({
-          data: {name: result.userName, password: result.password}
-        }, config.SECRET, {expiresIn: 60 * 60 * 24});
-        delete resultCopy.password;
-        return this.res.json({errorCode: 0, message: '已获得认证，登陆成功!', result: resultCopy});
-      }).catch(err => {
-        return this.res.json({errorCode: -1, message: err.message});
-      });
-		}
-	}).catch(err => {
-    return this.res.json({errorCode: -1, message: err.message});
-  });
+  let requestData = {where:{userName: this.req.body.userName}};
+	userModel.findOne(requestData)
+    .then(userData => {
+      if (!userData) {
+        throw new Error('登陆失败，该用户不存在!');
+      } else {
+        // 判断登陆密码
+        var password = crypto.createHash('sha1').update(this.req.body.password).digest('hex');
+        if (password != userData.password) {
+          throw new Error('登陆失败，密码错误!');
+        }
+        // 查询角色;
+        userRoleModel.findOne({where: {userId: userData.userId}})
+          .then(roleData => {
+            var userDataCopy = tool.clone(userData.dataValues);
+            userDataCopy.role = ['visitor', 'worker', 'manager', 'root'][roleData.dataValues.roleCode];
+            // 获得token;
+            userDataCopy.token = jwt.sign(
+              {data: {name: userData.userName, password: userData.password}},
+              config.SECRET, {expiresIn: 60 * 60 * 24});
+
+            // 登陆的返回结果剔除密码;
+            delete userDataCopy.password;
+            return this.res.status(200).json({errorCode: 0, userData: userDataCopy, message: '已获得认证，登陆成功!'});
+          })
+          .catch(err => {
+            throw new Error(err.message);
+          });
+      }
+	  })
+    .catch(err => {
+      this.next(err);
+    });
 };
 
 /**
@@ -107,37 +121,23 @@ UserController.prototype.login = function () {
  * @method find
  */
 UserController.prototype.find = function () {
-	let flag;
-	if (!this.req.query.pageSize && !this.req.query.pageNum) {
-		flag = 'findAll';
-	} else if (this.req.query.pageSize && this.req.query.pageNum) {
-		flag = 'pageFind';
-	} else {
-		this.res.json({errorCode: -1, message: '查询参数有误'});
-		return;
-	}
-	const pageSize = parseInt(this.req.query.pageSize);
-	const startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
-	var defaultsAttr = { exclude: ['password'] };
-	const requestParam = flag === 'findAll' ? { attributes: defaultsAttr } : {limit: pageSize, offset: startIndex, attributes: defaultsAttr};
-	userModel.findAllUser(requestParam).then(result => {
-			return result
-		}).then(result => {
-			return userModel.getTotalRowNum('user_id', 'total').then(data => {
-				this.res.json({errorCode: 0, result: { data: result, total: data[0].dataValues.total }, message: '查找成功'});
-			});
-		});
-};
-
-/*
- * @todo 用户更新功能;
- * */
-UserController.prototype.update = function () {
-	tool.extend(this.model, this.req.body);
-	userModel.upDateOneUser(this.model, { where: { userName: this.model.userName } }).then(result => {
-		this.res.json({errorCode: 0, result: { data: result }, message: '更新成功'});
-		return;
-	});
+  let requestParam = {};
+  requestParam.attributes = {exclude: ['password']};
+  if (this.req.query.pageSize && this.req.query.pageNum) {
+    requestParam.limit = this.req.query.pageSize;
+    requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
+  }
+  userModel.findAndCountAll(requestParam)
+    .then(userDatas => {
+      return this.res.json({
+        errorCode: 0,
+        result: { data: userDatas.rows, total: userDatas.count },
+        message: '查找成功'
+      });
+    })
+    .catch(err => {
+      this.next(err);
+    });
 };
 
 /**
@@ -145,15 +145,17 @@ UserController.prototype.update = function () {
  * @method delete
  */
 UserController.prototype.delete = function () {
-	tool.extend(this.model, this.req.query);
-	userModel.deleteOneUser({ userName: this.model.userName }).then(result => {
-		if (result === 1) {
-			this.res.json({errorCode: 0, result: { data: result }, message: '删除成功'});
-		} else {
-			this.res.json({errorCode: -1, result: { data: result }, message: '删除失败'});
-		}
-		return;
-	});
+  let requestData = {where: {userName: this.req.query.id}};
+	userModel.destroy(requestData)
+    .then(affectedCount => {
+      if(affectedCount) {
+        return this.res.json({errorCode: 0, message: '删除成功'});
+      }
+      throw new Error('id为'+this.req.query.id+'的用户不存在');
+	  })
+    .catch(err => {
+      this.next(err);
+    });
 };
 
 module.exports = UserController;
