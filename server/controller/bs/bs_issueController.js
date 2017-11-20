@@ -16,7 +16,7 @@ const issueModel = require('../../models/bs/issueModel');
 const caseModel = require('../../models/bs/caseModel');
 
 /**
- * 用户管理控制器;
+ * 问题管理控制器;
  * @param req
  * @param res
  * @constructor
@@ -53,8 +53,9 @@ issueController.prototype.upload = function () {
 };
 
 /**
- * 创建问题;
+ * 创建问题
  * @method create
+ * @returns {Promise.<TResult>}
  */
 issueController.prototype.create = function () {
   this.req.body.images = this.req.body.images.join(',');
@@ -79,7 +80,11 @@ issueController.prototype.create = function () {
   });
 };
 
-// 查找问题(通过项目id和案例id)
+/**
+ * 查找问题(通过项目id和案例id)
+ * @method find
+ * @returns {Promise.<TResult>}
+ */
 issueController.prototype.find = function () {
   let projectId = this.req.query.proCode;
   let caseId = this.req.query.caseCode;
@@ -116,6 +121,7 @@ issueController.prototype.find = function () {
 /**
  * 根据问题id删除问题;
  * @method delete
+ * @returns {Promise.<TResult>}
  */
 issueController.prototype.delete = function () {
   let requestData = {where: {id: this.req.query.id}};

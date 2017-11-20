@@ -35,6 +35,7 @@ function caseController(req, res) {
 /**
  * 根据用户查询项目列表
  * @method list
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
@@ -81,6 +82,7 @@ caseController.prototype.list = function () {
 /**
  * 创建项目;
  * @method create
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.create = function () {
   tool.extend(this.model, this.req.body);
@@ -117,6 +119,7 @@ caseController.prototype.create = function () {
 /**
  * 根据项目id删除项目;
  * @method delete
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.delete = function () {
   let requestData = {where: {id: this.req.query.id}};

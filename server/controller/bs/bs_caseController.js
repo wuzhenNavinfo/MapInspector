@@ -36,6 +36,7 @@ function caseController(req, res) {
 /**
  * 查存所有案例列表;
  * @method list
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
@@ -43,7 +44,7 @@ caseController.prototype.list = function () {
     requestParam.limit = this.req.query.pageSize;
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
-  caseModel.findAndCountAll (requestParam).then (caseDatas => {
+  return caseModel.findAndCountAll (requestParam).then (caseDatas => {
     let dataList = [];
     let caseTotal = caseDatas.count;
     for (let i = 0; i < caseDatas.rows.length; i++) {
@@ -66,6 +67,7 @@ caseController.prototype.list = function () {
 /**
  * 案例列表;
  * @method list
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.listDetail = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
@@ -74,7 +76,7 @@ caseController.prototype.listDetail = function () {
     requestParam.limit = this.req.query.pageSize;
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
-  caseModel.findJoinWithIssue (requestParam)
+  return caseModel.findJoinWithIssue (requestParam)
   .then (result => {
     return caseModel.count()
     .then(caseCount => {
@@ -110,10 +112,11 @@ caseController.prototype.listDetail = function () {
 /**
  * 根据案例id查询案例详情
  * @method query
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.query = function () {
   let requestParam = {where: {id: this.req.query.id}};
-  caseModel.findOne (requestParam).then (caseData => {
+  return caseModel.findOne (requestParam).then (caseData => {
     if (caseData) {
       let caseDataCopy = tool.clone (caseData);
       let caseValues = caseDataCopy.dataValues;
@@ -157,12 +160,13 @@ caseController.prototype.upload = function () {
 /**
  * 创建案例
  * @method create
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.create = function () {
   this.req.body.images = this.req.body.images.join (',');
   this.req.body.videos = this.req.body.videos.join (',');
   tool.extend (this.model, this.req.body);
-  caseModel.create (this.model)
+  return caseModel.create (this.model)
   .then (caseData => {
     if (caseData) {
       let caseDataCopy = tool.clone (caseData);
@@ -188,7 +192,8 @@ caseController.prototype.create = function () {
 
 /**
  * 更新案例
- * @method create
+ * @method update
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.update = function () {
   let condition = {where: {id: this.req.body.id}};
@@ -196,7 +201,7 @@ caseController.prototype.update = function () {
   this.req.body.videos = this.req.body.videos.join (',');
   tool.extend (this.model, this.req.body);
   delete this.model.id;
-  caseModel.update (this.model, condition)
+  return caseModel.update (this.model, condition)
   .then (result => {
     if (result) {
       return this.res.json ({
@@ -218,10 +223,11 @@ caseController.prototype.update = function () {
 /**
  * 删除案例
  * @method delete
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.delete = function () {
   let requestParam = {where: {id: this.req.query.id}};
-  caseModel.destroy (requestParam)
+  return caseModel.destroy (requestParam)
   .then (result => {
     if (result) {
       return this.res.json ({
