@@ -22,7 +22,7 @@ const caseModel = require('../../models/bs/caseModel');
  */
 function caseController(req, res) {
   this.model = {};
-  this.model.createUser = '';
+  this.model.createUser = req.loginUser.userId;
   this.model.caseSnap = '';
   this.model.caseDesc = '';
   this.model.caseMethod = '';
@@ -34,129 +34,109 @@ function caseController(req, res) {
 }
 
 /**
- * 案例列表
+ * 查存所有案例列表;
  * @method list
  */
 caseController.prototype.list = function () {
-  let requestParam = null;
-  if (!this.req.query.pageSize && !this.req.query.pageNum) {
-    requestParam = {};
-  } else if (this.req.query.pageSize && this.req.query.pageNum) {
-    let pageSize = parseInt(this.req.query.pageSize);
-    let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
-    if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
-      return this.res.json({errorCode: -1, message: '查询参数有误'});
-    }
-    requestParam = { limit: pageSize, offset: startIndex };
-  } else {
-    return this.res.json({errorCode: -1, message: '查询参数有误'});
+  let requestParam = {order: [["createdAt", "DESC"]]};
+  if (this.req.query.pageSize && this.req.query.pageNum) {
+    requestParam.limit = this.req.query.pageSize;
+    requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
-  caseModel.multiFind (requestParam).then (result => {
-    let rowNum = result.count;
+  caseModel.findAndCountAll (requestParam).then (caseDatas => {
     let dataList = [];
-    for (let i = 0; i < result.rows.length; i++) {
-      let data = {};
-      let imageLength = 0;
-      let videoLength = 0;
-      if (result.rows[i].dataValues.images) {
-        imageLength = result.rows[i].dataValues.images.split(',').length;
-      }
-      if (result.rows[i].dataValues.videos) {
-        videoLength = result.rows[i].dataValues.videos.split(',').length;
-      }
-      data.id = result.rows[i].dataValues.id;
-      data.createUser = result.rows[i].dataValues.createUser;
-      data.caseSnap = result.rows[i].dataValues.caseSnap;
+    let caseTotal = caseDatas.count;
+    for (let i = 0; i < caseDatas.rows.length; i++) {
+      let data = tool.clone (caseDatas.rows[i].dataValues);
+      let imageLength = data.images ? data.images.split (',').length : 0;
+      let videoLength = data.videos ? data.videos.split (',').length : 0;
       data.mediaLength = imageLength + videoLength;
-      data.createdAt = result.rows[i].dataValues.createdAt;
-      dataList.push(data);
+      dataList.push (data);
     }
-    return this.res.json ({errorCode: 0, result: {data: dataList, total: rowNum}, message: '查找成功'});
-  }).catch(err => {
+    return this.res.json ({
+      errorCode: 0,
+      result: {data: dataList, total: caseTotal},
+      message: '查找成功'
+    });
+  }).catch (err => {
     throw err;
   });
 };
 
 /**
- * 案例列表
+ * 案例列表;
  * @method list
  */
 caseController.prototype.listDetail = function () {
-  let requestParam = null;
-  if (!this.req.query.pageSize && !this.req.query.pageNum) {
-    requestParam = {};
-  } else if (this.req.query.pageSize && this.req.query.pageNum) {
-    let pageSize = parseInt(this.req.query.pageSize);
-    let startIndex = (parseInt(this.req.query.pageNum) - 1) * pageSize;
-    if (isNaN(startIndex) || isNaN(pageSize) || startIndex < 0 || pageSize < 1) {
-      return this.res.json({errorCode: -1, message: '查询参数有误'});
-    }
-    requestParam = { limit: pageSize, offset: startIndex };
-  } else {
-    return this.res.json({errorCode: -1, message: '查询参数有误'});
+  let requestParam = {order: [["createdAt", "DESC"]]};
+  requestParam.condition = this.req.query.projectCode;
+  if (this.req.query.pageSize && this.req.query.pageNum) {
+    requestParam.limit = this.req.query.pageSize;
+    requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
-  requestParam.condition = parseInt(this.req.query.projectCode);
-  caseModel.findCombinaionIssue (requestParam).then (result => {
-    caseModel.getCount().then(countRes => {
-      let rowNum = countRes;
+  caseModel.findJoinWithIssue (requestParam)
+  .then (result => {
+    return caseModel.count()
+    .then(caseCount => {
       let dataList = [];
       for (let i = 0; i < result.length; i++) {
         let data = {};
-        let caseImageLength = caseVideoLength = proImageLength = proVideoLength = 0;
-        if (result[i].caseImages) {
-          caseImageLength = result[i].caseImages.split(',').length;
-        }
-        if (result.caseVideos) {
-          caseVideoLength = result[i].caseVideos.split(',').length;
-        }
-        if (result[i].proImages) {
-          proImageLength = result[i].proImages.split(',').length;
-        }
-        if (result.proVideos) {
-          proVideoLength = result[i].proVideos.split(',').length;
-        }
-        data.caseSnap = result[i].caseSnap;
-        data.caseMediaLength = caseImageLength + caseVideoLength;
+        proImageLength = result[i].proImages ? result[i].proImages.split(',').length : 0;
+        proVideoLength = result[i].proVideos ? result[i].proVideos.split(',').length : 0;
         data.proMediaLength = proImageLength + proVideoLength;
-        data.proCode = result[i].proCode ? result[i].proCode : parseInt(this.req.query.projectCode);
+        data.proCode = result[i].proCode ? result[i].proCode : this.req.query.projectCode;
+
+        caseImageLength = result[i].caseImages ? result[i].caseImages.split(',').length : 0;
+        caseVideoLength = result[i].caseVideos ? result[i].caseVideos.split(',').length : 0;
+        data.caseMediaLength = caseImageLength + caseVideoLength;
+        data.caseSnap = result[i].caseSnap;
+        data.caseDesc = result[i].caseDesc;
         data.caseCode = result[i].caseCode;
         data.createdAt = result[i].createdAt;
         dataList.push(data);
       }
-      return this.res.json ({errorCode: 0, result: {data: dataList, total: rowNum}, message: '查找成功'});
+      return this.res.json ({
+        errorCode: 0,
+        result: {data: dataList, total: caseCount},
+        message: '查找成功'
+      });
     });
-  }).catch(err => {
+  })
+  .catch(err => {
     throw err;
   });
 };
 
 /**
- * 查询案例详情
+ * 根据案例id查询案例详情
  * @method query
  */
 caseController.prototype.query = function () {
-  let id = parseInt(this.req.query.id);
-  if (!id || isNaN(id)) {
-    return this.res.json({errorCode: -1, message: '查询参数有误'});
-  }
-  let requestParam = { where: { id: parseInt(this.req.query.id) } };
-  caseModel.findOneCase(requestParam).then(result => {
-    if (result) {
-      let videos = result.dataValues.videos;
-      let images = result.dataValues.images;
-      result.dataValues.videos = videos ? videos.split(',') : [];
-      result.dataValues.images = images ? images.split(',') : [];
-      return this.res.json({errorCode: 0, result: { data: result }, message: '查找成功'});
+  let requestParam = {where: {id: this.req.query.id}};
+  caseModel.findOne (requestParam).then (caseData => {
+    if (caseData) {
+      let caseDataCopy = tool.clone (caseData);
+      let caseValues = caseDataCopy.dataValues;
+      caseDataCopy.dataValues.videos = caseValues.videos ? caseValues.videos.split (',') : [];
+      caseDataCopy.dataValues.images = caseValues.images ? caseValues.images.split (',') : [];
+      return this.res.json ({
+        errorCode: 0,
+        result: {data: caseDataCopy},
+        message: '查找成功'
+      });
     } else {
-      return this.res.json({errorCode: -1, message: 'id为' + this.req.query.id + '的案例不存在!'});
+      return this.res.json ({
+        errorCode: -1,
+        message: 'id为' + this.req.query.id + '的案例不存在!'
+      });
     }
-  }).catch(err => {
+  }).catch (err => {
     throw err;
   });
 };
 
 /**
- * 上传图片
+ * 上传图片todo
  *@method upload
  */
 caseController.prototype.upload = function () {
@@ -179,51 +159,58 @@ caseController.prototype.upload = function () {
  * @method create
  */
 caseController.prototype.create = function () {
-  this.req.body.createUser = parseInt(this.req.body.createUser);
-  if (!this.req.body.createUser || isNaN(this.req.body.createUser)) {
-    return this.res.json({errorCode: -1, message: '参数错误,createUser不合法!'});
-  }
-  this.req.body.images = this.req.body.images.join(',');
-  this.req.body.videos = this.req.body.videos.join(',');
-  tool.extend(this.model, this.req.body);
-  caseModel.addCase(this.model).then(result => {
-    if (result) {
-      let videos = result.dataValues.videos;
-      let images = result.dataValues.images;
-      result.dataValues.videos = videos ? videos.split(',') : [];
-      result.dataValues.images = images ? images.split(',') : [];
-      return this.res.json({errorCode: 0, result: { data: result }, message: '案例创建成功'});
+  this.req.body.images = this.req.body.images.join (',');
+  this.req.body.videos = this.req.body.videos.join (',');
+  tool.extend (this.model, this.req.body);
+  caseModel.create (this.model)
+  .then (caseData => {
+    if (caseData) {
+      let caseDataCopy = tool.clone (caseData);
+      let caseValues = caseDataCopy.dataValues;
+      caseDataCopy.dataValues.videos = caseValues.videos ? caseValues.videos.split (',') : [];
+      caseDataCopy.dataValues.images = caseValues.images ? caseValues.images.split (',') : [];
+      return this.res.json ({
+        errorCode: 0,
+        result: {data: caseDataCopy},
+        message: '案例创建成功'
+      });
     } else {
-      return this.res.json({errorCode: -1, message: '案例创建失败!'});
+      return this.res.json ({
+        errorCode: -1,
+        message: '案例创建失败'
+      });
     }
-  }).catch(err => {
+  })
+  .catch (err => {
     throw err;
   });
 };
 
 /**
- * 创建案例
+ * 更新案例
  * @method create
  */
 caseController.prototype.update = function () {
-  this.req.body.id = parseInt(this.req.body.id);
-  if (!this.req.body.id || isNaN(this.req.body.id)) {
-    return this.res.json({errorCode: -1, message: '参数错误id值不合法!'});
-  }
-  this.req.body.createUser = parseInt(this.req.body.createUser);
-  this.req.body.images = this.req.body.images.join(',');
-  this.req.body.videos = this.req.body.videos.join(',');
-  tool.extend(this.model, this.req.body);
+  let condition = {where: {id: this.req.body.id}};
+  this.req.body.images = this.req.body.images.join (',');
+  this.req.body.videos = this.req.body.videos.join (',');
+  tool.extend (this.model, this.req.body);
   delete this.model.id;
-  var updateData = this.model;
-  var condition = {where: {id: this.req.body.id}};
-  caseModel.updateCase(updateData, condition).then(result => {
+  caseModel.update (this.model, condition)
+  .then (result => {
     if (result) {
-      return this.res.json({errorCode: 0, message: '案例更新成功'});
+      return this.res.json ({
+        errorCode: 0,
+        message: '案例更新成功'
+      });
     } else {
-      return this.res.json({errorCode: -1, message: '案例更新失败!'});
+      return this.res.json ({
+        errorCode: -1,
+        message: '案例更新失败!'
+      });
     }
-  }).catch(err => {
+  })
+  .catch (err => {
     throw err;
   });
 };
@@ -233,21 +220,22 @@ caseController.prototype.update = function () {
  * @method delete
  */
 caseController.prototype.delete = function () {
-  let deleteId =  0;
-  let requestParam = {};
-  if (this.req.query.id) {
-    deleteId = parseInt(this.req.query.id);
-  } else {
-    return this.res.json({errorCode: -1, message: '参数错误!'});
-  }
-  requestParam.where = { id: deleteId };
-  caseModel.deleteCase(requestParam).then(result => {
+  let requestParam = {where: {id: this.req.query.id}};
+  caseModel.destroy (requestParam)
+  .then (result => {
     if (result) {
-      return this.res.json({errorCode: 0, message: '删除成功'});
+      return this.res.json ({
+        errorCode: 0,
+        message: '删除成功'
+      });
     } else {
-      return this.res.json({errorCode: -1, message: '删除失败'});
+      return this.res.json ({
+        errorCode: -1,
+        message: '删除失败'
+      });
     }
-  }).catch(err => {
+  })
+  .catch (err => {
     throw err;
   });
 };
