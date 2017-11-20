@@ -9,7 +9,7 @@
       </el-col>
       <el-col :span="14" :style="backgroundImage">
         <div class="tools" @click.prevent="collapse">
-          <i class="fa fa-align-justify"></i>
+          <i class="fa fa-align-justify" style="font-size:14px;"></i>
         </div>
       </el-col>
       <el-col :span="4" class="userinfo">

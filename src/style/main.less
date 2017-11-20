@@ -1,0 +1,55 @@
+/**
+ * @description 整个项目的公共样式的重写
+ * @file api.js
+ * @author    wuzhen
+ * @date      2017/11/17
+ *
+ * @copyright @Navinfo, all rights reserved.
+ */
+
+html, body, a, input, select, textarea, div {
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/*********************************滚动条样式************************************/
+.scroll_style {
+  overflow: auto;
+  height: 100%;
+}
+.scroll_style::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.1);
+}
+.scroll_style::-webkit-scrollbar-thumb {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  background: #c1c1c1;
+}
+.scrollDiy::-webkit-scrollbar {
+  width: 0 !important;
+}
+
+/*************************panel内容的样式*****************************/
+.st-card {
+  margin-top: 20px;
+  cursor: pointer;
+  &:hover {
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.3)
+  }
+  .label{
+    padding: 2px;
+  }
+}
+
+
+

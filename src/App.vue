@@ -10,26 +10,9 @@ export default {
 }
 </script>
 
-<style >
-body {
-	margin: 0px;
-	padding: 0px;
-	font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
-	font-size: 12px;
-	-webkit-font-smoothing: antialiased;
-}
-
-/*****地图样式重写*****/
-
-#ImgCopyright{
-  display: none !important;
-}
-#ImgCopyright + div {
-  display: none !important;
-}
-#LayerScale {
-  left: 50% !important;
-}
+<style lang="less">
+  @import "./style/main.less";
+  @import "./style/thirdPartsRewrite.less";
 
 #app {
 	position: absolute;
