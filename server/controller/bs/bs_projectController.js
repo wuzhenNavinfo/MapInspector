@@ -42,7 +42,13 @@ function caseController(req, res) {
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
-  requestParam.where = {createUser: this.model.createUser};
+  // 根据当前登陆用户过滤项目;
+  if (this.req.loginUser['om_roles'][0].roleCode == 1) {
+    requestParam.where = {createUser: this.model.createUser};
+  } else {
+    requestParam.where = {auditUser: this.model.createUser};
+  }
+  // 根据项目状态过滤项目;
   if (this.req.query.projectStatus) {
     requestParam.where.projectStatus = this.req.query.projectStatus;
   }
@@ -50,7 +56,6 @@ caseController.prototype.list = function () {
     requestParam.limit = this.req.query.pageSize;
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
-
   return projectModel.findAndCountAll (requestParam)
   .then (result => {
     let proTotal = result.count;
@@ -170,6 +175,8 @@ caseController.prototype.submit = function () {
     }
   });
 };
+
+
 
 /**
  * 根据项目id删除项目;

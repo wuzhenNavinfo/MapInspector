@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const sequelize = require("../dataBase");
 const userModel = sequelize.import('../models/om/userModel');
+const roleModel = sequelize.import('../models/om/roleModel');
 // 检查用户会话
 module.exports = function(req, res, next) {
     //检查post,get的信息或者参数或者头信息
@@ -21,7 +22,7 @@ module.exports = function(req, res, next) {
           if (err) {
             return res.json({ errorCode: -1, message: err.message });
           } else {
-            userModel.findOne({where: {userName: decoded.data.name}}).then(result => {
+            userModel.findOne({where: {userName: decoded.data.name},include: {model: roleModel}}).then(result => {
               // 获得解码后的用户信息;
               req.loginUser = result.dataValues;
               // 供后面的路由使用
