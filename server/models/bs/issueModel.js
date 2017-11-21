@@ -8,6 +8,7 @@
  */
 
 // 创建 model
+const moment = require('moment');
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('bb_issue', {
       id: {
@@ -27,11 +28,17 @@ module.exports = function (sequelize, DataTypes) {
       },
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD');
+        }
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
+        }
       }
     }, {
       freezeTableName: true

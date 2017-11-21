@@ -29,7 +29,8 @@ function caseController(req, res) {
   this.model.createUser = req.loginUser.id;
   this.model.projectName = '';
   this.model.projectDesc = '';
-  this.model.projectStatus = 0; // 作业中
+  this.model.auditUser = null;
+  this.model.projectStatus = 1; // 作业中
   this.req = req;
   this.res = res;
 }
@@ -41,7 +42,16 @@ function caseController(req, res) {
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
-  requestParam.where = {createUser: this.model.createUser};
+  // 根据当前登陆用户过滤项目;
+  if (this.req.loginUser['om_roles'][0].roleCode == 1) {
+    requestParam.where = {createUser: this.model.createUser};
+  } else {
+    requestParam.where = {auditUser: this.model.createUser};
+  }
+  // 根据项目状态过滤项目;
+  if (this.req.query.projectStatus) {
+    requestParam.where.projectStatus = this.req.query.projectStatus;
+  }
   if (this.req.query.pageSize && this.req.query.pageNum) {
     requestParam.limit = this.req.query.pageSize;
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
@@ -117,6 +127,56 @@ caseController.prototype.create = function () {
     throw err;
   });
 };
+
+/**
+ * 提交项目projectStatus 1->待作业；2->已提交；3->已完成;
+ * @method submit
+ * @returns {Promise.<TResult>}
+ */
+caseController.prototype.submit = function () {
+  let projectId = this.req.body.id;
+  let auditUser = this.req.body.auditUser;
+  let updateData = {
+    auditUser: auditUser,
+    projectStatus: 2
+  };
+  let condition = {where: {id: projectId}};
+  async.parallel([
+    function (calledBack) {
+      return caseModel.count ()
+        .then(count => {
+          calledBack(null, count)
+        })
+    },
+    function (calledBack) {
+      let requestData = {
+        where: { proCode: projectId }
+      };
+      return issueModel.count(requestData)
+      .then(count => {
+        calledBack(null, count);
+      });
+    }
+  ],(err, results) => {
+    if (results[0] != results[1]) {
+      this.res.json({errorCode: '-1', message: '问题还没处理完'});
+    } else {
+      return projectModel.update(updateData, condition)
+      .then(affectedCount => {
+        if (affectedCount) {
+          this.res.json({errorCode: 0, message: '提交案例成功'});
+        } else {
+          this.res.json({errorCode: -1, message: '提交案例失败'});
+        }
+      })
+      .catch(err => {
+        throw err;
+      })
+    }
+  });
+};
+
+
 
 /**
  * 根据项目id删除项目;
