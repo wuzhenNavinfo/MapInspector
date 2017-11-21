@@ -50,10 +50,10 @@ return sequelize.sync ({force: false})
       },
       function (callback) {
         userModel.bulkCreate ([
-          {userName: 'root', fullName: 'root123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},// 123
-          {userName: 'admin', fullName: 'admin123', password: 'd033e22ae348aeb5660fc2140aec35850c4da997'}, // admin
-          {userName: 'user', fullName: 'user123', password: '12dea96fec20593566ab75692c9949596833adc9'}, // user
-          {userName: 'visitor', fullName: 'visitor123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'} // 123
+          {userName: 'root', fullName: 'root123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
+          {userName: 'admin', fullName: 'admin123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
+          {userName: 'user', fullName: 'user123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
+          {userName: 'wuzhen', fullName: 'wuzhen', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'}
         ]).then(result => {
           callback(null, result);
         });

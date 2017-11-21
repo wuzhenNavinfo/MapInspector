@@ -91,23 +91,23 @@ UserController.prototype.login = function () {
     } else {
       // 判断登陆密码
       let password = crypto.createHash('sha1').update(this.req.body.password).digest('hex');
-      if (password != userData.password) throw new Error('登陆失败，密码错误!');
+      if (password != userData.password) {
+        return this.res.json({errorCode: '-1', message:'登陆失败，密码错误'});
+      }
       // 查询角色;
-
       return userRoleModel.findOne({where: {userId: userData.id}})
       .then(roleData => {
         let userDataCopy = tool.clone(userData.dataValues);
-        userDataCopy.role = ['visitor', 'worker', 'manager', 'root'][userDataCopy.roleCode];
+        userDataCopy.role = ['worker', 'manager'][roleData.roleId - 1];
         // 获得token;
         userDataCopy.token = jwt.sign(
           {data: {name: userData.userName, password: userData.password}},
           config.SECRET, {expiresIn: 60 * 60 * 24});
-
         // 登陆的返回结果剔除密码;
         delete userDataCopy.password;
         return this.res.status(200).json({
           errorCode: 0,
-          userData: userDataCopy,
+          result: userDataCopy,
           message: '已获得认证，登陆成功!'
         });
       });

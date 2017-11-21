@@ -92,27 +92,20 @@ issueController.prototype.find = function () {
   let requestData = {where: {proCode: projectId, caseCode: caseId}};
   return issueModel.findOne (requestData)
   .then (result => {
-    if (!result) {
-      return this.res.json ({
-        errorCode: -1,
-        message: 'proCode为' + projectId + '和caseCode为' + caseId + '问题不存在'
-      });
-    } else {
-      return caseModel.findOne ({where: {id: caseId}})
-      .then (res => {
-        let tempResult = {};
-        tempResult.caseCode = res.dataValues.id;
-        tempResult.caseSnap = res.dataValues.caseSnap;
-        tempResult.caseDesc = res.dataValues.caseDesc;
-        tempResult.caseMethod = res.dataValues.caseMethod;
-        tempResult.caseMarker = tool.clone (res.dataValues.marker);
-        tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
-        tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
-        tempResult.issueVideos = (result && result.dataValues.videos) ? result.dataValues.videos.split (',') : [];
-        tempResult.issueImages = (result && result.dataValues.images) ? result.dataValues.images.split (',') : [];
-        return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});
-      });
-    }
+    return caseModel.findOne ({where: {id: caseId}})
+    .then (res => {
+      let tempResult = {};
+      tempResult.caseCode = res.dataValues.id;
+      tempResult.caseSnap = res.dataValues.caseSnap;
+      tempResult.caseDesc = res.dataValues.caseDesc;
+      tempResult.caseMethod = res.dataValues.caseMethod;
+      tempResult.caseMarker = tool.clone (res.dataValues.marker);
+      tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
+      tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
+      tempResult.issueVideos = (result && result.dataValues.videos) ? result.dataValues.videos.split (',') : [];
+      tempResult.issueImages = (result && result.dataValues.images) ? result.dataValues.images.split (',') : [];
+      return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});
+    });
   })
   .catch (err => {
     throw err;
