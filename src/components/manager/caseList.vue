@@ -9,6 +9,7 @@
         <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:6px;" @click="leftPanelCtrl('close')"></i>
       </div>
       <div style="overflow:auto;" class="scroll_style" :style="{'max-height': panelHeight}">
+        <el-input class="search-filter" v-model="schfilter" placeholder="案例概述" prefix-icon="el-icon-search"> </el-input>
         <el-table stripe border highlight-current-row max-height="100%"
           :data="tableData.data" @row-click="selectedRow">
           <el-table-column type="index" width="50px" label="序号"> </el-table-column>
@@ -29,20 +30,15 @@
     </div>
     <div class="map_operate_tool">
        <el-button size="mini" type="danger" icon="el-icon-circle-plus" @click="createCase()">创 建</el-button>
+       <el-tooltip :content="showIconFlag?'图标已打开':'图标已关闭'" >
+        <el-switch v-model="showIconFlag" style="margin-bottom:4px;margin-left:4px;" active-color="#409eff" > </el-switch>
+       </el-tooltip>
     </div>
     <div class="right-open-icon" title="展开">
        <i class="el-icon-caret-left" :class="operationed?'enabled':'disabled'" @click="rightPanelCtrl('open')" ></i>
     </div>
-    <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'">
-       <i class="el-icon-back" style="cursor:pointer;" ></i>
-       <!-- <el-dropdown trigger="hover">
-                      <i class="el-icon-date" style="cursor:pointer;" ></i>
-                      <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>我的消息</el-dropdown-item>
-                        <el-dropdown-item>设置</el-dropdown-item>
-                        <el-dropdown-item divided >退出登录</el-dropdown-item>
-                      </el-dropdown-menu>
-                   </el-dropdown> -->
+    <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'">
+       <comLogout ></comLogout>
     </div>
     <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
       <div class='my-panel'>
@@ -90,9 +86,9 @@
     </div>
     <div>
       <el-dialog custom-class="my-dialog" :visible.sync="imageDialogVisible">
-         <el-carousel ref="imagesCarousel" indicator-position="outside" :autoplay="false">
+         <el-carousel ref="imagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
             <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
-              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;height:500px;">
+              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
             </el-carousel-item>
           </el-carousel>
       </el-dialog>
@@ -106,22 +102,28 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
+import ComLogout from '../common/Logout'
 import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
-import mapMarker from '../../assets/poi.png'
+import markerIcon from '../../assets/poi.png'
+import markerIconBlue from '../../assets/poi_blue.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
+let _ = require('lodash');
 
 export default {
   name: 'CaseList',
   data () {
     return {
+      schfilter:'',
       operationed: false,
+      showIconFlag: true,
       imageDialogVisible: false,
       rightCollapsed: false,
       leftCollapsed: true,
       currentPage1: 1,
       pageCtrl:{},
+      allCaseList:[], // 存储所有的案例
       ctrl: {
         curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
@@ -173,15 +175,27 @@ export default {
     }
   },
   components: {
-    myVideo
+    myVideo,
+    ComLogout
   },
   methods: {
+    gotoMainPage: function () {
+      this.$router.push('/mainFrame');
+    },
+    logout: function () {
+      this.$confirm('确认退出吗?', '提示', {
+        type: 'warning '
+      }).then(() => {
+        sessionStorage.removeItem('user');
+        this.$router.push('/login');
+      }).catch(() => {
+      });
+    },
     handleSizeChange(size) {
       this.ctrl.pageSize = size;
       this.queryCaseList()
     },
     handleCurrentChange(currentPage) {
-      console.log(`当前页: ${currentPage}`);
       this.ctrl.pageNum = currentPage;
       this.queryCaseList()
     },
@@ -210,7 +224,6 @@ export default {
       }
     },
     leftPanelCtrl(flag) {
-      console.info(flag);
       if (flag == 'close') {
         this.leftCollapsed = false;
       }
@@ -238,8 +251,10 @@ export default {
     addLocation () {
       this.caseForm.location = ''
       this.ctrl.addLocation = true;
+      this.showIconFlag = true;
     },
     saveCase() {
+      this.queryAllCaseList();
       let that = this;
       this.$refs.caseForm.validate(function (valid) {
         if(valid) {
@@ -261,6 +276,7 @@ export default {
             that.ctrl.saving = false;
             if (data.errorCode == 0){
               that.queryCaseList();
+              that.queryAllCaseList();
               if (!that.caseForm.id) { // 修改
                 that.caseForm.id = data.result.data.id;
               }
@@ -281,9 +297,9 @@ export default {
       deleteCaseById({id: this.caseForm.id}).then(res => {
         let {errorCode} = res;
         if (errorCode === 0) {
-          window.maplet.clearOverlays();
           that.createCase();
           that.queryCaseList();
+          that.queryAllCaseList();
         }
       });
     },
@@ -297,7 +313,12 @@ export default {
         that.$refs.imagesCarousel.setActiveItem(index);
       })
     },
-    selectedRow(row, event) {
+    selectedRow(row) {
+      this.fillContent(row, function (loc) {
+        window.maplet.setCenter(new MPoint (loc.lon, loc.lat));
+      });
+    },
+    fillContent(row, callback) {
       if (this.$refs.caseForm && this.$refs.caseForm.clearValidate) {
         this.$refs.caseForm.clearValidate();
       }
@@ -310,19 +331,12 @@ export default {
           let lon = result.data.marker.coordinates[0];
           let lat = result.data.marker.coordinates[1];
           that.caseForm.location = lon + "," + lat;
-          window.maplet.setCenter(new MPoint (lon, lat));
-          window.maplet.clearOverlays();
-          window.marker = new MMarker(
-              new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32,5,22)
-          );
-          window.maplet.addOverlay(marker);
+          if (callback) {
+            callback({lon: lon, lat: lat});
+          }
         }
       })
       that.rightPanelCtrl('open');
-    },
-    backPrev() {
-      this.$router.push('/mainFrame');
     },
     queryCaseList() {
       let that = this;
@@ -331,6 +345,7 @@ export default {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.tableData = result;
+          that.tableDataClone = _.clone(result);
         } else {
           that.$message({
             message: message,
@@ -338,6 +353,41 @@ export default {
           });
         }
       })
+    },
+    queryAllCaseList() {
+      this.allCaseList = [];
+      let that = this;
+      queryCaseList({}).then(function (data) {
+        let { errorCode, message, result } = data;
+        if (errorCode == 0) {
+          result.data.forEach((value, index, arr) => {
+            that.allCaseList.push({
+              id: value.id,
+              location: [value.marker.coordinates[0], value.marker.coordinates[1]]
+            })
+          });
+          that.addOrRemoveIcon('add');
+        }
+      })
+    },
+    addOrRemoveIcon(flag) {
+      if (flag == 'add') {
+        window.maplet.clearOverlays();
+        let that = this;
+        this.allCaseList.forEach((value, index, arr) => {
+          let marker = new MMarker(
+            new MPoint(value.location[0], value.location[1]),
+            new MIcon(markerIcon,32,32,5,22)
+          )
+          marker.id = marker.id + '_' + value.id;
+          MEvent.addListener(marker, "click", function (mk) {
+            that.fillContent({id: mk.id.split('_')[1] });
+          });
+          window.maplet.addOverlay(marker);
+        })
+      } else {
+        window.maplet.clearOverlays();
+      }
     },
     initMapbar() {
       let that = this;
@@ -348,14 +398,15 @@ export default {
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
-          console.info(point.pid)
           that.caseForm.location = point.pid;
-          console.info(that.caseForm.location,'------------')
-          window.maplet.clearOverlays();
+          if (window.marker) {
+            window.maplet.removeOverlay(window.marker);
+            window.marker = null;
+          }
           let poi = point.pid.split(',');
           window.marker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32,5,22)
+              new MIcon(markerIconBlue,32,32,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -381,9 +432,23 @@ export default {
   },
   mounted: function () {
     this.queryCaseList();
-    // this.initMapboxgl();
+    this.queryAllCaseList();
     this.initMapbar();
   },
+  watch: {
+    'showIconFlag': {
+      handler: function(newValue, oldValue) {
+        if (newValue) {
+          this.addOrRemoveIcon('add');
+        } else {
+          this.addOrRemoveIcon('remove');
+        }
+      }
+    },
+    'schfilter': function (val, oldVal) {
+      this.tableData.data = this.tableDataClone.data.filter( item => (~item.caseSnap.indexOf(val)));
+    }
+  }
 }
 </script>
 
@@ -437,12 +502,11 @@ export default {
   .right-open-icon {
     position: absolute;
     right: 0px;
-    top: 0px;
+    top: 11px;
     color: #FFFFFF;
     i {
       background-color:#20a0ff;
       padding:10px;
-      margin-top: 10px;
       border-radius: 8px 0px 0px 8px;
       cursor:pointer;
     }
@@ -454,7 +518,7 @@ export default {
   .return-page-icon {
     position: absolute;
     right: 40px;
-    top: 0px;
+    top: 10px;
     color: #FFFFFF;
     &.open-return-page {
       right: 330px;
@@ -471,7 +535,6 @@ export default {
     i{
       background-color:#20a0ff;
       padding:10px;
-      margin-top: 10px;
       border-radius: 8px 8px 8px 8px;
     }
   }
@@ -498,7 +561,7 @@ export default {
 .my-from {
   .img_delete{
     position: relative;
-    top: -73px;
+    top: -72px;
     left: 54px;
     cursor: pointer;
     font-size: 16px;
@@ -523,9 +586,15 @@ export default {
   padding: 10px;
   padding-top: 0px;
 }
-
-.my-dialog{
-  background-color: red !important;
-}
 </style>
 
+<style lang="less">
+  .return-page-icon .el-dropdown:hover {
+     border-radius: 6px;
+  }
+  .search-filter {
+    .el-input__inner {
+       border-radius: 0px;
+    }
+  }
+</style>

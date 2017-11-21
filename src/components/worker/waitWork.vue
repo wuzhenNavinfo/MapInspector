@@ -51,7 +51,7 @@
 import { saveIssue, queryIssueList, createProject, deleteProject } from '../../dataService/api';
 import { Constant } from '../../common/js/constant.js';
 import { appUtil } from '../../config';
-var _ = require('lodash');
+let _ = require('lodash');
 
 
 export default {
@@ -133,7 +133,6 @@ export default {
     }
   },
   mounted: function () {
-    console.info("dddddd", );
     this.queryIssueList();
   }
 }

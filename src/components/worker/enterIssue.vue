@@ -9,10 +9,11 @@
         <i class="el-icon-caret-left" style="cursor:pointer;float:right;margin-top:6px;" @click="leftPanelCtrl('close')"></i>
       </div>
       <div style="overflow:auto;" class="scroll_style" :style="{'max-height': panelHeight}">
+        <el-input class="search-filter" v-model="schfilter" placeholder="问题描述" prefix-icon="el-icon-search"> </el-input>
         <el-table stripe border highlight-current-row max-height="100%"
           :data="tableData.data" @row-click="selectedRow">
           <el-table-column type="index" width="50px" label="序号"> </el-table-column>
-          <el-table-column prop="caseSnap" label="问题描述"> </el-table-column>
+          <el-table-column prop="caseSnap" label="案例概述"> </el-table-column>
           <el-table-column width="64px" prop="caseMediaLength" label="附件数"> </el-table-column>
           <el-table-column width="50px" prop="proMediaLength" label="处理"> </el-table-column>
         </el-table>
@@ -27,8 +28,8 @@
         </el-pagination>
       </div>
     </div>
-    <div class="return-page-icon" @click="backPrev()" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
-       <i class="el-icon-back" style="cursor:pointer;" ></i>
+    <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
+      <comLogout ></comLogout>
     </div>
     <div class="right scroll_style" :class="rightCollapsed?'open-panel':'close-panel'">
       <div>
@@ -52,7 +53,7 @@
           </ul>
           <el-row style="padding-left:6px;">
             <el-col :span="6" v-for="(image, index) in caseForm.caseImages" :key="index">
-              <img :src="ctrl.baseUrl+'/'+image" class="img-list">
+              <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showImages(index)">
             </el-col>
           </el-row>
         </div>
@@ -65,7 +66,7 @@
         <div class="scroll_style">
           <el-row style="padding:6px;">
             <el-col :span="6" v-for="(image, index) in caseForm.issueImages" :key="index">
-              <img :src="ctrl.baseUrl+'/'+image" class="img-list">
+              <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showIssueImages(index)">
               <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
@@ -78,6 +79,22 @@
         </div>
       </div>
     </div>
+    <div>
+      <el-dialog :visible.sync="imageDialogVisible">
+         <el-carousel ref="imagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
+            <el-carousel-item v-for="image in caseForm.caseImages" :key="image" style="text-align:center">
+              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
+            </el-carousel-item>
+          </el-carousel>
+      </el-dialog>
+      <el-dialog :visible.sync="issueImageDialogVisible">
+         <el-carousel ref="issueImagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
+            <el-carousel-item v-for="image in caseForm.issueImages" :key="image" style="text-align:center">
+              <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
+            </el-carousel-item>
+          </el-carousel>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -85,17 +102,22 @@
 
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
+import ComLogout from '../common/Logout'
 import { queryCaseListDetail, queryCaseById, queryIssue, createIssue} from '../../dataService/api';
 // import mapMarker from '../../assets/marker.png'
 import mapMarker from '../../assets/poi.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
+let _ = require('lodash');
 
 export default {
   name: 'CaseList',
   data () {
     return {
+      schfilter: '',
+      imageDialogVisible: false,
+      issueImageDialogVisible: false,
       rightCollapsed: false,
       leftCollapsed: true,
       currentPage1: 1,
@@ -148,7 +170,8 @@ export default {
     }
   },
   components: {
-    myVideo
+    myVideo,
+    ComLogout
   },
   methods: {
     handleSizeChange(size) {
@@ -199,6 +222,20 @@ export default {
     deleteImage(index) {
       this.caseForm.issueImages.splice(index, 1);
     },
+    showImages(index) {
+      this.imageDialogVisible = true;
+      let that = this;
+      setTimeout(function(){
+        that.$refs.imagesCarousel.setActiveItem(index);
+      })
+    },
+    showIssueImages(index) {
+      this.issueImageDialogVisible = true;
+      let that = this;
+      setTimeout(function(){
+        that.$refs.issueImagesCarousel.setActiveItem(index);
+      })
+    },
     selectedRow(row, event) {
       this.selectedRowData = row;
       let that = this;
@@ -219,8 +256,17 @@ export default {
       })
       that.rightPanelCtrl('open');
     },
-    backPrev() {
+    gotoMainPage() {
       this.$router.push('/mainFrame');
+    },
+    logout: function () {
+      this.$confirm('确认退出吗?', '提示', {
+        type: 'warning '
+      }).then(() => {
+        sessionStorage.removeItem('user');
+        this.$router.push('/login');
+      }).catch(() => {
+      });
     },
     queryCaseList(projectCode) {
       let that = this;
@@ -229,6 +275,7 @@ export default {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.tableData = result;
+          that.tableDataClone = _.clone(result);
         } else {
           that.$message({
             message: message,
@@ -266,6 +313,11 @@ export default {
   mounted: function () {
     this.queryCaseList(this.$route.params.projectCode);
     this.initMapbar();
+  },
+  watch: {
+    'schfilter': function (val, oldVal) {
+      this.tableData.data = this.tableDataClone.data.filter( item => (~item.caseSnap.indexOf(val)));
+    }
   }
 }
 </script>
@@ -332,19 +384,19 @@ export default {
   .return-page-icon {
     position: absolute;
     right: 40px;
-    top: 0px;
+    top: 10px;
     color: #FFFFFF;
     &.open-return-page {
-       right: 330px;
+      right: 330px;
+      :hover{
+        background-color: #55A1EF;
+      }
     }
     &.close-return-page {
-       right: 0px;
-    }
-    i{
-      background-color:#20a0ff;
-      padding:10px;
-      margin-top: 10px;
-      border-radius: 8px 0px 0px 8px;
+      right: 40px;
+      :hover{
+        background-color: #55A1EF;
+      }
     }
   }
   .left-open-icon {
