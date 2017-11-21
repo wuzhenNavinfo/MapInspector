@@ -6,45 +6,26 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
-const Sequelize = require('sequelize');
-const db = require('../../dataBase');
 
-// 创建 model
-module.exports = db.define('om_user_role', {
-        id: {
-            type: Sequelize.INTEGER,
-            field: 'pid',
-            autoIncrement: true,
-            primaryKey: true,
-            allowNull: false
-        },
-        userId: {
-          type: Sequelize.INTEGER,
-          field: 'user_id',
-          allowNull: false,
-          references: {
-            model: 'om_user',
-            key: 'user_id'
-          }
-        },
-        roleCode: {
-          type: Sequelize.INTEGER,
-          field: 'role_code',
-          allowNull: false,
-          references: {
-            model: 'om_role',
-            key: 'role_code'
-          }
-        },
-        createdAt: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        },
-        updatedAt: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        }
+// 创建用户脚色关系模型model;
+module.exports = function (sequelize, DataTypes) {
+  return sequelize.define('om_user_role', {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+      }
     }, {
-        freezeTableName: true
+      freezeTableName: true
     }
-);
+  );
+};

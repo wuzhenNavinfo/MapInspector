@@ -12,18 +12,19 @@
  */
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
-const issueModel = require('../../models/bs/issueModel');
-const caseModel = require('../../models/bs/caseModel');
+const sequelize = require("../../dataBase");
+const issueModel = sequelize.import('../../models/bs/issueModel');
+const caseModel = sequelize.import('../../models/bs/caseModel');
 
 /**
- * 用户管理控制器;
+ * 问题管理控制器;
  * @param req
  * @param res
  * @constructor
  */
 function issueController(req, res) {
   this.model = {};
-  this.model.createUser = req.loginUser.userId;
+  this.model.createUser = req.loginUser.id;
   this.model.proCode = '';
   this.model.caseCode = '';
   this.model.images = [];
@@ -53,13 +54,14 @@ issueController.prototype.upload = function () {
 };
 
 /**
- * 创建问题;
+ * 创建问题
  * @method create
+ * @returns {Promise.<TResult>}
  */
 issueController.prototype.create = function () {
-  this.req.body.images = this.req.body.images.join(',');
-  this.req.body.videos = this.req.body.videos.join(',');
   tool.extend(this.model, this.req.body);
+  this.model.images = this.model.images.join(',');
+  this.model.videos = this.model.videos.join(',');
   return issueModel.upsert(this.model)
   .then(result => {
     if (result) {
@@ -79,34 +81,31 @@ issueController.prototype.create = function () {
   });
 };
 
-// 查找问题(通过项目id和案例id)
+/**
+ * 查找问题(通过项目id和案例id)
+ * @method find
+ * @returns {Promise.<TResult>}
+ */
 issueController.prototype.find = function () {
   let projectId = this.req.query.proCode;
   let caseId = this.req.query.caseCode;
   let requestData = {where: {proCode: projectId, caseCode: caseId}};
   return issueModel.findOne (requestData)
   .then (result => {
-    if (!result) {
-      return this.res.json ({
-        errorCode: -1,
-        message: 'proCode为' + projectId + '和caseCode为' + caseId + '问题不存在'
-      });
-    } else {
-      return caseModel.findOne ({where: {id: caseId}})
-      .then (res => {
-        let tempResult = {};
-        tempResult.caseCode = res.dataValues.id;
-        tempResult.caseSnap = res.dataValues.caseSnap;
-        tempResult.caseDesc = res.dataValues.caseDesc;
-        tempResult.caseMethod = res.dataValues.caseMethod;
-        tempResult.caseMarker = tool.clone (res.dataValues.marker);
-        tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
-        tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
-        tempResult.issueVideos = result ? result.dataValues.videos.split (',') : [];
-        tempResult.issueImages = result ? result.dataValues.images.split (',') : [];
-        return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});
-      });
-    }
+    return caseModel.findOne ({where: {id: caseId}})
+    .then (res => {
+      let tempResult = {};
+      tempResult.caseCode = res.dataValues.id;
+      tempResult.caseSnap = res.dataValues.caseSnap;
+      tempResult.caseDesc = res.dataValues.caseDesc;
+      tempResult.caseMethod = res.dataValues.caseMethod;
+      tempResult.caseMarker = tool.clone (res.dataValues.marker);
+      tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
+      tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
+      tempResult.issueVideos = (result && result.dataValues.videos) ? result.dataValues.videos.split (',') : [];
+      tempResult.issueImages = (result && result.dataValues.images) ? result.dataValues.images.split (',') : [];
+      return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});
+    });
   })
   .catch (err => {
     throw err;
@@ -116,6 +115,7 @@ issueController.prototype.find = function () {
 /**
  * 根据问题id删除问题;
  * @method delete
+ * @returns {Promise.<TResult>}
  */
 issueController.prototype.delete = function () {
   let requestData = {where: {id: this.req.query.id}};

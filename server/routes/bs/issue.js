@@ -15,7 +15,10 @@ var bs_issueController = require('../../controller/bs/bs_issueController');
 
 
 // 创建问题;
-router.post('/create', function (req, res, next) {
+router.post('/create', [
+  check('proCode').exists().withMessage('缺少proCode参数').isInt().withMessage('proCode必须为整数'),
+  check('caseCode').exists().withMessage('缺少caseCode参数').isInt().withMessage('caseCode必须为整数')
+], function (req, res, next) {
   next('route');
 });
 

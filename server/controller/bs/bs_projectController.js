@@ -12,9 +12,11 @@
  */
 const async = require('async');
 const tool = require('../../utils/publicTool');
-const projectModel = require('../../models/bs/projectModel');
-const issueModel = require('../../models/bs/issueModel');
-const caseModel = require('../../models/bs/caseModel');
+
+const sequelize = require("../../dataBase");
+const caseModel = sequelize.import('../../models/bs/caseModel');
+const issueModel = sequelize.import('../../models/bs/issueModel');
+const projectModel = sequelize.import('../../models/bs/projectModel');
 
 /**
  * 用户管理控制器;
@@ -24,7 +26,7 @@ const caseModel = require('../../models/bs/caseModel');
  */
 function caseController(req, res) {
   this.model = {};
-  this.model.createUser = req.loginUser.userId;
+  this.model.createUser = req.loginUser.id;
   this.model.projectName = '';
   this.model.projectDesc = '';
   this.model.projectStatus = 0; // 作业中
@@ -35,6 +37,7 @@ function caseController(req, res) {
 /**
  * 根据用户查询项目列表
  * @method list
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
@@ -81,6 +84,7 @@ caseController.prototype.list = function () {
 /**
  * 创建项目;
  * @method create
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.create = function () {
   tool.extend(this.model, this.req.body);
@@ -117,6 +121,7 @@ caseController.prototype.create = function () {
 /**
  * 根据项目id删除项目;
  * @method delete
+ * @returns {Promise.<TResult>}
  */
 caseController.prototype.delete = function () {
   let requestData = {where: {id: this.req.query.id}};
