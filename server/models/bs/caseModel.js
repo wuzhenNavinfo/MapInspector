@@ -6,54 +6,40 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
-const Sequelize = require('sequelize');
-const db = require('../../dataBase');
 
-module.exports = function () {
-  let caseModel = db.define ('bb_case', {
+module.exports = function (sequelize, DataTypes) {
+  let caseModel = sequelize.define ('bb_case', {
       id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
       },
-      createUser: {
-        type: Sequelize.INTEGER,
-        field: 'create_user',
-        allowNull: false,
-        references: {
-          model: 'om_user',
-          key: 'user_id'
-        }
-      },
       caseSnap: {
-        type: Sequelize.STRING,
-        field: 'case_snap'
+        type: DataTypes.STRING
       },
       caseDesc: {
-        type: Sequelize.STRING,
-        field: 'case_desc'
+        type: DataTypes.STRING
       },
       caseMethod: {
-        type: Sequelize.STRING,
-        field: 'case_method'
+        type: DataTypes.STRING
       },
       images: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       videos: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       marker: {
-        type: Sequelize.GEOMETRY
+        type: DataTypes.GEOMETRY
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
       }
     }, {
       freezeTableName: true
@@ -68,12 +54,12 @@ module.exports = function () {
     }
     var cond = obj.condition;
     var sql = 'SELECT ' +
-      'c.id as caseCode, c.case_snap as caseSnap, c.case_desc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.createdAt, ' +
-      'i.pro_code as proCode, i.case_code as proCaseCode, i.images as proImages, i.videos as proVideos ' +
+      'c.id as caseCode, c.caseSnap as caseSnap, c.caseDesc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.createdAt, ' +
+      'i.proCode as proCode, i.caseCode as proCaseCode, i.images as proImages, i.videos as proVideos ' +
       'FROM bb_case AS c LEFT JOIN bb_issue As i ' +
-      'ON (c.id=i.case_code) AND i.pro_code=' + cond + limit;
-    return db.query (sql, {type: Sequelize.QueryTypes.SELECT});
+      'ON (c.id=i.caseCode) AND i.proCode=' + cond + limit;
+    return sequelize.query (sql, {type: sequelize.QueryTypes.SELECT});
   };
 
   return caseModel;
-}();
+};

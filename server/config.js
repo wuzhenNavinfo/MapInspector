@@ -6,7 +6,7 @@ var config = {};
 config.DB_HOST = '192.168.4.189';
 config.DB_USER = 'root';
 config.DB_PWD = '111111';
-config.DB_NAME = 'map_inspector';
+config.DB_NAME = 'maping';
 
 // token签名;
 config.SECRET = 'mapInspectorSecret';

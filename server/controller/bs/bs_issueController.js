@@ -12,8 +12,9 @@
  */
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
-const issueModel = require('../../models/bs/issueModel');
-const caseModel = require('../../models/bs/caseModel');
+const sequelize = require("../../dataBase");
+const issueModel = sequelize.import('../../models/bs/issueModel');
+const caseModel = sequelize.import('../../models/bs/caseModel');
 
 /**
  * 问题管理控制器;
@@ -23,7 +24,7 @@ const caseModel = require('../../models/bs/caseModel');
  */
 function issueController(req, res) {
   this.model = {};
-  this.model.createUser = req.loginUser.userId;
+  this.model.createUser = req.loginUser.id;
   this.model.proCode = '';
   this.model.caseCode = '';
   this.model.images = [];
@@ -58,9 +59,9 @@ issueController.prototype.upload = function () {
  * @returns {Promise.<TResult>}
  */
 issueController.prototype.create = function () {
-  this.req.body.images = this.req.body.images.join(',');
-  this.req.body.videos = this.req.body.videos.join(',');
   tool.extend(this.model, this.req.body);
+  this.model.images = this.model.images.join(',');
+  this.model.videos = this.model.videos.join(',');
   return issueModel.upsert(this.model)
   .then(result => {
     if (result) {
@@ -107,8 +108,8 @@ issueController.prototype.find = function () {
         tempResult.caseMarker = tool.clone (res.dataValues.marker);
         tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
         tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
-        tempResult.issueVideos = result ? result.dataValues.videos.split (',') : [];
-        tempResult.issueImages = result ? result.dataValues.images.split (',') : [];
+        tempResult.issueVideos = (result && result.dataValues.videos) ? result.dataValues.videos.split (',') : [];
+        tempResult.issueImages = (result && result.dataValues.images) ? result.dataValues.images.split (',') : [];
         return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});
       });
     }

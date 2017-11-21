@@ -12,9 +12,11 @@
  */
 const async = require('async');
 const tool = require('../../utils/publicTool');
-const projectModel = require('../../models/bs/projectModel');
-const issueModel = require('../../models/bs/issueModel');
-const caseModel = require('../../models/bs/caseModel');
+
+const sequelize = require("../../dataBase");
+const caseModel = sequelize.import('../../models/bs/caseModel');
+const issueModel = sequelize.import('../../models/bs/issueModel');
+const projectModel = sequelize.import('../../models/bs/projectModel');
 
 /**
  * 用户管理控制器;
@@ -24,7 +26,7 @@ const caseModel = require('../../models/bs/caseModel');
  */
 function caseController(req, res) {
   this.model = {};
-  this.model.createUser = req.loginUser.userId;
+  this.model.createUser = req.loginUser.id;
   this.model.projectName = '';
   this.model.projectDesc = '';
   this.model.projectStatus = 0; // 作业中

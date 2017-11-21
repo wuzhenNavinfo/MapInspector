@@ -12,7 +12,8 @@
  */
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
-const caseModel = require('../../models/bs/caseModel');
+const sequelize = require("../../dataBase");
+const caseModel = sequelize.import('../../models/bs/caseModel');
 
 /**
  * 用户管理控制器;
@@ -22,12 +23,12 @@ const caseModel = require('../../models/bs/caseModel');
  */
 function caseController(req, res) {
   this.model = {};
-  this.model.createUser = req.loginUser.userId;
+  this.model.createUser = req.loginUser.id;
   this.model.caseSnap = '';
   this.model.caseDesc = '';
   this.model.caseMethod = '';
-  this.model.images = '';
-  this.model.videos = '';
+  this.model.images = [];
+  this.model.videos = [];
   this.model.marker = {type: 'Point', coordinates: [0, 0]};
   this.req = req;
   this.res = res;
@@ -163,9 +164,9 @@ caseController.prototype.upload = function () {
  * @returns {Promise.<TResult>}
  */
 caseController.prototype.create = function () {
-  this.req.body.images = this.req.body.images.join (',');
-  this.req.body.videos = this.req.body.videos.join (',');
   tool.extend (this.model, this.req.body);
+  this.model.images = this.model.images.join (',');
+  this.model.videos = this.model.videos.join (',');
   return caseModel.create (this.model)
   .then (caseData => {
     if (caseData) {
@@ -197,9 +198,9 @@ caseController.prototype.create = function () {
  */
 caseController.prototype.update = function () {
   let condition = {where: {id: this.req.body.id}};
-  this.req.body.images = this.req.body.images.join (',');
-  this.req.body.videos = this.req.body.videos.join (',');
   tool.extend (this.model, this.req.body);
+  this.model.images = this.model.images.join (',');
+  this.model.videos = this.model.videos.join (',');
   delete this.model.id;
   return caseModel.update (this.model, condition)
   .then (result => {

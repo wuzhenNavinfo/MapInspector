@@ -14,8 +14,12 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const tool = require('../../utils/publicTool');
-const userModel = require('../../models/om/userModel');
-const userRoleModel = require('../../models/om/user_roleModel');
+
+const sequelize = require("../../dataBase");
+const userModel = sequelize.import('../../models/om/userModel');
+const userRole = sequelize.import('../../models/om/roleModel');
+const userRoleModel = sequelize.import('../../models/om/user_roleModel');
+
 /**
  * 用户管理控制器;
  * @param req
@@ -54,9 +58,9 @@ UserController.prototype.register = function () {
       .then(userData => {
         if (userData) {
           // 创建用户时先默认分配用户为作业员;
-          return userRoleModel.create({userId: userData.userId, roleCode: 2})
+          return userRoleModel.create({userId: userData.id, roleId: 2})
             .then(roleData => {
-              userData.dataValues.role = roleData.roleCode;
+              userData.dataValues.role = roleData.roleId;
               return this.res.json({
                 errorCode: 0,
                 result: userData,
@@ -78,7 +82,8 @@ UserController.prototype.register = function () {
  * @returns {Promise.<TResult>}
  */
 UserController.prototype.login = function () {
-  let requestData = {where:{userName: this.req.body.userName}};
+  let requestData = {};
+  requestData.where = {userName: this.req.body.userName};
 	return userModel.findOne(requestData)
   .then(userData => {
     if (!userData) {
@@ -88,23 +93,24 @@ UserController.prototype.login = function () {
       let password = crypto.createHash('sha1').update(this.req.body.password).digest('hex');
       if (password != userData.password) throw new Error('登陆失败，密码错误!');
       // 查询角色;
-      return userRoleModel.findOne({where: {userId: userData.userId}})
-        .then(roleData => {
-          let userDataCopy = tool.clone(userData.dataValues);
-          userDataCopy.role = ['visitor', 'worker', 'manager', 'root'][roleData.dataValues.roleCode];
-          // 获得token;
-          userDataCopy.token = jwt.sign(
-            {data: {name: userData.userName, password: userData.password}},
-            config.SECRET, {expiresIn: 60 * 60 * 24});
 
-          // 登陆的返回结果剔除密码;
-          delete userDataCopy.password;
-          return this.res.status(200).json({
-            errorCode: 0,
-            userData: userDataCopy,
-            message: '已获得认证，登陆成功!'
-          });
+      return userRoleModel.findOne({where: {userId: userData.id}})
+      .then(roleData => {
+        let userDataCopy = tool.clone(userData.dataValues);
+        userDataCopy.role = ['visitor', 'worker', 'manager', 'root'][userDataCopy.roleCode];
+        // 获得token;
+        userDataCopy.token = jwt.sign(
+          {data: {name: userData.userName, password: userData.password}},
+          config.SECRET, {expiresIn: 60 * 60 * 24});
+
+        // 登陆的返回结果剔除密码;
+        delete userDataCopy.password;
+        return this.res.status(200).json({
+          errorCode: 0,
+          userData: userDataCopy,
+          message: '已获得认证，登陆成功!'
         });
+      });
     }
   })
   .catch(err => {
@@ -121,15 +127,25 @@ UserController.prototype.login = function () {
 UserController.prototype.find = function () {
   let requestParam = {};
   requestParam.attributes = {exclude: ['password']};
+  requestParam.include = {
+    model:userRole,
+    through: {attributes: ['roleCode', 'roleName']}
+  };
   if (this.req.query.pageSize && this.req.query.pageNum) {
     requestParam.limit = this.req.query.pageSize;
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
   return userModel.findAndCountAll(requestParam)
   .then(userDatas => {
+    let userDatasCopy = tool.clone(userDatas);
+    userDatasCopy.rows.forEach(item => {
+      let userRole = item.dataValues['om_roles'][0].roleCode;
+      delete item.dataValues['om_roles'];
+      item.dataValues.role = parseInt(userRole) === 1 ? 'worker' : 'manager';
+    });
     return this.res.json({
       errorCode: 0,
-      result: { data: userDatas.rows, total: userDatas.count },
+      result: { data: userDatasCopy.rows, total: userDatasCopy.count },
       message: '查找成功'
     });
   })
@@ -144,7 +160,7 @@ UserController.prototype.find = function () {
  * @returns {Promise.<TResult>}
  */
 UserController.prototype.delete = function () {
-  let requestData = {where: {userName: this.req.query.id}};
+  let requestData = {where: {id: this.req.query.id}};
 	return userModel.destroy(requestData)
     .then(affectedCount => {
       if(affectedCount) {

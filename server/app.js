@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./utils/autoRouter');
+//初始化数据库表结构;
+require('./models/model');
 // 创建express实例;
 var app = express();
 
