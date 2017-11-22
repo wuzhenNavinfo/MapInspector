@@ -14,6 +14,7 @@ const async = require('async');
 const tool = require('../../utils/publicTool');
 
 const sequelize = require("../../dataBase");
+const userModel = sequelize.import('../../models/om/userModel');
 const caseModel = sequelize.import('../../models/bs/caseModel');
 const issueModel = sequelize.import('../../models/bs/issueModel');
 const projectModel = sequelize.import('../../models/bs/projectModel');
@@ -42,15 +43,17 @@ function caseController(req, res) {
  */
 caseController.prototype.list = function () {
   let requestParam = {order: [["createdAt", "DESC"]]};
+  let createMan = this.model.createUser;
+  requestParam.include = ['pojectUser'];
   // 根据当前登陆用户过滤项目;
   if (this.req.loginUser['om_roles'][0].roleCode == 1) {
-    requestParam.where = {createUser: this.model.createUser};
+    requestParam.where = {createUser: createMan};
   } else {
-    requestParam.where = {auditUser: this.model.createUser};
+    requestParam.where = {auditUser: createMan};
   }
   // 根据项目状态过滤项目;
   if (this.req.query.projectStatus) {
-    requestParam.where.projectStatus = this.req.query.projectStatus;
+    requestParam.where.projectStatus = {$in: JSON.parse(this.req.query.projectStatus)};
   }
   if (this.req.query.pageSize && this.req.query.pageNum) {
     requestParam.limit = this.req.query.pageSize;
@@ -63,19 +66,42 @@ caseController.prototype.list = function () {
     return caseModel.count ()
     .then (caseCount => {
       return async.map (proDataList, (item, callback) => {
-        let requestData = {
-          where: {
-            createUser: this.model.createUser,
-            proCode: item.dataValues.id
+        return async.parallel([
+          function (cb) {
+            issueModel.count({where: {proCode: item.id}})
+            .then(count=> {
+              cb(null, count)
+            })
+          },
+          function (cb) {
+            issueModel.count({where: {proCode: item.id, issueStatus: 0}})
+            .then(count=> {
+              cb(null, count)
+            })
+          },
+          function (cb) {
+            issueModel.count({where: {proCode: item.id, issueStatus: 1}})
+            .then(count=> {
+              cb(null, count)
+            })
+          },
+          function (cb) {
+            issueModel.count({where: {proCode: item.id, issueStatus: 2}})
+            .then(count=> {
+              cb(null, count)
+            })
           }
-        };
-        return issueModel.findAll (requestData)
-        .then (issueDatas => {
+        ], (err, results) => {
           item.dataValues.issueTotal = caseCount;
-          item.dataValues.worked = issueDatas.length;
-          item.dataValues.unworked = caseCount - issueDatas.length;
+          item.dataValues.worked = results[0];
+          item.dataValues.unworked = caseCount - results[0];
+          item.dataValues.createUser = item.dataValues.pojectUser.userName;
+          item.dataValues.waitAudited = results[1];
+          item.dataValues.audited = results[2];
+          item.dataValues.errorCount = results[3];
+          delete item.dataValues.pojectUser;
           callback (null, item);
-        });
+        })
       }, (err, results) => {
         if (err) throw err;
         return this.res.json ({
@@ -129,7 +155,7 @@ caseController.prototype.create = function () {
 };
 
 /**
- * 提交项目projectStatus 1->待作业；2->已提交；3->已完成;
+ * 提交项目projectStatus 1->待作业；2->已提交；3->已完成；4->审核不通过;
  * @method submit
  * @returns {Promise.<TResult>}
  */
@@ -138,7 +164,8 @@ caseController.prototype.submit = function () {
   let auditUser = this.req.body.auditUser;
   let updateData = {
     auditUser: auditUser,
-    projectStatus: 2
+    projectStatus: 2,
+    submitAt: Date()
   };
   let condition = {where: {id: projectId}};
   async.parallel([
@@ -176,7 +203,39 @@ caseController.prototype.submit = function () {
   });
 };
 
-
+/**
+ * 项目审核;
+ * @method auditPro
+ * @returns {Promise.<T>}
+ */
+caseController.prototype.auditPro = function () {
+  let projectId = this.req.body.id;
+  let requestData = {where: {id: projectId}};
+  return projectModel.findOne (requestData)
+  .then (result => {
+    if (result.auditUser != this.req.loginUser.id) {
+      return this.req.json ({errorCode: '-1', message: '该项目不属于用该用户审核'});
+    }
+    if (result.projectStatus != 2) {
+      return this.req.json ({errorCode: '-1', message: '该项目不满足审核的状态'});
+    }
+    let updateData = {projectStatus: this.req.body.projectStatus};
+    if (this.req.body.projectStatus == 4) {
+      updateData.auditUser = null;
+    }
+    return projectModel.update (updateData, {where: {id: projectId}})
+    .then ((affectedCount, affectedRow) => {
+      if (affectedCount) {
+        return this.res.json ({errorCode: 0, message: '审核成功'});
+      } else {
+        return this.res.json ({errorCode: -1, message: '审核失败'});
+      }
+    });
+  })
+  .catch (err => {
+    throw err
+  });
+};
 
 /**
  * 根据项目id删除项目;

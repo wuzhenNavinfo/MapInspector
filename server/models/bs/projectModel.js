@@ -48,6 +48,16 @@ module.exports = function (sequelize, DataTypes) {
         get: function (){
           return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
         }
+      },
+      submitAt: {
+        type: DataTypes.DATE,
+        get: function (){
+          let time = this.getDataValue('submitAt');
+          if (time) {
+            return moment(time).format('YYYY-MM-DD');
+          }
+          return null;
+        }
       }
     }, {
       freezeTableName: true
