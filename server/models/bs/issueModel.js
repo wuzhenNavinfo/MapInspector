@@ -6,64 +6,43 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
-const Sequelize = require('sequelize');
-const db = require('../../dataBase');
 
 // 创建 model
-module.exports = db.define('bb_issue', {
-    id: {
-      type: Sequelize.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-      allowNull: false
-    },
-    createUser: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'om_user',
-        key: 'user_id'
+const moment = require('moment');
+module.exports = function (sequelize, DataTypes) {
+  return sequelize.define('bb_issue', {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+      },
+      images: {
+        type: DataTypes.STRING
+      },
+      videos: {
+        type: DataTypes.STRING
+      },
+      issueStatus: {
+        type: DataTypes.INTEGER
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD');
+        }
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
+        }
       }
-    },
-    proCode: {
-      type: Sequelize.INTEGER,
-      field: 'pro_code',
-      allowNull: false,
-      unique: 'compositeIndex',
-      references: {
-        model: 'bb_project',
-        key: 'id'
-      }
-    },
-    caseCode: {
-      type: Sequelize.INTEGER,
-      field: 'case_code',
-      allowNull: false,
-      unique: 'compositeIndex',
-      references: {
-        model: 'bb_case',
-        key: 'id'
-      }
-    },
-    images: {
-      type: Sequelize.STRING
-    },
-    videos: {
-      type: Sequelize.STRING
-    },
-    issueStatus: {
-      type: Sequelize.INTEGER,
-      field: 'issue_status'
-    },
-    createdAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
-    },
-    updatedAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
+    }, {
+      freezeTableName: true
     }
-  }, {
-    freezeTableName: true
-  }
-);
+  );
+};
+

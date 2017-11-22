@@ -6,48 +6,52 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
-const Sequelize = require('sequelize');
-const db = require('../../dataBase');
 
 // 创建 model
-module.exports = db.define('bb_project', {
-    id: {
-      type: Sequelize.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-      allowNull: false
-    },
-    projectName: {
-      type: Sequelize.STRING,
-      field: 'pro_name',
-      allowNull: false
-    },
-    projectDesc: {
-      type: Sequelize.STRING,
-      field: 'pro_desc',
-      allowNull: false
-    },
-    createUser: {
-      type: Sequelize.INTEGER,
-      field: 'create_person',
-      references: {
-        model: 'om_user',
-        key: 'user_id'
+const moment = require('moment');
+module.exports = function (sequelize, DataTypes) {
+  return sequelize.define('bb_project', {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+      },
+      projectName: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      projectDesc: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      auditUser: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: sequelize.model('om_user'),
+          key: 'id'
+        }
+      },
+      projectStatus: {
+        type: DataTypes.INTEGER
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD');
+        }
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+          return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
+        }
       }
-    },
-    projectStatus: {
-      type: Sequelize.INTEGER,
-      field: 'pro_status'
-    },
-    createdAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
-    },
-    updatedAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
+    }, {
+      freezeTableName: true
     }
-  }, {
-    freezeTableName: true
-  }
-);
+  );
+};
+

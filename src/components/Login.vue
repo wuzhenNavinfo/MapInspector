@@ -56,6 +56,7 @@ export default {
             that.logining = false;
             let { errorCode, message,  result } = data;
             if (errorCode == 0) {
+              console.log(result)
               appUtil.setCurrentUser(result);
               that.$router.push('/mainFrame');
             } else {
