@@ -38,14 +38,14 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-        get() {
+        get: function () {
           return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD');
         }
       },
       updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-        get() {
+        get: function (){
           return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
         }
       }

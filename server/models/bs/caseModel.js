@@ -6,6 +6,7 @@
  *
  * @copyright @Navinfo, all rights reserved.
  */
+
 const moment = require('moment');
 module.exports = function (sequelize, DataTypes) {
   let caseModel = sequelize.define ('bb_case', {
@@ -36,14 +37,14 @@ module.exports = function (sequelize, DataTypes) {
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-        get() {
+        get: function () {
           return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD');
         }
       },
       updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-        get() {
+        get: function (){
           return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
         }
       }
@@ -60,7 +61,7 @@ module.exports = function (sequelize, DataTypes) {
     }
     var cond = obj.condition;
     var sql = 'SELECT ' +
-      'c.id as caseCode, c.caseSnap as caseSnap, c.caseDesc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.createdAt, ' +
+      'c.id as caseCode, c.caseSnap as caseSnap, c.caseDesc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.marker as marker, c.createdAt, ' +
       'i.proCode as proCode, i.caseCode as proCaseCode, i.images as proImages, i.videos as proVideos ' +
       'FROM bb_case AS c LEFT JOIN bb_issue As i ' +
       'ON (c.id=i.caseCode) AND i.proCode=' + cond + limit;

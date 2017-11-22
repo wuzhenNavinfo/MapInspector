@@ -10,6 +10,7 @@
 /**
  * 引入相关模块
  */
+const moment = require('moment');
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
 const sequelize = require("../../dataBase");
@@ -46,18 +47,16 @@ caseController.prototype.list = function () {
     requestParam.offset = (this.req.query.pageNum - 1) * this.req.query.pageSize;
   }
   return caseModel.findAndCountAll (requestParam).then (caseDatas => {
-    let dataList = [];
     let caseTotal = caseDatas.count;
     for (let i = 0; i < caseDatas.rows.length; i++) {
       let data = tool.clone (caseDatas.rows[i].dataValues);
       let imageLength = data.images ? data.images.split (',').length : 0;
       let videoLength = data.videos ? data.videos.split (',').length : 0;
-      data.mediaLength = imageLength + videoLength;
-      dataList.push (data);
+      caseDatas.rows[i].dataValues.mediaLength = imageLength + videoLength;
     }
     return this.res.json ({
       errorCode: 0,
-      result: {data: dataList, total: caseTotal},
+      result: {data: caseDatas.rows, total: caseTotal},
       message: '查找成功'
     });
   }).catch (err => {
@@ -95,7 +94,8 @@ caseController.prototype.listDetail = function () {
         data.caseSnap = result[i].caseSnap;
         data.caseDesc = result[i].caseDesc;
         data.caseCode = result[i].caseCode;
-        data.createdAt = result[i].createdAt;
+        data.marker = result[i].marker;
+        data.createdAt = moment(result[i].createdAt).format('YYYY-MM-DD');
         dataList.push(data);
       }
       return this.res.json ({
