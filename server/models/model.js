@@ -24,7 +24,8 @@ roleModel.belongsToMany (userModel, { through: userRoleModel, foreignKey: 'roleI
 // 设置用户和案例的关系(1:m);
 userModel.hasMany (caseModel, {foreignKey: 'createUser'});
 // 设置用户和项目的关系(1:m);
-userModel.hasMany (projectModel, {foreignKey: 'createUser'});
+userModel.hasMany (projectModel, {as: 'pojectUser', foreignKey: 'createUser'});
+projectModel.belongsTo (userModel, {as: 'pojectUser', foreignKey: 'createUser'});
 
 // 设置问题表（案例和项目n:m产生的表);
 caseModel.belongsToMany (projectModel, {through: issueModel, foreignKey: 'caseCode'});

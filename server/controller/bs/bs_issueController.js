@@ -82,6 +82,27 @@ issueController.prototype.create = function () {
 };
 
 /**
+ * 审核问题
+ * @method auditIssue
+ * @returns {Promise.<TResult>}
+ */
+issueController.prototype.auditIssue = function () {
+  let updateData = {issueStatus: this.req.body.issueStatus}
+  let condition = {where: {id: this.req.body.id}};
+  return issueModel.update(updateData, condition)
+  .then(affectedCount => {
+    if (affectedCount[0]) {
+      this.res.json({errorCode: 0, message: '问题审核成功'});
+    } else {
+      this.res.json({errorCode: -1, message: '问题审核失败'});
+    }
+  })
+  .catch(err => {
+    throw err;
+  });
+};
+
+/**
  * 查找问题(通过项目id和案例id)
  * @method find
  * @returns {Promise.<TResult>}
