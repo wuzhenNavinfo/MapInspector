@@ -3,8 +3,8 @@
     <el-col :span="24" class="header">
       <el-col :span="6" class="logo" :class="titleCtrl.collapsed?'logo-collapse-width':'logo-width'">
         <transition name="fade">
-          <div v-if='!sysNameShow'>审图系统</div>
-          <div v-if='sysNameShow'>审</div>
+          <div v-if='!sysNameShow'>审图常见问题审查工具</div>
+          <div v-if='sysNameShow'>审图</div>
         </transition>
       </el-col>
       <el-col :span="14" :style="backgroundImage">
@@ -88,9 +88,9 @@ import {appUtil} from '../config'
       color:#fff;
       .logo{
         height:60px;
-        font-size: 22px;
-        padding-left:20px;
-        padding-right:20px;
+        font-size: 20px;
+        padding-left:10px;
+        padding-right:10px;
         border-color: rgba(238,241,146,0.3);
         border-right-width: 1px;
         border-right-style: solid;
@@ -123,8 +123,8 @@ import {appUtil} from '../config'
             float: right;
           }
         }
+
       }
     }
 	}
-
 </style>
