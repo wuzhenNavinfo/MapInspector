@@ -80,11 +80,12 @@ export default {
     display:flex; /*设为伸缩容器*/
     flex-flow:row; /*伸缩项目单行排列*/
     align-items: center; /* 上下居中 */
-    background-image: url(../assets/bg.jpg);
+    background-image: url(../assets/login_back.png);
     background-size: 100% 100%;
     background-position: 50%;
     .stable{
       width:450px; /*固定宽度*/
+      opacity: .8;
     }
     .change{
       flex:1; /*这里设置为占比1，填充满剩余空间*/
