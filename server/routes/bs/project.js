@@ -51,6 +51,14 @@ router.post('/submit', [
   handler(req, res, next);
 });
 
+// 审核项目;
+router.post('/auditPro', [
+  check('id').exists().withMessage('缺少项目id').isInt().withMessage('项目id必须为整数'),
+  check('projectStatus').exists().withMessage('缺少审核状态').isIn([1, 3]).withMessage('项目状态值域错误')
+], function (req, res, next) {
+  handler(req, res, next);
+});
+
 
 // 案例删除;
 router.get('/delete', [
