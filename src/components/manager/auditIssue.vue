@@ -15,7 +15,7 @@
           <el-table-column type="index" width="50px" label="序号"> </el-table-column>
           <el-table-column prop="caseSnap" label="案例概述"> </el-table-column>
           <el-table-column width="64px" prop="caseMediaLength" label="附件数"> </el-table-column>
-          <el-table-column width="50px" prop="proMediaLength" label="处理"> </el-table-column>
+          <el-table-column width="76px" prop="issueMediaLength" label="处理状态" :formatter="formatterStatus"> </el-table-column>
         </el-table>
         <el-pagination small
           @size-change="handleSizeChange"
@@ -29,9 +29,6 @@
       </div>
     </div>
     <div class="map_operate_tool">
-       <el-tooltip :content="showIconFlag?'图标已打开':'图标已关闭'" >
-        <el-switch v-model="showIconFlag" style="margin-bottom:4px;margin-left:4px;" active-color="#409eff" > </el-switch>
-       </el-tooltip>
     </div>
     <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
       <comLogout ></comLogout>
@@ -66,21 +63,19 @@
       <div>
         <div class='my-panel'>
           问题处理
-          <el-button style="float:right;margin-left:10px;" size="mini" type="warning" :loading="ctrl.saving" @click="saveCaseIssue()" >保存</el-button>
         </div>
         <div class="scroll_style">
           <el-row style="padding:6px;">
             <el-col :span="6" v-for="(image, index) in caseForm.issueImages" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showIssueImages(index)">
-              <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
-          <el-upload
-            class="my-upload" multiple
-            :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token"
-            :on-success="handlesuccess" :show-file-list="false">
-            <el-button size="small" type="primary">点击上传图片</el-button>
-          </el-upload>
+          <el-row>
+            <el-col :span="24" style="text-align:center;">
+              <el-button size="mini" type="primary" :disabled="caseForm.issueStatus==1" :loading="ctrl.passSaving" @click="saveCaseIssue(1)" >通 过</el-button>
+              <el-button size="mini" type="primary" :disabled="caseForm.issueStatus==2" :loading="ctrl.saving" @click="saveCaseIssue(2)" >不通过</el-button>
+            </el-col>
+          </el-row>
         </div>
       </div>
     </div>
@@ -108,9 +103,10 @@
 import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import ComLogout from '../common/Logout'
-import { queryCaseListDetail, queryCaseById, queryIssue, createIssue} from '../../dataService/api';
-// import mapMarker from '../../assets/marker.png'
-import mapMarker from '../../assets/poi_blue.png'
+import { queryCaseListDetail, queryIssue, auditIssueApi } from '../../dataService/api';
+
+import markerIcon from '../../assets/poi_blue.png'
+import markerIconRed from '../../assets/poi_red.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -120,21 +116,22 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      currentEditMarker: null,
+      currentProjectCode: '',
       schfilter: '',
-      showIconFlag: true,
       imageDialogVisible: false,
       issueImageDialogVisible: false,
       rightCollapsed: false,
       leftCollapsed: true,
       currentPage1: 1,
       pageCtrl:{},
-      selectedRowData:{},
       ctrl: {
         curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
         caseCreate: false,
         addLocation: false, // 增加点位的标识
         saving: false,
+        passSaving: false,
         pageSize: 20,
         pageNum:1
       },
@@ -180,6 +177,17 @@ export default {
     ComLogout
   },
   methods: {
+    formatterStatus(row, column) {
+      let value = '未知';
+      if (row.issueStatus == 0) {
+        value = '未审核';
+      } else if (row.issueStatus == 1) {
+        value = '通过'
+      } else if (row.issueStatus == 2) {
+        value = '不通过'
+      }
+      return value;
+    },
     handleSizeChange(size) {
       this.ctrl.pageSize = size;
       this.queryCaseList()
@@ -209,19 +217,27 @@ export default {
         this.leftCollapsed = true;
       }
     },
-    saveCaseIssue() {
+    saveCaseIssue(status) {
       let param = {
-        caseCode: this.selectedRowData.caseCode,
-        proCode: this.selectedRowData.proCode,
-        images: this.caseForm.issueImages,
-        videos:[]
+        issueId: this.caseForm.issueId,
+        issueStatus: status
       };
       let that = this;
-      that.ctrl.saving = true;
-      createIssue(param).then(res => {
-        that.ctrl.saving = false;
+      if (status == 1) {
+        that.ctrl.passSaving = true;
+      } else if (status == 2) {
+         that.ctrl.saving = true;
+      }
+
+      auditIssueApi(param).then(res => {
+        if (status == 1) {
+          that.ctrl.passSaving = false;
+        } else if (status == 2) {
+           that.ctrl.saving = false;
+        }
         if (res.errorCode === 0) {
-          that.queryCaseList(that.selectedRowData.proCode);
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+          that.queryCaseList(that.currentProjectCode);
         }
       })
     },
@@ -243,7 +259,13 @@ export default {
       })
     },
     selectedRow(row, event) {
-      this.selectedRowData = row;
+      let that = this;
+      this.fillContent(row, function (loc) {
+        window.maplet.setCenter(new MPoint (loc.lon, loc.lat));
+        that.redraw(row.caseCode);
+      });
+    },
+    fillContent(row, callback) {
       let that = this;
       queryIssue({proCode: row.proCode, caseCode: row.caseCode}).then(data => {
         let { errorCode, message, result } = data;
@@ -251,28 +273,24 @@ export default {
           that.caseForm = result;
           let lon = result.caseMarker.coordinates[0];
           let lat = result.caseMarker.coordinates[1];
-          window.maplet.setCenter(new MPoint (lon, lat));
-          window.maplet.clearOverlays();
-          window.marker = new MMarker(
-              new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32,5,22)
-          );
-          window.maplet.addOverlay(marker);
+          if (callback) {
+            callback({lon: lon, lat: lat});
+          }
         }
       })
       that.rightPanelCtrl('open');
     },
-    gotoMainPage() {
-      this.$router.push('/mainFrame');
-    },
-    logout: function () {
-      this.$confirm('确认退出吗?', '提示', {
-        type: 'warning '
-      }).then(() => {
-        sessionStorage.removeItem('user');
-        this.$router.push('/login');
-      }).catch(() => {
-      });
+    redraw(id) {
+      let marks = window.maplet.getMarkers();
+      for (let i = 0; i < marks.length; i++) {
+        let item = marks[i];
+        let itemId = item.extraData.caseCode;
+        if (itemId == id) {
+          marks[i].setIcon(new MIcon(markerIconRed,22,39,12,33));
+        } else {
+          marks[i].setIcon(new MIcon(markerIcon,22,39,12,33));
+        }
+      }
     },
     queryCaseList(projectCode) {
       let that = this;
@@ -298,7 +316,8 @@ export default {
         if (errorCode == 0) {
           result.data.forEach((value, index, arr) => {
             that.allCaseList.push({
-              id: value.id,
+              caseCode: value.caseCode,
+              proCode: value.proCode,
               location: [value.marker.coordinates[0], value.marker.coordinates[1]]
             })
           });
@@ -306,21 +325,47 @@ export default {
         }
       })
     },
+    addOrRemoveIcon(flag) {
+      let that = this;
+      if (flag == 'add') {
+        window.maplet.clearOverlays();
+        let that = this;
+        this.allCaseList.forEach((value, index, arr) => {
+          let marker = new MMarker(
+            new MPoint(value.location[0], value.location[1]),
+            new MIcon(markerIcon,22,39,12,33)
+          )
+          marker.extraData = {
+            caseCode: value.caseCode,
+            proCode: value.proCode
+          }
+          MEvent.addListener(marker, "click", function (mk) {
+            if (that.currentEditMarker) { // 删除当前新建的点
+              window.maplet.removeOverlay(that.currentEditMarker);
+            }
+            that.redraw(mk.extraData.caseCode);
+            that.fillContent({caseCode: mk.extraData.caseCode, proCode: mk.extraData.proCode}, null);
+
+          });
+          window.maplet.addOverlay(marker);
+        })
+      } else {
+        window.maplet.clearOverlays();
+      }
+    },
     initMapbar() {
       let that = this;
       window.maplet = new Maplet("map");
       window.maplet.centerAndZoom(new MPoint(116.38749,39.90515), 8);
       window.maplet.clickToCenter = false;
-      // window.maplet.showScale(false);
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
-          that.caseForm.location = point.pid;
           window.maplet.clearOverlays();
           let poi = point.pid.split(',');
-          window.marker = new MMarker(
+          that.currentEditMarker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32,5,22)
+              new MIcon(markerIcon,22,39,12,33)
           );
           window.maplet.addOverlay(marker);
         }
@@ -333,9 +378,10 @@ export default {
     this.panelHeight = clientHeight - 50 + 'px'; // 后续改善
   },
   mounted: function () {
-    this.queryCaseList(this.$route.params.projectCode);
+    this.currentProjectCode = this.$route.params.projectCode;
+    this.queryCaseList(this.currentProjectCode);
     this.initMapbar();
-    this.queryAllCaseList(this.$route.params.projectCode);
+    this.queryAllCaseList(this.currentProjectCode);
   },
   watch: {
     'schfilter': function (val, oldVal) {
@@ -435,11 +481,13 @@ export default {
     }
   }
 }
-.img_delete{
+.img-delete{
   position: relative;
-  top: -70px;
-  left: 52px;
+  top: -72px;
+  left: 54px;
   cursor: pointer;
+  font-size: 16px;
+  color: red;
   &:hover {
     background: #CCC;
     border-radius: 2px

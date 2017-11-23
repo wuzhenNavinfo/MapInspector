@@ -384,7 +384,7 @@ export default {
         this.allCaseList.forEach((value, index, arr) => {
           let marker = new MMarker(
             new MPoint(value.location[0], value.location[1]),
-            new MIcon(markerIcon,22,39,5,22)
+            new MIcon(markerIcon,22,39,12,33)
           )
           marker.id = marker.id + '_' + value.id;
           MEvent.addListener(marker, "click", function (mk) {
@@ -407,9 +407,9 @@ export default {
         let item = marks[i];
         let itemId = item.id.split('_')[1];
         if (itemId == id) {
-          marks[i].setIcon(new MIcon(markerIconRed,22,39,5,22));
+          marks[i].setIcon(new MIcon(markerIconRed,22,39,12,33));
         } else {
-          marks[i].setIcon(new MIcon(markerIcon,22,39,5,22));
+          marks[i].setIcon(new MIcon(markerIcon,22,39,12,33));
         }
       }
     },
@@ -431,7 +431,7 @@ export default {
           let poi = point.pid.split(',');
           that.currentEditMarker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(markerIconGreen,22,39,5,22)
+              new MIcon(markerIconGreen,22,39,12,33)
           );
           window.maplet.addOverlay(that.currentEditMarker);
         }

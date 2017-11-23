@@ -102,7 +102,7 @@ export default {
     submitProject() {
       let that = this;
       that.submitLoading = true;
-      submitProjectApi({id: this.currentProjectId, auditUser: this.auditUser}).then(res => {
+      submitProjectApi({projectId: this.currentProjectId, auditUser: this.auditUser}).then(res => {
         that.submitLoading = false;
         if (res.errorCode === 0) {
           that.queryIssueList();

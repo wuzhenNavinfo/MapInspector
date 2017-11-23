@@ -15,7 +15,7 @@
           <el-table-column type="index" width="50px" label="序号"> </el-table-column>
           <el-table-column prop="caseSnap" label="案例概述"> </el-table-column>
           <el-table-column width="64px" prop="caseMediaLength" label="附件数"> </el-table-column>
-          <el-table-column width="50px" prop="proMediaLength" label="处理"> </el-table-column>
+          <el-table-column width="50px" prop="issueMediaLength" label="处理"> </el-table-column>
         </el-table>
         <el-pagination small
           @size-change="handleSizeChange"
@@ -271,9 +271,9 @@ export default {
         let item = marks[i];
         let itemId = item.extraData.caseCode;
         if (itemId == id) {
-          marks[i].setIcon(new MIcon(markerIconRed,22,39,5,22));
+          marks[i].setIcon(new MIcon(markerIconRed,22,39,12,33));
         } else {
-          marks[i].setIcon(new MIcon(markerIcon,22,39,5,22));
+          marks[i].setIcon(new MIcon(markerIcon,22,39,12,33));
         }
       }
     },
@@ -318,7 +318,7 @@ export default {
         this.allCaseList.forEach((value, index, arr) => {
           let marker = new MMarker(
             new MPoint(value.location[0], value.location[1]),
-            new MIcon(markerIcon,22,39,5,22)
+            new MIcon(markerIcon,22,39,12,33)
           )
 
           marker.id = marker.id + '_' + value.id;
@@ -352,7 +352,7 @@ export default {
           let poi = point.pid.split(',');
           that.currentEditMarker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(markerIcon,22,39,5,22)
+              new MIcon(markerIcon,22,39,12,33)
           );
           window.maplet.addOverlay(marker);
         }
@@ -370,6 +370,15 @@ export default {
     this.queryAllCaseList(this.$route.params.projectCode);
   },
   watch: {
+    'showIconFlag': {
+      handler: function(newValue, oldValue) {
+        if (newValue) {
+          this.addOrRemoveIcon('add');
+        } else {
+          this.addOrRemoveIcon('remove');
+        }
+      }
+    },
     'schfilter': function (val, oldVal) {
       this.tableData.data = this.tableDataClone.data.filter( item => (~item.caseSnap.indexOf(val)));
     }

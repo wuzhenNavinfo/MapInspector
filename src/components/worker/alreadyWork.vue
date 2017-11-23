@@ -1,6 +1,15 @@
 <template>
   <div>
     <el-row :gutter="20" style="padding:10px;margin:0px;">
+      <el-col :span="6" v-if="cardDataList.length==0">
+        <el-card style="margin-top:20px;">
+          <div class="addPanel">
+            <div style="height:110px;text-align:center;padding-top:55px;font-size:30px;">
+               无已提交数据
+            </div>
+          </div>
+        </el-card>
+      </el-col>
       <el-col :span="6" v-for="item in cardDataList" :key="item.id">
         <el-card class="st-card" >
           <el-progress type="circle" :percentage="item.progress" :width="80" style="float:right;"></el-progress>

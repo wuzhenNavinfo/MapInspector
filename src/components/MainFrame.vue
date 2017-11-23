@@ -10,7 +10,7 @@
               <span slot="title">导航菜单</span>
             </template>
             <el-menu-item index="/manager/waitWork">待审核</el-menu-item>
-            <!-- <el-menu-item index="/tableView">已审核</el-menu-item> -->
+            <el-menu-item index="/manager/alreadyAudit">已审核</el-menu-item>
             <el-menu-item index="/manager/caseList" >案例列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
@@ -26,7 +26,7 @@
             </template>
             <el-menu-item index="/worker/waitWork">待作业</el-menu-item>
             <el-menu-item index="/worker/alreadyWork">已提交</el-menu-item>
-            <el-menu-item index="/worker/completed">已完成</el-menu-item>
+            <el-menu-item index="/worker/alreadyCompleted">已完成</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>

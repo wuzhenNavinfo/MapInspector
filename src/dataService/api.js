@@ -61,6 +61,9 @@ export const queryCaseListDetail = param => { return getReq('/api/bs/case/listDe
 export const queryIssue = param => { return getReq('/api/bs/issue/find', param)};
 export const createIssue = param => { return postReq('/api/bs/issue/create', param)};
 export const submitProjectApi = param => { return postReq('/api/bs/project/submit', param)};
+export const auditProApi = param => { return postReq('/api/bs/project/auditPro', param)};
 
+// -- 问题相关  --
+export const auditIssueApi = param => { return postReq('/api/bs/issue/auditIssue', param)};
 
 
