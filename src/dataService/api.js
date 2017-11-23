@@ -38,6 +38,7 @@ var getReq = function (url, param) {
 // -- 用户相关  --
 export const login = param => { return postReq('/api/om/user/login', param) }; // 登录接口, 注意箭头函数返回对象是要加小括号的知识点
 export const findUser = param => { return axios.get(`${baseUrl}/api/om/user/find`, {params: param}).then(res => res.data).catch(res => ({errcode: null})); }; // 注意get和post的传递参数方式的不同
+export const findUserList = param => { return getReq('/api/om/user/find', param)};
 
 // -- 案例相关  --
 export const queryCaseList = param => { return getReq('/api/bs/case/list', param)};
@@ -59,4 +60,10 @@ export const deleteProject = param => { return getReq('/api/bs/project/delete', 
 export const queryCaseListDetail = param => { return getReq('/api/bs/case/listDetail', param)};
 export const queryIssue = param => { return getReq('/api/bs/issue/find', param)};
 export const createIssue = param => { return postReq('/api/bs/issue/create', param)};
+export const submitProjectApi = param => { return postReq('/api/bs/project/submit', param)};
+export const auditProApi = param => { return postReq('/api/bs/project/auditPro', param)};
+
+// -- 问题相关  --
+export const auditIssueApi = param => { return postReq('/api/bs/issue/auditIssue', param)};
+
 
