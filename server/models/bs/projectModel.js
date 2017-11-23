@@ -61,6 +61,11 @@ module.exports = function (sequelize, DataTypes) {
         }
       }
     }, {
+      getterMethods   : {
+        auditedAt: function (){
+          return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
+        }
+      },
       freezeTableName: true
     }
   );

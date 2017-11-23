@@ -209,7 +209,7 @@ caseController.prototype.submit = function () {
  * @returns {Promise.<T>}
  */
 caseController.prototype.auditPro = function () {
-  let projectId = this.req.body.id;
+  let projectId = this.req.body.projectId;
   let requestData = {where: {id: projectId}};
   return projectModel.findOne (requestData)
   .then (result => {
