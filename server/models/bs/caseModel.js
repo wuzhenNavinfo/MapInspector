@@ -62,7 +62,7 @@ module.exports = function (sequelize, DataTypes) {
     var cond = obj.condition;
     var sql = 'SELECT ' +
       'c.id as caseCode, c.caseSnap as caseSnap, c.caseDesc as caseDesc, c.images as caseImages, c.videos as caseVideos, c.marker as marker, c.createdAt, ' +
-      'i.proCode as proCode, i.caseCode as proCaseCode, i.images as proImages, i.videos as proVideos ' +
+      'i.id as issueId, i.proCode as proCode, i.caseCode as proCaseCode, i.issueStatus as issueStatus, i.images as proImages, i.videos as proVideos ' +
       'FROM bb_case AS c LEFT JOIN bb_issue As i ' +
       'ON (c.id=i.caseCode) AND i.proCode=' + cond + limit;
     return sequelize.query (sql, {type: sequelize.QueryTypes.SELECT});

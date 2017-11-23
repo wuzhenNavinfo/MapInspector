@@ -39,7 +39,7 @@ router.post('/create', [
 // 创建问题;
 router.post('/auditIssue', [
   check('issueStatus').exists().withMessage('缺少issueStatus参数').isInt().withMessage('issueStatus必须为整数'),
-  check('id').exists().withMessage('缺少id参数').isInt().withMessage('id必须为整数')
+  check('issueId').exists().withMessage('缺少issueId参数').isInt().withMessage('issueId必须为整数')
 ], function (req, res, next) {
   handler(req, res, next);
 });
