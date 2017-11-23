@@ -30,14 +30,12 @@
     </div>
     <div class="map_operate_tool">
        <el-button size="mini" type="danger" icon="el-icon-circle-plus" @click="createCase()">创 建</el-button>
-       <el-tooltip :content="showIconFlag?'图标已打开':'图标已关闭'" >
-        <el-switch v-model="showIconFlag" style="margin-bottom:4px;margin-left:4px;" active-color="#409eff" > </el-switch>
-       </el-tooltip>
     </div>
     <div class="right-open-icon" title="展开">
        <i class="el-icon-caret-left" :class="operationed?'enabled':'disabled'" @click="rightPanelCtrl('open')" ></i>
     </div>
     <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'">
+       <el-checkbox class="st-check" size="medium" v-model="showIconFlag" label="marker开关" border></el-checkbox>
        <comLogout ></comLogout>
     </div>
     <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
@@ -46,7 +44,7 @@
         <el-button style="float:right;margin-left:10px;" icon="el-icon-check" size="mini" type="warning" :loading="ctrl.saving" @click="saveCase()" >保存</el-button>
         <el-button style="float:right;" icon="el-icon-delete"  size="mini" type="warning" :loading="ctrl.deleteing" @click="deleteCase()">删除</el-button>
       </div>
-      <div class="scroll_style" :style="{'max-height': panelHeight}">
+      <div class="scroll_style" :style="{'max-height': panelHeight}" @click.stop="rightPanelClick();">
         <el-form ref="caseForm" :model="caseForm" class="my-from" :rules="rules" :show-message="false" :status-icon="true"  label-width="80px">
           <el-form-item label="问题编号">
             <el-input disabled v-model="caseForm.id"></el-input>
@@ -61,13 +59,14 @@
             <el-input type="textarea" v-model="caseForm.caseMethod"></el-input>
           </el-form-item>
           <el-form-item prop="location" disabled label="点位信息">
-            <el-input disabled v-model="caseForm.location" style="width:200px;"></el-input>
-            <i class="el-icon-location" @click="addLocation" style="cursor:pointer;font-size:24px;"></i>
+            <el-input disabled v-model="caseForm.location" style="width:190px;"></el-input>
+            <!--  <i class="el-icon-location" @click="addLocation" title="修改点位" style="cursor:pointer;font-size:24px;"></i> -->
+            <el-button class="location-add-icon" :class="{selected: ctrl.addLocation}" @click.stop="addLocation($event)"  type="primary" size="mini" round icon="el-icon-location"></el-button>
           </el-form-item>
           <el-row style="padding-left:10px;">
             <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showImages(index)">
-              <div class="el-icon-circle-close-outline img_delete" @click="deleteImage(index)"></div>
+              <div class="el-icon-circle-close-outline img-delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
           <el-upload
@@ -104,8 +103,9 @@ import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import ComLogout from '../common/Logout'
 import { queryCaseList, queryCaseById, saveCaseInfo, deleteCaseById} from '../../dataService/api';
-import markerIcon from '../../assets/poi.png'
-import markerIconBlue from '../../assets/poi_blue.png'
+import markerIcon from '../../assets/poi_blue.png'
+import markerIconRed from '../../assets/poi_red.png'
+import markerIconGreen from '../../assets/poi_green.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -115,6 +115,7 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      currentEditMarker: null,
       schfilter:'',
       operationed: false,
       showIconFlag: true,
@@ -238,6 +239,7 @@ export default {
       if (this.$refs.caseForm && this.$refs.caseForm.clearValidate) {
         this.$refs.caseForm.clearValidate();
       }
+      this.ctrl.addLocation = false;
     },
     clearCase() {
       this.caseForm.id = '';
@@ -248,13 +250,12 @@ export default {
       this.caseForm.images = [];
       this.caseForm.videos = [];
     },
-    addLocation () {
-      this.caseForm.location = ''
-      this.ctrl.addLocation = true;
+    addLocation (e) {
+      // this.caseForm.location = ''
+      this.ctrl.addLocation = !this.ctrl.addLocation;
       this.showIconFlag = true;
     },
     saveCase() {
-      this.queryAllCaseList();
       let that = this;
       this.$refs.caseForm.validate(function (valid) {
         if(valid) {
@@ -273,6 +274,7 @@ export default {
           }
           that.ctrl.saving = true;
           saveCaseInfo(param).then(data => {
+            that.ctrl.addLocation = false;
             that.ctrl.saving = false;
             if (data.errorCode == 0){
               that.queryCaseList();
@@ -295,6 +297,7 @@ export default {
       }
       let that = this;
       deleteCaseById({id: this.caseForm.id}).then(res => {
+        that.ctrl.addLocation = false;
         let {errorCode} = res;
         if (errorCode === 0) {
           that.createCase();
@@ -304,7 +307,7 @@ export default {
       });
     },
     deleteImage(index) {
-      this.caseForm.images.splice(index, 1)
+      this.caseForm.images.splice(index, 1);
     },
     showImages(index) {
       this.imageDialogVisible = true;
@@ -314,9 +317,12 @@ export default {
       })
     },
     selectedRow(row) {
+      let that = this;
       this.fillContent(row, function (loc) {
         window.maplet.setCenter(new MPoint (loc.lon, loc.lat));
+        that.redraw(row.id);
       });
+      this.ctrl.addLocation = false;
     },
     fillContent(row, callback) {
       if (this.$refs.caseForm && this.$refs.caseForm.clearValidate) {
@@ -371,22 +377,40 @@ export default {
       })
     },
     addOrRemoveIcon(flag) {
+      let that = this;
       if (flag == 'add') {
         window.maplet.clearOverlays();
         let that = this;
         this.allCaseList.forEach((value, index, arr) => {
           let marker = new MMarker(
             new MPoint(value.location[0], value.location[1]),
-            new MIcon(markerIcon,32,32,5,22)
+            new MIcon(markerIcon,22,39,12,33)
           )
           marker.id = marker.id + '_' + value.id;
           MEvent.addListener(marker, "click", function (mk) {
-            that.fillContent({id: mk.id.split('_')[1] });
+            if (that.currentEditMarker) { // 删除当前新建的点
+              window.maplet.removeOverlay(that.currentEditMarker);
+            }
+            that.redraw(mk.id.split('_')[1]);
+            that.fillContent({id: mk.id.split('_')[1]}, null);
+
           });
           window.maplet.addOverlay(marker);
         })
       } else {
         window.maplet.clearOverlays();
+      }
+    },
+    redraw(id) {
+      let marks = window.maplet.getMarkers();
+      for (let i = 0; i < marks.length; i++) {
+        let item = marks[i];
+        let itemId = item.id.split('_')[1];
+        if (itemId == id) {
+          marks[i].setIcon(new MIcon(markerIconRed,22,39,12,33));
+        } else {
+          marks[i].setIcon(new MIcon(markerIcon,22,39,12,33));
+        }
       }
     },
     initMapbar() {
@@ -396,33 +420,25 @@ export default {
       window.maplet.clickToCenter = false;
       // window.maplet.showScale(false);
       window.maplet.showOverview(false);
+      // 地图绑定单击事件
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
           that.caseForm.location = point.pid;
-          if (window.marker) {
-            window.maplet.removeOverlay(window.marker);
-            window.marker = null;
+          if (that.currentEditMarker) {
+            window.maplet.removeOverlay(that.currentEditMarker);
+            that.currentEditMarker = null;
           }
           let poi = point.pid.split(',');
-          window.marker = new MMarker(
+          that.currentEditMarker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(markerIconBlue,32,32,5,22)
+              new MIcon(markerIconGreen,22,39,12,33)
           );
-          window.maplet.addOverlay(marker);
+          window.maplet.addOverlay(that.currentEditMarker);
         }
       })
     },
-    initMapboxgl() {
-      mapboxgl.accessToken="pk.eyJ1IjoiZmFuZ2xhbmsiLCJhIjoiY2lpcjc1YzQxMDA5NHZra3NpaDAyODB4eSJ9.z6uZHccXvtyVqA5zmalfGg"
-      var map = new mapboxgl.Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/streets-v9',
-          center: [116.403909,39.915212],
-          zoom: 10,
-          maxZoom: 17,
-          minZoom: 5,
-          pitch: 0
-      });
+    rightPanelClick() {
+       this.ctrl.addLocation = false;
     }
   },
   created: function () {
@@ -552,23 +568,18 @@ export default {
   }
 }
 
-.map_operate_tool {
-  position: absolute;
-  z-index: 10;
-  top: 10px;
-  left: 48%;
-}
 .my-from {
-  .img_delete{
+  .img-delete{
     position: relative;
     top: -72px;
     left: 54px;
     cursor: pointer;
     font-size: 16px;
-  }
-  .img_delete:hover {
-    background: #CCC;
-    border-radius: 2px
+    color: red;
+    &:hover {
+      background: #CCC;
+      border-radius: 2px
+    }
   }
   .el-form-item{
     margin-top: 10px;
@@ -596,5 +607,13 @@ export default {
     .el-input__inner {
        border-radius: 0px;
     }
+  }
+  .location-add-icon {
+    padding: 3px 3px !important;
+    font-size: 18px;
+  }
+  .location-add-icon.selected {
+    background-color: #ccc;
+    border-color: #ccc;
   }
 </style>

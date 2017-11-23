@@ -51,5 +51,41 @@ body {
   }
 }
 
+.list-group ul {
+  list-style-type: none;
+  padding: 0px;
+  li{
+    padding: 10px;
+    font-size: 14px;
+    & > label{
+      width: 60px;
+      float: left;
+      text-align: right
+    }
+    & > div{
+      margin-left: 60px;
+      padding-left: 10px;
+    }
+  }
+}
+
+.return-page-icon {
+  .st-check {
+    background-color: #20a0ff;
+    color: white;
+    .el-checkbox__label {
+      color: white !important;
+    }
+  }
+}
+
+/** 地图上方的工具按钮样式 **/
+.map_operate_tool {
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  left: 48%;
+}
+
 
 
