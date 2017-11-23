@@ -88,7 +88,7 @@ issueController.prototype.create = function () {
  */
 issueController.prototype.auditIssue = function () {
   let updateData = {issueStatus: this.req.body.issueStatus}
-  let condition = {where: {id: this.req.body.id}};
+  let condition = {where: {id: this.req.body.issueId}};
   return issueModel.update(updateData, condition)
   .then(affectedCount => {
     if (affectedCount[0]) {
