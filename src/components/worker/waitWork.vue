@@ -24,7 +24,7 @@
           <div class="label">已作业：{{item.worked}}</div>
           <div class="label">待作业：{{item.unworked}}</div>
           <div style="text-align:center;padding-top:10px">
-            <el-button type="primary" size="mini">提交</el-button>
+            <el-button type="primary" size="mini" :disabled="item.unworked > 0" @click="openSubmitProj(item.id)">提交</el-button>
           </div>
         </el-card>
       </el-col>
@@ -44,11 +44,28 @@
         <el-button type="primary" @click="saveIssue()">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="选择提交项目审核人" :visible.sync="submitDialogVisible" width="30%" center>
+      <div style="text-align: center;">
+        <el-select v-model="auditUser" filterable placeholder="请选择审核人">
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.userName"
+            :value="item.userId">
+          </el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="submitDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="submitProject()" :loading="submitLoading">提 交</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { saveIssue, queryIssueList, createProject, deleteProject } from '../../dataService/api';
+import { saveIssue, queryIssueList, createProject, deleteProject, findUserList, submitProjectApi} from '../../dataService/api';
 import { Constant } from '../../common/js/constant.js';
 import { appUtil } from '../../config';
 let _ = require('lodash');
@@ -58,6 +75,10 @@ export default {
   name: 'workWaitWork',
   data () {
     return {
+      submitLoading: false,
+      userList: [],
+      auditUser: '',
+      currentProjectId: '',
       curentUser: appUtil.getCurrentUser(),
       rules: {
         projectName: [
@@ -69,10 +90,29 @@ export default {
       },
       issueForm:{},
       centerDialogVisible: false,
+      submitDialogVisible: false, // 提交确认框
       cardDataList: []
     }
   },
   methods: {
+    openSubmitProj (projectId) {
+      this.submitDialogVisible = true;
+      this.currentProjectId = projectId;
+    },
+    submitProject() {
+      let that = this;
+      that.submitLoading = true;
+      submitProjectApi({id: this.currentProjectId, auditUser: this.auditUser}).then(res => {
+        that.submitLoading = false;
+        if (res.errorCode === 0) {
+          that.queryIssueList();
+          this.submitDialogVisible = false;
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+        } else {
+          that.$notify.error({ title: '提交失败', message: res.message, position: 'bottom-right', duration: 1000});
+        }
+      });
+    },
     addProject() {
       this.centerDialogVisible = true;
       this.issueForm.projectName = '';
@@ -119,7 +159,7 @@ export default {
     },
     queryIssueList() {
       let that = this;
-      queryIssueList({pageSize:1000, pageNum:1}).then(data => {
+      queryIssueList({projectStatus: "[1,4]"}).then(data => { // 1待作业 4提交未通过
         if (data.errorCode === 0) {
           that.cardDataList = [];
           let list = data.result.data;
@@ -130,10 +170,30 @@ export default {
           }
         }
       })
+    },
+    queryUserList() {
+      let that = this;
+      findUserList().then(data => {
+        let {errorCode, result} = data;
+        if (errorCode === 0) {
+          result.data.forEach((value, index, arr) => {
+            if (value.role == 'manager') {
+              that.userList.push({
+                userId: value.id,
+                userName: value.fullName
+              });
+            }
+          });
+          if (that.userList.length > 0) {
+            that.auditUser = that.userList[0].userId;
+          }
+        }
+      })
     }
   },
   mounted: function () {
     this.queryIssueList();
+    this.queryUserList();
   }
 }
 </script>

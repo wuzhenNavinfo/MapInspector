@@ -25,7 +25,7 @@
               <span slot="title">导航菜单</span>
             </template>
             <el-menu-item index="/worker/waitWork">待作业</el-menu-item>
-            <el-menu-item index="/worker/submited">已提交</el-menu-item>
+            <el-menu-item index="/worker/alreadyWork">已提交</el-menu-item>
             <el-menu-item index="/worker/completed">已完成</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
@@ -44,6 +44,7 @@
 <script>
 import TableView from './TableView'
 import FrameTitle from './FrameTitle'
+import AlreadWork from './worker/alreadyWork'
 import {appUtil} from '../config.js'
 
   export default {
@@ -64,7 +65,8 @@ import {appUtil} from '../config.js'
     },
     components: {
       TableView,
-      FrameTitle
+      FrameTitle,
+      AlreadWork
     },
     created: function () {
       this.userRole = appUtil.getCurrentUser().role;
