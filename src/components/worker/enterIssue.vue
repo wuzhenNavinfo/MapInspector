@@ -29,11 +29,9 @@
       </div>
     </div>
     <div class="map_operate_tool">
-       <el-tooltip :content="showIconFlag?'图标已打开':'图标已关闭'" >
-        <el-switch v-model="showIconFlag" style="margin-bottom:4px;margin-left:4px;" active-color="#409eff" > </el-switch>
-       </el-tooltip>
     </div>
     <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'" title="返回上一页">
+      <el-checkbox class="st-check" size="medium" v-model="showIconFlag" label="marker开关" border></el-checkbox>
       <comLogout ></comLogout>
     </div>
     <div class="right scroll_style" :class="rightCollapsed?'open-panel':'close-panel'">
@@ -72,7 +70,7 @@
           <el-row style="padding:6px;">
             <el-col :span="6" v-for="(image, index) in caseForm.issueImages" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showIssueImages(index)">
-              <div class="el-icon-delete img_delete" @click="deleteImage(index)"></div>
+              <div class="el-icon-circle-close-outline img-delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
           <el-upload
@@ -109,8 +107,9 @@ import Maplet from 'Maplet'
 import myVideo from 'vue-video'
 import ComLogout from '../common/Logout'
 import { queryCaseListDetail, queryCaseById, queryIssue, createIssue} from '../../dataService/api';
-// import mapMarker from '../../assets/marker.png'
-import mapMarker from '../../assets/poi_blue.png'
+
+import markerIcon from '../../assets/poi_blue.png'
+import markerIconRed from '../../assets/poi_red.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
@@ -120,6 +119,7 @@ export default {
   name: 'CaseList',
   data () {
     return {
+      currentEditMarker: null,
       schfilter: '',
       showIconFlag: true,
       imageDialogVisible: false,
@@ -245,34 +245,37 @@ export default {
     selectedRow(row, event) {
       this.selectedRowData = row;
       let that = this;
+      this.fillContent(row, function (loc) {
+        window.maplet.setCenter(new MPoint (loc.lon, loc.lat));
+        that.redraw(row.caseCode);
+      });
+    },
+    fillContent(row, callback) {
+      let that = this;
       queryIssue({proCode: row.proCode, caseCode: row.caseCode}).then(data => {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.caseForm = result;
           let lon = result.caseMarker.coordinates[0];
           let lat = result.caseMarker.coordinates[1];
-          window.maplet.setCenter(new MPoint (lon, lat));
-          window.maplet.clearOverlays();
-          window.marker = new MMarker(
-              new MPoint(lon, lat),
-              new MIcon(mapMarker,32,32,5,22)
-          );
-          window.maplet.addOverlay(marker);
+          if (callback) {
+            callback({lon: lon, lat: lat});
+          }
         }
       })
       that.rightPanelCtrl('open');
     },
-    gotoMainPage() {
-      this.$router.push('/mainFrame');
-    },
-    logout: function () {
-      this.$confirm('确认退出吗?', '提示', {
-        type: 'warning '
-      }).then(() => {
-        sessionStorage.removeItem('user');
-        this.$router.push('/login');
-      }).catch(() => {
-      });
+    redraw(id) {
+      let marks = window.maplet.getMarkers();
+      for (let i = 0; i < marks.length; i++) {
+        let item = marks[i];
+        let itemId = item.extraData.caseCode;
+        if (itemId == id) {
+          marks[i].setIcon(new MIcon(markerIconRed,22,39,5,22));
+        } else {
+          marks[i].setIcon(new MIcon(markerIcon,22,39,5,22));
+        }
+      }
     },
     queryCaseList(projectCode) {
       let that = this;
@@ -298,7 +301,8 @@ export default {
         if (errorCode == 0) {
           result.data.forEach((value, index, arr) => {
             that.allCaseList.push({
-              id: value.id,
+              caseCode: value.caseCode,
+              proCode: value.proCode,
               location: [value.marker.coordinates[0], value.marker.coordinates[1]]
             })
           });
@@ -306,21 +310,49 @@ export default {
         }
       })
     },
+    addOrRemoveIcon(flag) {
+      let that = this;
+      if (flag == 'add') {
+        window.maplet.clearOverlays();
+        let that = this;
+        this.allCaseList.forEach((value, index, arr) => {
+          let marker = new MMarker(
+            new MPoint(value.location[0], value.location[1]),
+            new MIcon(markerIcon,22,39,5,22)
+          )
+
+          marker.id = marker.id + '_' + value.id;
+          marker.extraData = {
+            caseCode: value.caseCode,
+            proCode: value.proCode
+          }
+          MEvent.addListener(marker, "click", function (mk) {
+            if (that.currentEditMarker) { // 删除当前新建的点
+              window.maplet.removeOverlay(that.currentEditMarker);
+            }
+            that.redraw(mk.extraData.caseCode);
+            that.fillContent({caseCode: mk.extraData.caseCode, proCode: mk.extraData.proCode}, null);
+
+          });
+          window.maplet.addOverlay(marker);
+        })
+      } else {
+        window.maplet.clearOverlays();
+      }
+    },
     initMapbar() {
       let that = this;
       window.maplet = new Maplet("map");
       window.maplet.centerAndZoom(new MPoint(116.38749,39.90515), 8);
       window.maplet.clickToCenter = false;
-      // window.maplet.showScale(false);
       window.maplet.showOverview(false);
       MEvent.addListener(window.maplet, "click", function(event,point) {
         if (that.ctrl.addLocation) {
-          that.caseForm.location = point.pid;
           window.maplet.clearOverlays();
           let poi = point.pid.split(',');
-          window.marker = new MMarker(
+          that.currentEditMarker = new MMarker(
               new MPoint(poi[0], poi[1]),
-              new MIcon(mapMarker,32,32,5,22)
+              new MIcon(markerIcon,22,39,5,22)
           );
           window.maplet.addOverlay(marker);
         }
@@ -435,11 +467,13 @@ export default {
     }
   }
 }
-.img_delete{
+.img-delete{
   position: relative;
-  top: -70px;
-  left: 52px;
+  top: -72px;
+  left: 54px;
   cursor: pointer;
+  font-size: 16px;
+  color: red;
   &:hover {
     background: #CCC;
     border-radius: 2px

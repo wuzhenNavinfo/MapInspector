@@ -30,14 +30,12 @@
     </div>
     <div class="map_operate_tool">
        <el-button size="mini" type="danger" icon="el-icon-circle-plus" @click="createCase()">创 建</el-button>
-       <el-tooltip :content="showIconFlag?'图标已打开':'图标已关闭'" >
-         <el-switch v-model="showIconFlag" style="margin-bottom:4px;margin-left:4px;" active-color="#409eff" > </el-switch>
-       </el-tooltip>
     </div>
     <div class="right-open-icon" title="展开">
        <i class="el-icon-caret-left" :class="operationed?'enabled':'disabled'" @click="rightPanelCtrl('open')" ></i>
     </div>
     <div class="return-page-icon" :class="rightCollapsed?'open-return-page':'close-return-page'">
+       <el-checkbox class="st-check" size="medium" v-model="showIconFlag" label="marker开关" border></el-checkbox>
        <comLogout ></comLogout>
     </div>
     <div class="right" :class="rightCollapsed?'open-panel':'close-panel'">
@@ -68,7 +66,7 @@
           <el-row style="padding-left:10px;">
             <el-col :span="6" v-for="(image, index) in caseForm.images" :key="index">
               <img :src="ctrl.baseUrl+'/'+image" class="img-list" style="cursor:pointer;" @click="showImages(index)">
-              <div class="el-icon-circle-close-outline img_delete" @click="deleteImage(index)"></div>
+              <div class="el-icon-circle-close-outline img-delete" @click="deleteImage(index)"></div>
             </el-col>
           </el-row>
           <el-upload
@@ -571,16 +569,17 @@ export default {
 }
 
 .my-from {
-  .img_delete{
+  .img-delete{
     position: relative;
     top: -72px;
     left: 54px;
     cursor: pointer;
     font-size: 16px;
-  }
-  .img_delete:hover {
-    background: #CCC;
-    border-radius: 2px
+    color: red;
+    &:hover {
+      background: #CCC;
+      border-radius: 2px
+    }
   }
   .el-form-item{
     margin-top: 10px;
