@@ -85,7 +85,9 @@ caseController.prototype.listDetail = function () {
         let data = {};
         proImageLength = result[i].proImages ? result[i].proImages.split(',').length : 0;
         proVideoLength = result[i].proVideos ? result[i].proVideos.split(',').length : 0;
-        data.proMediaLength = proImageLength + proVideoLength;
+        data.issueMediaLength = proImageLength + proVideoLength;
+        data.issueId = result[i].issueId;
+        data.issueStatus = result[i].issueStatus;
         data.proCode = result[i].proCode ? result[i].proCode : this.req.query.projectCode;
 
         caseImageLength = result[i].caseImages ? result[i].caseImages.split(',').length : 0;

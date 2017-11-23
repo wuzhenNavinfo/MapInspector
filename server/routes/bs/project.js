@@ -45,7 +45,7 @@ router.post('/create', [
 
 // 提交项目;
 router.post('/submit', [
-  check('id').exists().withMessage('缺少项目id'),
+  check('projectId').exists().withMessage('缺少项目projectId'),
   check('auditUser').exists().withMessage('缺少审核用户id')
 ], function (req, res, next) {
   handler(req, res, next);

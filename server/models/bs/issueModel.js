@@ -24,7 +24,8 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING
       },
       issueStatus: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        comment: "0待审核，1审核通过，2审核不通过"
       },
       createdAt: {
         type: DataTypes.DATE,

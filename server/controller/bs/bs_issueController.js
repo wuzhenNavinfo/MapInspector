@@ -123,6 +123,7 @@ issueController.prototype.find = function () {
       tempResult.caseMarker = tool.clone (res.dataValues.marker);
       tempResult.caseImages = res.dataValues.images ? res.dataValues.images.split (',') : [];
       tempResult.caseVideos = res.dataValues.videos ? res.dataValues.videos.split (',') : [];
+      tempResult.issueId = result.dataValues.id;
       tempResult.issueVideos = (result && result.dataValues.videos) ? result.dataValues.videos.split (',') : [];
       tempResult.issueImages = (result && result.dataValues.images) ? result.dataValues.images.split (',') : [];
       return this.res.json ({errorCode: 0, result: tempResult, message: '问题查询成功'});

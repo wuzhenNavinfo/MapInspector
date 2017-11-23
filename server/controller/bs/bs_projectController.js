@@ -160,7 +160,7 @@ caseController.prototype.create = function () {
  * @returns {Promise.<TResult>}
  */
 caseController.prototype.submit = function () {
-  let projectId = this.req.body.id;
+  let projectId = this.req.body.projectId;
   let auditUser = this.req.body.auditUser;
   let updateData = {
     auditUser: auditUser,
