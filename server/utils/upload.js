@@ -95,7 +95,7 @@ function upload() {
       async.map(fileKeys, (key, callback) => {
         var filePath = files[key].path;
         var fileExt = filePath.substring(filePath.lastIndexOf('.'));
-        if (['.jpg', 'jpeg', '.png', '.gif'].indexOf(fileExt.toLowerCase()) === -1) {
+        if (['.jpg', '.jpeg', '.png', '.gif'].indexOf(fileExt.toLowerCase()) === -1) {
           throw new Error('上传文件扩展名错误!');
         } else {
           // 以当前时间戳对上传文件进行重命名
