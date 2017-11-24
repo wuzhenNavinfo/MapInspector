@@ -45,7 +45,7 @@ router.post('/create', [
 
 // 提交项目;
 router.post('/submit', [
-  check('id').exists().withMessage('缺少项目id'),
+  check('projectId').exists().withMessage('缺少项目projectId'),
   check('auditUser').exists().withMessage('缺少审核用户id')
 ], function (req, res, next) {
   handler(req, res, next);
@@ -53,8 +53,8 @@ router.post('/submit', [
 
 // 审核项目;
 router.post('/auditPro', [
-  check('id').exists().withMessage('缺少项目id').isInt().withMessage('项目id必须为整数'),
-  check('projectStatus').exists().withMessage('缺少审核状态').isIn([1, 3]).withMessage('项目状态值域错误')
+  check('projectId').exists().withMessage('缺少项目projectId').isInt().withMessage('项目projectId必须为整数'),
+  check('projectStatus').exists().withMessage('缺少审核状态').isIn([3, 4]).withMessage('项目状态值域错误')
 ], function (req, res, next) {
   handler(req, res, next);
 });

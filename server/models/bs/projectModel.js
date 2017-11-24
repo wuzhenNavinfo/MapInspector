@@ -33,7 +33,8 @@ module.exports = function (sequelize, DataTypes) {
         }
       },
       projectStatus: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        comment: "1未提交，2待提交/待审核，3已提交/审核通过,4审核不通过"
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -60,6 +61,11 @@ module.exports = function (sequelize, DataTypes) {
         }
       }
     }, {
+      getterMethods   : {
+        auditedAt: function (){
+          return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
+        }
+      },
       freezeTableName: true
     }
   );
