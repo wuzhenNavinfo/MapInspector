@@ -378,7 +378,7 @@ export default {
     this.panelHeight = clientHeight - 50 + 'px'; // 后续改善
   },
   mounted: function () {
-    this.currentProjectCode = this.$route.params.projectCode;
+    this.currentProjectCode = this.$route.query.projectCode;
     this.queryCaseList(this.currentProjectCode);
     this.initMapbar();
     this.queryAllCaseList(this.currentProjectCode);

@@ -139,7 +139,7 @@ export default {
     enterIssue(id) {
       this.$router.push({
         name: 'enterIssue', // 和router/index.js保持一致
-        params: {
+        query: {
           projectCode: id
         }
       });

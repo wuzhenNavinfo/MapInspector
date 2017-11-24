@@ -89,9 +89,9 @@ export default {
     enterIssue(id) {
       this.$router.push({
         name: 'AuditIssue', // 和router/index.js保持一致
-        params: {
+        query: {
           projectCode: id
-        }
+        },
       });
     }
   },
