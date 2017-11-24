@@ -107,9 +107,9 @@ export default {
         if (res.errorCode === 0) {
           that.queryIssueList();
           this.submitDialogVisible = false;
-          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 2000});
         } else {
-          that.$notify.error({ title: '提交失败', message: res.message, position: 'bottom-right', duration: 1000});
+          that.$notify.error({ title: '提交失败', message: res.message, position: 'bottom-right', duration: 2000});
         }
       });
     },
@@ -139,7 +139,7 @@ export default {
     enterIssue(id) {
       this.$router.push({
         name: 'enterIssue', // 和router/index.js保持一致
-        params: {
+        query: {
           projectCode: id
         }
       });

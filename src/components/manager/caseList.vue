@@ -70,7 +70,7 @@
             </el-col>
           </el-row>
           <el-upload
-            class="my-upload" multiple
+            class="my-upload" multiple accept=".jpg,.png,.jpeg"
             :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
             :on-success="handlesuccess" :show-file-list="false">
             <el-button size="small" icon="el-icon-upload" type="primary">点击上传图片</el-button>
@@ -282,9 +282,9 @@ export default {
               if (!that.caseForm.id) { // 修改
                 that.caseForm.id = data.result.data.id;
               }
-              that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 1000});
+              that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 2000});
             } else {
-              that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 1000});
+              that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 2000});
             }
           });
         }

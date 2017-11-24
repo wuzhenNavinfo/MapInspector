@@ -19,7 +19,7 @@
           <div class="label">状态：审核中 </div>
           <div class="label">创建时间：{{item.createdAt}}</div>
           <div class="label">问题总数：{{item.issueTotal}}</div>
-          <div class="label">已审核数：{{item.auditedCount}}</div>
+          <div class="label">已审核数：{{item.audited}}</div>
         </el-card>
       </el-col>
     </el-row>
@@ -44,8 +44,7 @@ export default {
           that.cardDataList = [];
           let list = data.result.data;
           for (let item of list) {
-            item.auditedCount = 2
-            item.progress = _.round((item.auditedCount/(item.issueTotal)) * 100, 2);
+            item.progress = _.round((item.audited/(item.issueTotal)) * 100, 2);
             that.cardDataList.push(item);
           }
         }

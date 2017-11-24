@@ -3,13 +3,14 @@ import MainFrame from '@/components/MainFrame'
 import TableView from '@/components/TableView'
 import Where from '@/components/404'
 import ManagerWaitWork from '@/components/manager/waitWork'
-import CaseList from '@/components/manager/caseList'
+import ManagerCaseList from '@/components/manager/caseList'
 import AuditIssue from '@/components/manager/auditIssue'
 import AlreadyAudit from '@/components/manager/alreadyAudit'
 import WaitWork from '@/components/worker/waitWork'
 import enterIssue from '@/components/worker/enterIssue'
 import AlreadyWork from '@/components/worker/alreadyWork'
 import AlreadyCompleted from '@/components/worker/alreadyCompleted'
+import WorkerCaseList from '@/components/worker/caseList'
 
 
 let routes = [
@@ -36,14 +37,13 @@ let routes = [
       { path: '/worker/submited', component: Where, name: 'Where'},
       { path: '/worker/completed', component: Where, name: 'Where'},
       { path: '/worker/alreadyWork', component: AlreadyWork, name: 'AlreadyWork'},
-      { path: '/worker/alreadyCompleted', component: AlreadyCompleted, name: 'AlreadyCompleted'}
+      { path: '/worker/alreadyCompleted', component: AlreadyCompleted, name: 'AlreadyCompleted'},
     ]
   },
-  {
-    path: '/manager/caseList', component: CaseList, name: 'CaseList'
-  },
+  { path: '/manager/caseList', component: ManagerCaseList, name: 'ManagerCaseList' },
+  { path: '/manager/auditIssue', component: AuditIssue, name: 'AuditIssue'},
   { path: '/worker/enterIssue', component: enterIssue, name: 'enterIssue'},
-  { path: '/manager/auditIssue', component: AuditIssue, name: 'AuditIssue'}
+  { path: '/worker/caseList', component: WorkerCaseList, name: 'WorkerCaseList' }
 ];
 
 export default routes;
