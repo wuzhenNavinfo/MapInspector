@@ -34,7 +34,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       projectStatus: {
         type: DataTypes.INTEGER,
-        comment: "1未提交，2待提交/待审核，3已提交/审核通过,4审核不通过"
+        comment: "1未提交，2已提交/待审核，3审核通过,4审核不通过"
       },
       createdAt: {
         type: DataTypes.DATE,
