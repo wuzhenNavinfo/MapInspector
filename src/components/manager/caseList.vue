@@ -282,9 +282,9 @@ export default {
               if (!that.caseForm.id) { // 修改
                 that.caseForm.id = data.result.data.id;
               }
-              that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 1000});
+              that.$notify.success({ title: '提示', message: '保存成功!', position: 'bottom-right', duration: 2000});
             } else {
-              that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 1000});
+              that.$notify.error({ title: '提示', message: '保存失败!', position: 'bottom-right', duration: 2000});
             }
           });
         }

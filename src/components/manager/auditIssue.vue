@@ -236,7 +236,7 @@ export default {
            that.ctrl.saving = false;
         }
         if (res.errorCode === 0) {
-          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 2000});
           that.queryCaseList(that.currentProjectCode);
         }
       })
