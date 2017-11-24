@@ -230,13 +230,15 @@ export default {
       }
 
       auditIssueApi(param).then(res => {
-        if (status == 1) {
-          that.ctrl.passSaving = false;
-        } else if (status == 2) {
-           that.ctrl.saving = false;
-        }
+        that.ctrl.saving = false;
+        that.ctrl.passSaving = false;
         if (res.errorCode === 0) {
-          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 2000});
+          if (status == 1) {
+            that.caseForm.issueStatus = 1;
+          } else if (status == 2) {
+             that.caseForm.issueStatus = 2;
+          }
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
           that.queryCaseList(that.currentProjectCode);
         }
       })

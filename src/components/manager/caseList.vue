@@ -70,7 +70,7 @@
             </el-col>
           </el-row>
           <el-upload
-            class="my-upload" multiple
+            class="my-upload" multiple accept=".jpg,.png,.jpeg"
             :action="ctrl.baseUrl+'/api/bs/case/upload?token='+ctrl.curentUser.token" :before-upload="handleBeforeUpload"
             :on-success="handlesuccess" :show-file-list="false">
             <el-button size="small" icon="el-icon-upload" type="primary">点击上传图片</el-button>

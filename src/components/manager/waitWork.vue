@@ -93,8 +93,7 @@ export default {
           that.cardDataList = [];
           let list = data.result.data;
           for (let item of list) {
-            item.progress = _.round((item.audited/(item.waitAudited + item.audited)) * 100, 2);
-            // item.projectStatusLabel = Constant.projectStatus[item.projectStatus];
+            item.progress = _.round(((item.audited + item.errorCount)/(item.issueTotal)) * 100, 2);
             that.cardDataList.push(item);
           }
         }
