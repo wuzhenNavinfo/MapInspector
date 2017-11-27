@@ -10,6 +10,7 @@
 /**
  * 引入相关模块
  */
+var logger = require('../../log').logger;
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
@@ -87,6 +88,7 @@ UserController.prototype.login = function () {
 	return userModel.findOne(requestData)
   .then(userData => {
     if (!userData) {
+      logger.error('登陆失败，该用户不存在!');
       throw new Error('登陆失败，该用户不存在!');
     } else {
       // 判断登陆密码

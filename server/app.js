@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./utils/autoRouter');
+var log = require('./log');
 //初始化数据库表结构;
 require('./models/model');
 // 创建express实例;
@@ -19,6 +20,7 @@ var allowCrossDomain = function(req, res, next) {
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 };
+log.use(app);
 // uncomment after placing your favicon in /public
 app.use(logger('dev'));
 app.use(bodyParser.json());
