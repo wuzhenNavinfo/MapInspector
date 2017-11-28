@@ -28,7 +28,18 @@ let handler = function (req, res, next) {
   }
 };
 
-// 用户注册（增加用户）
+/**
+ * @api {post} /om/user/register 用户注册(om/user/register).
+ * @apiName register.
+ * @apiGroup user manage.
+ * @apiDescription 用户注册接口,注册的用户默认会分配为作业员身份(roleCode=2).
+ * @apiParam {String} userName      用户名（必填）.
+ * @apiParam {String} [fullName]    全名（可选）.
+ * @apiParam {String} password      密码（必填）.
+ * @apiParam {String} email         邮箱（必填）.
+ * @apiParam {String} [cellPhone]   电话（可选）.
+ * @apiParam {Integer} [status]     用户状态（可选，默认为0）.
+ */
 router.post('/register', [
     check('userName')
     .exists()
@@ -40,7 +51,14 @@ router.post('/register', [
   }
 );
 
-// 用户登陆
+/**
+ * @api {post} /om/login 用户登陆(om/user/login)
+ * @apiName login.
+ * @apiGroup user manage.
+ * @apiDescription 用户登陆接口.
+ * @apiParam {String} userName 用户名（必填）.
+ * @apiParam {String} password 密码（必填）.
+ */
 router.post('/login', [
     check('userName').exists().withMessage('userName参数不能为空'),
     check('password').exists().withMessage('password参数不能为空')
@@ -49,7 +67,15 @@ router.post('/login', [
   }
 );
 
-// 查找用户;
+/**
+ * @api {post} /om/user/find 用户查询(om/user/find)
+ * @apiName find.
+ * @apiGroup user manage.
+ * @apiDescription 用户查询功能，不传参数返回所有用户,
+ * 传递pageSize和pageNum可进行分页查询.
+ * @apiParam {Integer} [pageSize] 每页显示个数（可选）.
+ * @apiParam {Integer} [pageNum]  查询页码（可选）.
+ */
 router.get('/find', [
     sanitize(['pageSize']).toInt(),
     sanitize('pageNum').toInt()
@@ -58,7 +84,13 @@ router.get('/find', [
   }
 );
 
-// 删除用户;
+/**
+ * @api {post} /om/user/delete 用户删除(om/user/delete).
+ * @apiName delete.
+ * @apiGroup user manage.
+ * @apiDescription 根据用户id删除用户功能.
+ * @apiParam {Integer} userId 用户主键Id（必填）.
+ */
 router.get('/delete', [
     check('id').isInt().withMessage('id必须为整数')
 ], (req, res, next) => {

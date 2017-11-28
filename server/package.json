@@ -3,7 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --debug ./bin/www"
+    "start": "nodemon --debug ./bin/www",
+    "genDoc": "apidoc -i ./routes/ -o ./public/dist/apiDoc"
+  },
+  "apidoc": {
+    "name": "审图项目",
+    "title": "审图项目api参考文档",
+    "version": "0.1.0",
+    "description": "API文档测试",
+    "url": "http://localhost:3000/api",
+    "header": {
+      "title": "header"
+    },
+    "footer": {
+      "title": "footer"
+    }
   },
   "dependencies": {
     "async": "^2.6.0",
@@ -24,6 +38,7 @@
     "serve-favicon": "~2.4.5"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "nodemon": "^1.12.1"
   }
 }

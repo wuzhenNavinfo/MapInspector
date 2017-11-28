@@ -28,7 +28,16 @@ let handler = function (req, res, next) {
   }
 };
 
-// 创建问题;
+/**
+ * @api {post} /bs/issue/create 创建问题(bs/issue/create).
+ * @apiName create.
+ * @apiGroup issue manage.
+ * @apiDescription 新增问题.
+ * @apiParam {Array} proCode 问题所在的项目id(必传).
+ * @apiParam {Array} caseCode 问题对应的案例id(必传).
+ * @apiParam {Array} [images] 问题图片，默认为[]（可选）.
+ * @apiParam {Array} [videos] 问题视频，默认为[]（可选）.
+ */
 router.post('/create', [
   check('proCode').exists().withMessage('缺少proCode参数').isInt().withMessage('proCode必须为整数'),
   check('caseCode').exists().withMessage('缺少caseCode参数').isInt().withMessage('caseCode必须为整数')
@@ -36,7 +45,14 @@ router.post('/create', [
   handler(req, res, next);
 });
 
-// 创建问题;
+/**
+ * @api {post} /bs/issue/auditIssue 审核问题(bs/issue/auditIssue).
+ * @apiName auditIssue.
+ * @apiGroup issue manage.
+ * @apiDescription 审核问题.
+ * @apiParam {Array} issueStatus 问题的状态(必传)，可选值为[0待审核，1审核通过，2审核不通过].
+ * @apiParam {Array} issueId 问题的主键id(必传).
+ */
 router.post('/auditIssue', [
   check('issueStatus').exists().withMessage('缺少issueStatus参数').isInt().withMessage('issueStatus必须为整数'),
   check('issueId').exists().withMessage('缺少issueId参数').isInt().withMessage('issueId必须为整数')
@@ -44,7 +60,14 @@ router.post('/auditIssue', [
   handler(req, res, next);
 });
 
-// 根据项目id和案例id查询单条问题;
+/**
+ * @api {get} /bs/issue/find 查询单条问题(bs/issue/find).
+ * @apiName find.
+ * @apiGroup issue manage.
+ * @apiDescription 根据项目id和案例id查询单条问题;
+ * @apiParam {Integer} proCode 问题所在的项目id(必传).
+ * @apiParam {Integer} caseCode 问题对应的案例id(必传).
+ */
 router.get('/find', [
   check('proCode').exists().withMessage('缺少proCode参数').isInt().withMessage('proCode必须为整数'),
   check('caseCode').exists().withMessage('缺少caseCode参数').isInt().withMessage('caseCode必须为整数')
@@ -52,12 +75,23 @@ router.get('/find', [
   handler(req, res, next);
 });
 
-// 问题上传;
+/**
+ * @api {post} /bs/issue/upload 问题上传(bs/issue/upload).
+ * @apiName upload.
+ * @apiGroup issue manage.
+ * @apiDescription 问题上传接口，支持的图片格式为'.jpg', 'jpeg', '.png', '.gif'.
+ */
 router.post('/upload', function (req, res, next) {
   handler(req, res, next);
 });
 
-// 问题删除;
+/**
+ * @api {get} /bs/issue/delete 问题删除(bs/issue/delete)
+ * @apiName delete.
+ * @apiGroup issue manage.
+ * @apiDescription 根据问题id删除问题功能.
+ * @apiParam {Integer} id 问题主键Id（必填）.
+ */
 router.get('/delete', [
   check('id')
   .exists().withMessage('项目id不能为空')
