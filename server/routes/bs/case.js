@@ -36,6 +36,74 @@ let handler = function (req, res, next) {
  * 传递pageSize和pageNum可进行分页查询.
  * @apiParam {Integer} [pageSize] 每页显示个数（可选）.
  * @apiParam {Integer} [pageNum]  查询页码（可选）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *     "errorCode": 0,
+ *     "result": {
+ *         "data": [
+ *             {
+ *                 "createdAt": "2017-11-24",
+ *                 "updatedAt": "2017-11-24",
+ *                 "id": 23,
+ *                 "caseSnap": "台湾海峡问题",
+ *                 "caseDesc": "台湾海峡部分地域存在争议",
+ *                 "caseMethod": "问题搁置，继续洽谈",
+ *                 "images": "images/case/11-24-2017/1511503483687.png",
+ *                 "videos": "",
+ *                 "marker": {
+ *                     "type": "Point",
+ *                     "coordinates": [
+ *                         119.63061,
+ *                         23.64742
+ *                     ]
+ *                 },
+ *                 "createUser": 1,
+ *                 "mediaLength": 1
+ *             },
+ *             {
+ *                 "createdAt": "2017-11-23",
+ *                 "updatedAt": "2017-11-24",
+ *                 "id": 22,
+ *                 "caseSnap": "南海问题",
+ *                 "caseDesc": "南海属于中国",
+ *                 "caseMethod": "干掉猴子",
+ *                 "images": "images/case/11-23-2017/1511429261442.jpg,images/case/11-23-2017/1511429266947.jpg,images/case/11-23-2017/1511429267193.jpg",
+ *                 "videos": "",
+ *                 "marker": {
+ *                     "type": "Point",
+ *                     "coordinates": [
+ *                         119.89719,
+ *                         12.31317
+ *                     ]
+ *                 },
+ *                 "createUser": 1,
+ *                 "mediaLength": 3
+ *             },
+ *             {
+ *                 "createdAt": "2017-11-21",
+ *                 "updatedAt": "2017-11-24",
+ *                 "id": 4,
+ *                 "caseSnap": "禁止直行",
+ *                 "caseDesc": "禁止直行描述",
+ *                 "caseMethod": "禁止直行处理方法",
+ *                 "images": "images/case/11-21-2017/1511248118886.jpg,images/case/11-21-2017/1511256242868.jpg",
+ *                 "videos": "",
+ *                 "marker": {
+ *                     "type": "Point",
+ *                     "coordinates": [
+ *                         117.32951,
+ *                         40.47641
+ *                     ]
+ *                 },
+ *                 "createUser": 1,
+ *                 "mediaLength": 2
+ *             }
+ *         ],
+ *         "total": 8
+ *     },
+ *     "message": "查找成功"
+ * }
  */
 router.get('/list', [
   sanitize(['pageSize']).toInt(),
@@ -54,6 +122,52 @@ router.get('/list', [
  * @apiParam {Integer} projectCode 项目Id（必填）.
  * @apiParam {Integer} [pageSize] 每页显示个数（可选）.
  * @apiParam {Integer} [pageNum]  查询页码（可选）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *   "errorCode": 0,
+ *   "result": {
+ *     "data": [
+ *       {
+ *         "issueMediaLength": 1,
+ *         "issueId": 122,
+ *         "issueStatus": 1,
+ *         "proCode": 13,
+ *         "caseMediaLength": 2,
+ *         "caseSnap": "禁止直行",
+ *         "caseDesc": "禁止直行描述",
+ *         "caseCode": 4,
+ *         "marker": {
+ *           "type": "Point",
+ *           "coordinates": [
+ *             117.32951,
+ *             40.47641
+ *           ]
+ *         },
+ *         "createdAt": "2017-11-21"
+ *       },
+ *       {
+ *         "issueMediaLength": 2,
+ *         "issueId": 115,
+ *         "issueStatus": 1,
+ *         "proCode": 13,
+ *         "caseMediaLength": 1,
+ *         "caseSnap": "黄金坪水系问题",
+ *         "caseDesc": "黄金坪水系问题",
+ *         "caseCode": 17,
+ *         "marker": {
+ *           "type": "Point",
+ *             124.2956,
+ *            39.97433
+ *           ]
+ *         },
+ *         "createdAt": "2017-11-23"
+ *       }
+ *     ],
+ *     "total": 2
+ *   },
+ *   "message": "查找成功"
+ * }
  */
 router.get('/listDetail', [
   sanitize(['pageSize']).toInt(),
@@ -64,12 +178,39 @@ router.get('/listDetail', [
 });
 
 /**
- * @api {get} /bs/case/query 用户查询(bs/case/query).
+ * @api {get} /bs/case/query 案例查询(bs/case/query).
  * @apiName query.
  * @apiGroup case manage.
  * @apiDescription 案例详情接口,返回某个案例的全量信息.
- * 传递pageSize和pageNum可进行分页查询.
  * @apiParam {Integer} id 案例的Id（必填）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ *  {
+ *     "errorCode": 0,
+ *     "result": {
+ *         "data": {
+ *             "createdAt": "2017-11-23",
+ *             "updatedAt": "2017-11-23",
+ *             "id": 17,
+ *             "caseSnap": "黄金坪水系问题",
+ *             "caseDesc": "黄金坪水系问题",
+ *             "caseMethod": "1",
+ *             "images": [
+ *                 "images/case/11-23-2017/1511420013768.PNG"
+ *             ],
+ *             "videos": [],
+ *             "marker": {
+ *                 "type": "Point",
+ *                 "coordinates": [
+ *                     124.2956,
+ *                     39.97433
+ *                 ]
+ *             },
+ *             "createUser": 1
+ *         }
+ *     },
+ *     "message": "查找成功"
+ * }
  */
 router.get('/query', [
   sanitize(['id']).toInt(),
@@ -89,6 +230,37 @@ router.get('/query', [
  * @apiParam {Array} [images] 案例图片，默认为[]（可选）.
  * @apiParam {Array} [videos] 案例视频，默认为[]（可选）.
  * @apiParam {geoJson} [marker] 案例的点位信息，默认为{type: 'Point', coordinates: [0, 0]}（可选）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *  "errorCode": 0,
+ *  "result": {
+ *    "data": {
+ *      "createdAt": "2017-11-28",
+ *      "updatedAt": "2017-11-28",
+ *      "id": 26,
+ *      "createUser": 1,
+ *      "caseSnap": "111",
+ *      "caseDesc": "111",
+ *      "caseMethod": "111",
+ *      "images": [
+ *        "images/case/11-28-2017/1511840633074.jpg",
+ *        "images/case/11-28-2017/1511840633090.jpg",
+ *        "images/case/11-28-2017/1511840633140.jpg",
+ *        "images/case/11-28-2017/1511840633155.jpg"
+ *      ],
+ *      "videos": [],
+ *      "marker": {
+ *        "type": "Point",
+ *        "coordinates": [
+ *          "119.5025",
+ *          "23.78178"
+ *        ]
+ *      }
+ *    }
+ *  },
+ *  "message": "案例创建成功"
+ *}
  */
 router.post('/create', [
   check('caseSnap').exists().withMessage('caseSnap属性为必填项'),
@@ -102,6 +274,16 @@ router.post('/create', [
  * @apiName upload.
  * @apiGroup case manage.
  * @apiDescription 案例上传接口，支持的图片格式为'.jpg', 'jpeg', '.png', '.gif'.
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *  "errorCode": 0,
+ *  "result": {
+ *    "data": [
+ *      "images/case/11-28-2017/1511840479211.jpg"
+ *    ]
+ *  },
+ *  "message": "成功上传1张图片"
+ *}
  */
 router.post('/upload', function (req, res, next) {
   handler(req, res, next);
@@ -118,6 +300,12 @@ router.post('/upload', function (req, res, next) {
  * @apiParam {Array} [images] 案例图片，默认为[]（可选）.
  * @apiParam {Array} [videos] 案例视频，默认为[]（可选）.
  * @apiParam {geoJson} [marker] 案例的点位信息，默认为{type: 'Point', coordinates: [0, 0]}（可选）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *  "errorCode": 0,
+ *  "message": "案例更新成功"
+ * }
  */
 router.post('/update', [
   check('id').exists().withMessage('缺少案例id').isInt().withMessage('id值必须为整数'),
@@ -132,6 +320,12 @@ router.post('/update', [
  * @apiGroup case manage.
  * @apiDescription 根据案例id删除案例功能.
  * @apiParam {Integer} id 案例主键Id（必填）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ *{
+ *  "errorCode": 0,
+ *  "message": "删除成功"
+ * }
  */
 router.get('/delete', [
   check('id').exists().withMessage('缺少案例id').isInt().withMessage('id值必须为整数')
