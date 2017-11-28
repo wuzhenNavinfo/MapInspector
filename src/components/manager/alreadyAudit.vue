@@ -5,8 +5,9 @@
       <el-table-column type="index" width="50px" label="序号"> </el-table-column>
       <el-table-column width="80px" prop="id" label="项目编号"> </el-table-column>
       <el-table-column prop="projectName" label="项目名称"> </el-table-column>
+      <el-table-column prop="projectDesc" label="项目描述"> </el-table-column>
       <el-table-column width="80px" prop="issueTotal" label="问题数"> </el-table-column>
-      <el-table-column prop="createUser" label="作业员"> </el-table-column>
+      <el-table-column width="100px" prop="createUser" label="作业员"> </el-table-column>
       <el-table-column width="100px" prop="submitAt" label="提交时间"> </el-table-column>
       <el-table-column width="100px" prop="waitAudited" label="审核状态" :formatter="formatterStatus"> </el-table-column>
       <el-table-column width="100px" prop="auditedAt" label="审核时间"> </el-table-column>

@@ -8,7 +8,7 @@ import 'font-awesome/css/font-awesome.min.css'
 // import './style/main.css'
 // import './style/thirdPartsRewrite.css'
 import VueRouter from 'vue-router'
-import routes from './router'
+import routes from './router' // 或者 import routes from './router/index'
 import { appUtil } from './config';
 
 Vue.use(ElementUI)

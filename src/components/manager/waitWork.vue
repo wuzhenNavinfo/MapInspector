@@ -23,8 +23,8 @@
         <div class="label">待审核 :  {{item.waitAudited}}</div>
         <div class="label">错误数 :  {{item.errorCount}}</div>
         <div style="text-align:center;padding-top:10px">
-          <el-button type="primary" size="mini" @click="auditProject(item.id,3)">通过</el-button>
-          <el-button type="primary" size="mini" @click="auditProject(item.id,4)" plain>不通过</el-button>
+          <el-button type="primary" size="mini" @click="auditProjectBefore(item, 3)">通过</el-button>
+          <el-button type="primary" size="mini" @click="auditProjectBefore(item, 4)" plain>不通过</el-button>
         </div>
       </el-card>
     </el-col>
@@ -47,12 +47,26 @@ export default {
     }
   },
   methods: {
-    auditProject(projectId, status) {
+    auditProjectBefore(item, status) {
+      let that = this;
+      if (item.waitAudited > 0 && status == 3) {
+        this.$confirm('存在待审核的数据，确认项目通过？','提示').then(() => {
+          that.auditProject(item.id, status);
+        });
+      } else if (item.issueTotal > 0 && status == 3) {
+        this.$confirm('存在审核不通过的数据，确认项目通过？','提示').then(() => {
+          that.auditProject(item.id, status);
+        });
+      } else {
+        that.auditProject(item.id, status);
+      }
+    },
+    auditProject(projectId, status){
+      let that = this;
       let param = {
         projectId: projectId,
         projectStatus: status
       };
-      let that = this;
       if (status == 3) { // 通过3，不通过4
         that.passSaving = true;
       } else if (status == 4) {
@@ -65,10 +79,10 @@ export default {
            that.nopassSaving = false;
         }
         if (res.errorCode === 0) {
-          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+          that.$notify.success({ title: '提示', message: res.message, position: 'bottom-right', duration: 2000});
           that.queryProject();
         } else {
-           that.$notify.error({ title: '提示', message: res.message, position: 'bottom-right', duration: 1000});
+           that.$notify.error({ title: '提示', message: res.message, position: 'bottom-right', duration: 2000});
         }
       })
     },
@@ -79,8 +93,7 @@ export default {
           that.cardDataList = [];
           let list = data.result.data;
           for (let item of list) {
-            item.progress = _.round((item.audited/(item.waitAudited + item.audited)) * 100, 2);
-            // item.projectStatusLabel = Constant.projectStatus[item.projectStatus];
+            item.progress = _.round(((item.audited + item.errorCount)/(item.issueTotal)) * 100, 2);
             that.cardDataList.push(item);
           }
         }
@@ -89,9 +102,9 @@ export default {
     enterIssue(id) {
       this.$router.push({
         name: 'AuditIssue', // 和router/index.js保持一致
-        params: {
+        query: {
           projectCode: id
-        }
+        },
       });
     }
   },

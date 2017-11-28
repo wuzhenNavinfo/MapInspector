@@ -27,6 +27,7 @@
             <el-menu-item index="/worker/waitWork">待作业</el-menu-item>
             <el-menu-item index="/worker/alreadyWork">已提交</el-menu-item>
             <el-menu-item index="/worker/alreadyCompleted">已完成</el-menu-item>
+            <el-menu-item index="/worker/caseList">案例列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="2">
             <i class="el-icon-menu"></i>
