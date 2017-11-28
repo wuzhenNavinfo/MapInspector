@@ -125,8 +125,7 @@ export default {
             userName: that.registerForm.userName,
             fullName: that.registerForm.fullName,
             password: that.registerForm.password,
-            role: that.registerForm.role,
-            email: 'wuzhen@navinfo2.com'
+            role: that.registerForm.role
           };
           if (param.role == 2) {
             that.$confirm('注册的角色是管理员？', '确认', {
