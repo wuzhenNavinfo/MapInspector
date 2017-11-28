@@ -66,7 +66,7 @@ export default {
       }
     };
     return {
-      activeName: 'registerTab',
+      activeName: 'loginTab',
       logining: false,
       registering: false,
       ruleForm: {
