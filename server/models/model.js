@@ -43,18 +43,17 @@ return sequelize.sync ({force: false})
     async.parallel ([
       function (callback) {
         roleModel.bulkCreate ([
+          {roleCode: 0, roleName: '游客', roleDesc: '只能看'},
           {roleCode: 1, roleName: '作业员', roleDesc: '维护创建的项目'},
-          {roleCode: 2, roleName: '管理员', roleDesc: '维护创建的案例'}
+          {roleCode: 2, roleName: '管理员', roleDesc: '维护创建的案例'},
+          {roleCode: 3, roleName: '超级管理员', roleDesc: '用户管理'}
         ]).then(result => {
           callback(null, result);
         })
       },
       function (callback) {
         userModel.bulkCreate ([
-          {userName: 'root', fullName: 'root123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
-          {userName: 'admin', fullName: 'admin123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
-          {userName: 'user', fullName: 'user123', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'},
-          {userName: 'wuzhen', fullName: 'wuzhen', password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'}
+          {userName: 'root', fullName: 'root123', status: 0, password: '40bd001563085fc35165329ea1ff5c5ecbdbbeef'}
         ]).then(result => {
           callback(null, result);
         });
@@ -62,10 +61,7 @@ return sequelize.sync ({force: false})
     ], (err, results) => {
       if (err) throw err;
       return userRoleModel.bulkCreate([
-        {userId: 1, roleId:2},
-        {userId: 2, roleId:2},
-        {userId: 3, roleId:1},
-        {userId: 4, roleId:1}
+        {userId: 1, roleId: 4}
       ]);
     });
   }

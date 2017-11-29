@@ -38,6 +38,12 @@ module.exports = function (sequelize, DataTypes) {
       status: {
         type: DataTypes.INTEGER
       },
+      company: {
+        type: DataTypes.STRING
+      },
+      passport: {
+        type: DataTypes.STRING
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -51,8 +57,24 @@ module.exports = function (sequelize, DataTypes) {
         get: function () {
           return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD');
         }
+      },
+      expiredAt: {
+        type: DataTypes.DATE,
+        defaultValue: function () {
+          var date = new Date();
+          return date.setMonth(date.getMonth() + 3);
+        },
+        get: function () {
+          return moment(this.getDataValue('expiredAt')).format('YYYY-MM-DD');
+        }
       }
     }, {
+      getterMethods   : {
+        isExpired: function (){
+          let now = new Date();
+          return this.getDataValue('expiredAt') < now.getTime();
+        }
+      },
       freezeTableName: true
     }
   );

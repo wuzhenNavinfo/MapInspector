@@ -22,11 +22,18 @@ module.exports = function(req, res, next) {
           if (err) {
             return res.json({ errorCode: -1, message: err.message });
           } else {
-            userModel.findOne({where: {userName: decoded.data.name},include: {model: roleModel}}).then(result => {
+            return userModel.findOne({
+              where: {userName: decoded.data.name, status: 1},
+              include: {model: roleModel}
+            }).then(result => {
               // 获得解码后的用户信息;
-              req.loginUser = result.dataValues;
-              // 供后面的路由使用
-              next();
+              if (result) {
+                req.loginUser = result.dataValues;
+                // 供后面的路由使用
+                next();
+              } else {
+                throw new Error('该用户不存在,或没有被激活!');
+              }
             }).catch(err => {
               return res.json({errorCode: -1, message: err.message});
             });
