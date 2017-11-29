@@ -41,9 +41,10 @@ let handler = function (req, res, next) {
  * @api {post} /om/user/register 用户注册(om/user/register).
  * @apiName register.
  * @apiGroup user manage.
- * @apiDescription 用户注册接口,注册的用户默认会分配为作业员身份(roleCode=2).
+ * @apiDescription 用户注册接口,注册的用户默认会分配为游客身份(roleCode=0).
  * @apiParam {String} userName      用户名（必填）.
- * @apiParam {String} [fullName]    全名（可选）.
+ * @apiParam {String} fullName    全名（必填）.
+ * @apiParam {String} [company]   公司（必填）.
  * @apiParam {String} password      密码（必填）.
  * @apiParam {String} email         邮箱（必填）.
  * @apiParam {String} [cellPhone]   电话（可选）.
@@ -64,15 +65,15 @@ let handler = function (req, res, next) {
  *         "status": 0,
  *         "role": 2
  *     },
- *     "message": "用户创建成功,并为用户分配为管理员角色"
+ *     "message": "用户创建成功,并为用户分配为游客角色"
  * }
  */
 router.post('/register', [
-    check('userName')
-    .exists()
-    .withMessage('userName参数不能为空'),
+    check('userName').exists().withMessage('userName参数不能为空'),
+    check('fullName').exists().withMessage('fullName'),
     check('password').exists().withMessage('password参数不能为空'),
-    check('email').exists().withMessage('email参数不能为空').isEmail().withMessage('邮箱格式不合法')
+    check('email').exists().withMessage('email参数不能为空').isEmail().withMessage('邮箱格式不合法'),
+    check('company').exists().withMessage('company参数不能为空')
 ], (req, res, next) => {
     handler(req, res, next);
   }
@@ -127,6 +128,7 @@ router.post('/login', [
  *      "result": {
  *          "data": [
  *              {
+ *                  "isExpired": false,
  *                  "createdAt": "2017-11-21",
  *                  "updatedAt": "2017-11-21",
  *                  "id": 1,
@@ -138,6 +140,7 @@ router.post('/login', [
  *                  "role": "manager"
  *              },
  *              {
+ *                 "isExpired": false,
  *                 "createdAt": "2017-11-21",
  *                 "updatedAt": "2017-11-21",
  *                 "id": 2,
@@ -179,5 +182,77 @@ router.get('/delete', [
   handler(req, res, next);
   }
 );
+
+/**
+ * @api {get} /om/user/getPassport 获得验证码(om/user/getPassport).
+ * @apiName getPassport.
+ * @apiGroup user manage.
+ * @apiDescription 根据用户id获得四位验证码.
+ * @apiParam {String} userName 用户主键Id（必填）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ *{
+ *  "errorCode": 0,
+ *  "message": "邮件发送成功"
+ * }
+ */
+router.get('/getPassport', [
+    check('userName').exists().withMessage('userName参数不能为空')
+  ], (req, res, next) => {
+    handler(req, res, next);
+  }
+);
+
+/**
+ * @api {post} /om/user/resetPwd 重置密码(om/user/resetPwd).
+ * @apiName resetPwd.
+ * @apiGroup user manage.
+ * @apiDescription 用户修改密码功能.
+ * @apiParam {String} userName 用户主键Id（必填）.
+ * @apiParam {String} password 新的密码（必填）.
+ * @apiParam {String} passport 收到的验证码（必填）.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ *{
+ *  "errorCode": 0,
+ *  "message": "重置密码成功"
+ * }
+ */
+router.post('/resetPassword', [
+    check('userName').exists().withMessage('userName参数不能为空'),
+    check('password').exists().withMessage('password参数不能为空'),
+    check('passport').exists().withMessage('passport参数不能为空')
+  ], (req, res, next) => {
+    handler(req, res, next);
+  }
+);
+
+
+
+/**
+ * @api {post} /om/user/auditUser 用户审核(om/user/auditUser).
+ * @apiName auditUser.
+ * @apiGroup user manage.
+ * @apiDescription 用户审核功能.
+ * @apiParam {Integer} userId 用户主键Id（必填）.
+ * @apiParam {Integer} status 用户审核状态（必填）0-刚注册未审核,1-,审核通过（启用），2-审核不通过，3-强制停用, 4-强制过期, .
+ * @apiParam {Integer} [roleId] 为用户分配的角色（必填）1-游客,2-作业员，3-管理员，4-超级管理员.
+ * @apiUse ErrorExample
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *     "errorCode": 0,
+ *     "message": "用户状态更新为已审核，并分配角色为管理员"
+ * }
+ */
+router.post('/auditUser', [
+    check('userId').exists().withMessage('userId参数不能为空').isInt().withMessage('id必须为整数'),
+    check('status').exists().withMessage('status参数不能为空').isInt().withMessage('id必须为整数')
+  ], (req, res, next) => {
+    handler(req, res, next);
+  }
+);
+
+
+
 
 module.exports = router;
