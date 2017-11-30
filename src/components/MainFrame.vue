@@ -34,6 +34,17 @@
             <span slot="title">导航其他</span>
           </el-menu-item>
         </el-menu>
+        <el-menu v-if="userRole == 'superManager'" default-active="/user/waitAuditList" :unique-opened="true" :collapse="pageCtrl.collapsed" @select="handleSelect">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-menu"></i>
+              <span slot="title">注册账号审核</span>
+            </template>
+            <el-menu-item index="/user/waitAuditList">待审核</el-menu-item>
+            <el-menu-item index="/user/auditedList">审核通过</el-menu-item>
+            <el-menu-item index="/user/auditNoPass">审核不通过</el-menu-item>
+          </el-submenu>
+        </el-menu>
       </aside>
       <section class="content-container scroll_style" style='over-flow:auto;'>
         <router-view></router-view>
@@ -43,7 +54,6 @@
 </template>
 
 <script>
-import TableView from './TableView'
 import FrameTitle from './FrameTitle'
 import AlreadWork from './worker/alreadyWork'
 import {appUtil} from '../config.js'
@@ -65,18 +75,22 @@ import {appUtil} from '../config.js'
       }
     },
     components: {
-      TableView,
       FrameTitle,
       AlreadWork
     },
     created: function () {
       this.userRole = appUtil.getCurrentUser().role;
+      // this.userRole = 'superManager';
       if (this.userRole == 'manager') {
         this.handleSelect(1, [1, '/manager/waitWork']);
         return;
       }
       if (this.userRole == 'worker') {
         this.handleSelect(1, [1, '/worker/waitWork']);
+        return;
+      }
+      if (this.userRole == 'superManager') {
+        this.handleSelect(1, [1, '/user/waitAuditList']);
         return;
       }
     },

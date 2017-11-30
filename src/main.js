@@ -24,7 +24,7 @@ router.beforeEach((to, from, next) => {
   }
 
   let user = appUtil.getCurrentUser();
-  if (!user && to.path != '/login') {
+  if (!user && to.path != '/login' && to.path != '/register' && to.path != '/resetPassword') {
     next({ path: '/login' })
   } else {
     next()
