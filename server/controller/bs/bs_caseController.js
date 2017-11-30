@@ -10,6 +10,7 @@
 /**
  * 引入相关模块
  */
+const logger = require('../../log').logger;
 const moment = require('moment');
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
@@ -60,6 +61,7 @@ caseController.prototype.list = function () {
       message: '查找成功'
     });
   }).catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -108,6 +110,7 @@ caseController.prototype.listDetail = function () {
     });
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -137,6 +140,7 @@ caseController.prototype.query = function () {
       });
     }
   }).catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -189,6 +193,7 @@ caseController.prototype.create = function () {
     }
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -219,6 +224,7 @@ caseController.prototype.update = function () {
     }
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -245,6 +251,7 @@ caseController.prototype.delete = function () {
     }
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };

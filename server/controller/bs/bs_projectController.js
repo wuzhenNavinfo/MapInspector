@@ -12,7 +12,7 @@
  */
 const async = require('async');
 const tool = require('../../utils/publicTool');
-
+const logger = require('../../log').logger;
 const sequelize = require("../../dataBase");
 const userModel = sequelize.import('../../models/om/userModel');
 const caseModel = sequelize.import('../../models/bs/caseModel');
@@ -113,6 +113,7 @@ caseController.prototype.list = function () {
     });
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -150,6 +151,7 @@ caseController.prototype.create = function () {
     }
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -197,6 +199,7 @@ caseController.prototype.submit = function () {
         }
       })
       .catch(err => {
+        logger.fatal(err);
         throw err;
       })
     }
@@ -233,6 +236,7 @@ caseController.prototype.auditPro = function () {
     });
   })
   .catch (err => {
+    logger.fatal(err);
     throw err
   });
 };
@@ -259,6 +263,7 @@ caseController.prototype.delete = function () {
     }
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };

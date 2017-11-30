@@ -9,6 +9,7 @@
 var express = require('express');
 var router = express.Router();
 const path = require('path');
+const logger = require('../../log').logger;
 const { check, validationResult } = require('express-validator/check');
 const { matchedData, sanitize } = require('express-validator/filter');
 var bs_projectController = require('../../controller/bs/bs_projectController');
@@ -16,6 +17,7 @@ var bs_projectController = require('../../controller/bs/bs_projectController');
 let handler = function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    logger.error(errors.mapped());
     return res.status(422).json({ errorCode: -1, errors: errors.mapped() });
   }
   // 要保证路由接口和控制器方法一致;
