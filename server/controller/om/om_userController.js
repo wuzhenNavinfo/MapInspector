@@ -10,7 +10,7 @@
 /**
  * 引入相关模块
  */
-var logger = require('../../log').logger;
+const logger = require('../../log').logger;
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
@@ -75,6 +75,7 @@ UserController.prototype.register = function () {
         }
       });
   }).catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -91,7 +92,6 @@ UserController.prototype.login = function () {
 	return userModel.findOne(requestData)
   .then(userData => {
     if (!userData) {
-      logger.error('登陆失败，该用户不存在或没有被激活!');
       return this.res.json({errorCode: '-1', message:'登陆失败，该用户不存在或没有被激活或已过期'});
     } else {
       // 判断登陆密码
@@ -120,6 +120,7 @@ UserController.prototype.login = function () {
     }
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -159,6 +160,7 @@ UserController.prototype.find = function () {
     });
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -182,6 +184,7 @@ UserController.prototype.delete = function () {
       }
 	  })
     .catch(err => {
+      logger.fatal(err);
       throw err;
     });
 };
@@ -204,8 +207,9 @@ UserController.prototype.auditUser = function () {
         .then(affectedCount => {
           if (affectedCount[0]) {
             let updateInfo = ['未审核','已审核','不通过','停用','强制过期'][this.req.body.status];
+            if (this.req.body.status == 99) updateInfo = '强制过期';
             if (this.req.body.roleId) {
-              let roleInfo = ['游客','作业员','管理员','超级管理员'][this.req.body.roleId];
+              let roleInfo = ['游客','作业员','管理员','超级管理员'][this.req.body.roleId - 1];
               return userRoleModel.update({roleId: this.req.body.roleId}, {where: {userId: this.req.body.userId}})
               .then(affectedCount => {
                 if (affectedCount[0]) {
@@ -226,6 +230,7 @@ UserController.prototype.auditUser = function () {
       }
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -259,7 +264,7 @@ UserController.prototype.getPassport = function () {
           let options = {
             from: '793588344@qq.com',
             to: result.email,
-            subject: '来自MapInspector邮件',
+            subject: '来自“审图平台”的邮件',
             text: '密码重置',
             html: '<p>这是一封来自审图平台的邮件，您本次修改密码操作的验证码为 <strong style="color: #00A0F0">'+passport.join('')+'</strong>,若非本人操作请不要理会<p/>'
           };
@@ -296,7 +301,7 @@ UserController.prototype.resetPassword = function () {
     if (password == result.password) {
       return this.res.json({errorCode: -1, message: '您的密码没有改变'});
     }
-    if (this.req.body.passport != result.passport) {
+    if (this.req.body.passport.toLowerCase() != result.passport.toLowerCase()) {
       return this.res.json({errorCode: -1, message: '验证码错误'});
     }
     let now = new Date();
@@ -311,6 +316,7 @@ UserController.prototype.resetPassword = function () {
     });
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };

@@ -1,13 +1,15 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./utils/autoRouter');
-var log = require('./log');
+var log = require('./log.js');
+var logger = require('./log').logger;
 //初始化数据库表结构;
 require('./models/model');
+
 // 创建express实例;
 var app = express();
 
@@ -22,7 +24,7 @@ var allowCrossDomain = function(req, res, next) {
 };
 log.use(app);
 // uncomment after placing your favicon in /public
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -35,6 +37,7 @@ routes.init(app);
 // 捕获404错误;
 app.use(function(req, res, next) {
   var err = new Error('没有对应的请求资源');
+  logger.error('没有对应的请求资源');
   err.status = 404;
   next(err);
 });
@@ -46,6 +49,7 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   // render the error page
   res.status(err.status || 500);
+  logger.error(err.message);
   res.json({errorCode: -1, message: err.message});
 });
 

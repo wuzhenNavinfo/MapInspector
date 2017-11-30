@@ -10,6 +10,7 @@
 /**
  * 引入相关模块
  */
+const logger = require('../../log').logger;
 const upLoad = require('../../utils/upload');
 const tool = require('../../utils/publicTool');
 const sequelize = require("../../dataBase");
@@ -77,6 +78,7 @@ issueController.prototype.create = function () {
     }
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -98,6 +100,7 @@ issueController.prototype.auditIssue = function () {
     }
   })
   .catch(err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -131,6 +134,7 @@ issueController.prototype.find = function () {
     });
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
@@ -157,6 +161,7 @@ issueController.prototype.delete = function () {
     }
   })
   .catch (err => {
+    logger.fatal(err);
     throw err;
   });
 };
