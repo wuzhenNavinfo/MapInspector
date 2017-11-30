@@ -10,7 +10,7 @@
       <el-table-column prop="email" label="邮箱"> </el-table-column>
       <el-table-column width="160px" prop="company" label="所属公司"> </el-table-column>
       <el-table-column width="110px" prop="cellPhone" label="电话"> </el-table-column>
-      <el-table-column width="80px" prop="role" label="角色">
+      <el-table-column width="80px" prop="role" label="角色" sortable>
         <template slot-scope="scope">
           <el-tag v-if="scope.row.role=='visitor'" type="warning">游客</el-tag>
           <el-tag v-if="scope.row.role=='manager'" type="success">管理员</el-tag>
