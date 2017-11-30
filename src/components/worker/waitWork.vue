@@ -68,7 +68,7 @@
 import { saveIssue, queryIssueList, createProject, deleteProject, findUserList, submitProjectApi} from '../../dataService/api';
 import { Constant } from '../../common/js/constant.js';
 import { appUtil } from '../../config';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 
 export default {
@@ -164,7 +164,7 @@ export default {
           that.cardDataList = [];
           let list = data.result.data;
           for (let item of list) {
-            item.progress = _.round((item.worked/(item.worked + item.unworked)) * 100, 2);
+            item.progress = Utils.round((item.worked/(item.worked + item.unworked)) * 100, 2);
             item.projectStatusLabel = Constant.projectStatus[item.projectStatus];
             that.cardDataList.push(item);
           }

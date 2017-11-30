@@ -47,13 +47,22 @@ export default {
   data () {
     let validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请再次输入密码'));
+        callback(new Error('请再次输入密码!'));
       } else if (value !== this.registerForm.password) {
-        callback(new Error('两次输入密码不一致!'));
+        callback(new Error('两次输入密码不一致'));
       } else {
         callback();
       }
     };
+    let validateCellphone = (rule, value, callback) => {
+      if (value != '') {
+        if (!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value)) {
+          callback(new Error('电话格式有误'));
+          return;
+        }
+      }
+      callback();
+    }
     return {
       registering: false,
       registerForm: {
@@ -68,6 +77,9 @@ export default {
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+        ],
+        cellPhone: [
+          { validator: validateCellphone,  trigger: 'blur,change' }
         ],
         company:[
           { required: true, message: '请输入所属公司', trigger: 'blur' },

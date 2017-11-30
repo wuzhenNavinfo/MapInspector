@@ -51,7 +51,7 @@
 <script>
 
 import { queryAllUserListApi, updateUserApi } from '../../dataService/api';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'WaitWork',
@@ -80,7 +80,6 @@ export default {
       let that = this;
       updateUserApi(param).then(data => {
         that.centerDialogVisible = false;
-        console.info(data);
         let {errorCode, message, result} = data;
         if (errorCode === 0) {
           that.$notify.success({ title: '提示', message: message, position: 'bottom-right', duration: 2000});
@@ -108,7 +107,7 @@ export default {
       queryAllUserListApi({status: '[0]', pageSize: this.pageSize, pageNum: this.pageNum }).then(data => { // status 0待审核
         if (data.errorCode === 0) {
           that.tableData = data.result;
-          that.tableDataClone = _.clone(data.result);
+          that.tableDataClone = Utils.clone(data.result);
         }
       })
     }
