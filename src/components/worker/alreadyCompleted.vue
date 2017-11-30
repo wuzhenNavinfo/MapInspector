@@ -16,7 +16,6 @@
 <script>
 
 import { queryIssueList } from '../../dataService/api';
-let _ = require('lodash');
 
 export default {
   name: 'WaitWork',

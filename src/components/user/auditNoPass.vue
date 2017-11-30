@@ -28,7 +28,7 @@
 <script>
 
 import { queryIssueList, queryAllUserListApi } from '../../dataService/api';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'WaitWork',
@@ -56,7 +56,7 @@ export default {
       queryAllUserListApi({status: '[2]', pageSize: this.pageSize, pageNum: this.pageNum }).then(data => {
         if (data.errorCode === 0) {
           that.tableData = data.result;
-          that.tableDataClone = _.clone(data.result);
+          that.tableDataClone = Utils.clone(data.result);
         }
       })
     },

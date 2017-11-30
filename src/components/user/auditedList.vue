@@ -42,7 +42,7 @@
 <script>
 
 import { queryAllUserListApi, updateUserApi  } from '../../dataService/api';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'WaitWork',
@@ -86,7 +86,7 @@ export default {
       queryAllUserListApi({status: '[1,3]', pageSize: this.pageSize, pageNum: this.pageNum }).then(data => {// status 1审核通过 3停用
         if (data.errorCode === 0) {
           that.tableData = data.result;
-          that.tableDataClone = _.clone(data.result);
+          that.tableDataClone = Utils.clone(data.result);
         }
       })
     }

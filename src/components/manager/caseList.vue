@@ -109,7 +109,7 @@ import markerIconGreen from '../../assets/poi_green.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'CaseList',
@@ -351,7 +351,7 @@ export default {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.tableData = result;
-          that.tableDataClone = _.clone(result);
+          that.tableDataClone = Utils.clone(result);
         } else {
           that.$message({
             message: message,

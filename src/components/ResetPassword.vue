@@ -42,7 +42,6 @@ export default {
   name: 'Login',
   data () {
     let validatePass = (rule, value, callback) => {
-      console.info(value)
       if (value === '') {
         callback(new Error('请再次输入密码'));
       } else if (value !== this.ruleForm.newPassword) {
