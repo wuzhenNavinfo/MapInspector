@@ -27,6 +27,7 @@
 <script>
 import { login, registerApi } from '../dataService/api';
 import { appUtil } from '../config';
+import { Utils } from '../common/js/utils.js'
 
 export default {
   name: 'Login',
@@ -66,12 +67,12 @@ export default {
       this.$refs.registerForm.validate(function (valid) {
         if (valid) {
           var param = {
-            userName: that.registerForm.userName,
-            fullName: that.registerForm.fullName,
-            password: that.registerForm.password,
-            cellPhone: that.registerForm.cellPhone,
-            email: that.registerForm.email,
-            company: that.registerForm.company
+            userName: Utils.trim(that.registerForm.userName),
+            fullName: Utils.trim(that.registerForm.fullName),
+            password: Utils.trim(that.registerForm.password),
+            cellPhone: Utils.trim(that.registerForm.cellPhone),
+            email: Utils.trim(that.registerForm.email),
+            company: Utils.trim(that.registerForm.company)
           };
           that.register(param);
         }

@@ -11,7 +11,11 @@
       <el-table-column prop="company" label="所属公司"></el-table-column>
       <el-table-column width="110px" prop="cellPhone" label="电话"></el-table-column>
       <el-table-column width="100px" prop="createdAt" label="注册时间"></el-table-column>
-      <el-table-column width="100px" prop="expiredAt" label="过期时间"></el-table-column>
+      <el-table-column width="100px" label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini" type="warning" @click="handleEdit(scope.$index, scope.row)">重新审核</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination small
       @size-change="handleSizeChange"
@@ -27,7 +31,7 @@
 
 <script>
 
-import { queryIssueList, queryAllUserListApi } from '../../dataService/api';
+import { queryIssueList, queryAllUserListApi, updateUserApi } from '../../dataService/api';
 import { Utils } from '../../common/js/utils.js'
 
 export default {
@@ -43,6 +47,22 @@ export default {
     }
   },
   methods: {
+    handleEdit(index, row) {
+      let param = {
+        userId: row.id,
+        status: 0
+      };
+      let that = this;
+      updateUserApi(param).then(data => {
+        let {errorCode, message, result} = data;
+        if (errorCode === 0) {
+          that.$notify.success({ title: '提示', message: message, position: 'bottom-right', duration: 2000});
+          that.queryAllUser();
+        } else {
+          that.$notify.error({ title: '提示', message: message, position: 'bottom-right', duration: 2000});
+        }
+      });
+    },
     handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       this.queryAllUser();
