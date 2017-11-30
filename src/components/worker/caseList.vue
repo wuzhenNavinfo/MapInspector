@@ -86,7 +86,7 @@ import markerIconGreen from '../../assets/poi_green.png'
 import imgSrc from '../../assets/user.png'
 import videoSrc from '../../assets/2.mp4'
 import { appConfig, appUtil } from '../../config';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'CaseList',
@@ -311,7 +311,7 @@ export default {
         let { errorCode, message, result } = data;
         if (errorCode == 0) {
           that.tableData = result;
-          that.tableDataClone = _.clone(result);
+          that.tableDataClone = Utils.clone(result);
         } else {
           that.$message({
             message: message,
@@ -346,13 +346,11 @@ export default {
             new MPoint(value.location[0], value.location[1]),
             new MIcon(markerIcon,22,39,12,33)
           )
-          console.info(value);
           marker.id = marker.id + '_' + value.id;
           marker.extraData = {
             id: value.id
           }
           MEvent.addListener(marker, "click", function (mk) {
-            console.info(mk);
             that.redraw(mk.extraData.id);
             that.fillContent({id: mk.extraData.id}, null);
 

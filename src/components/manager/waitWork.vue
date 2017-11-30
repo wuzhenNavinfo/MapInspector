@@ -34,7 +34,7 @@
 <script>
 
 import { queryIssueList, auditProApi } from '../../dataService/api';
-let _ = require('lodash');
+import { Utils } from '../../common/js/utils.js'
 
 export default {
   name: 'WaitWork',
@@ -53,7 +53,7 @@ export default {
         this.$confirm('存在待审核的数据，确认项目通过？','提示').then(() => {
           that.auditProject(item.id, status);
         });
-      } else if (item.issueTotal > 0 && status == 3) {
+      } else if ((item.errorCount > 0 || item.waitAudited > 0) && status == 3) {
         this.$confirm('存在审核不通过的数据，确认项目通过？','提示').then(() => {
           that.auditProject(item.id, status);
         });
@@ -93,7 +93,7 @@ export default {
           that.cardDataList = [];
           let list = data.result.data;
           for (let item of list) {
-            item.progress = _.round(((item.audited + item.errorCount)/(item.issueTotal)) * 100, 2);
+            item.progress = Utils.round(((item.audited + item.errorCount)/(item.issueTotal)) * 100, 2);
             that.cardDataList.push(item);
           }
         }

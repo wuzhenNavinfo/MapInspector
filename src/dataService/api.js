@@ -17,18 +17,18 @@ var postReq = function (url, param) {
     if (!param) {
       param = {};
     }
-    if (url != '/api/om/user/login' && url != '/api/om/user/register') {
+    if (url != '/api/om/user/login' && url != '/api/om/user/register' && url != '/api/om/user/getPassport' && url != '/api/om/user/resetPassword') {
       let token = appUtil.getCurrentUser().token;
       param.token = token;
     }
-    return axios.post(`${baseUrl + url}`, param).then(res => res.data).catch(res => ({errcode: null}));
+    return axios.post(`${baseUrl + url}`, param).then(res => res.data).catch(res => ({errcode: null, message: '处理失败'}));
 }
 // 统一增加token
 var getReq = function (url, param) {
   if (!param) {
     param = {};
   }
-  if (url != '/api/om/user/login') {
+  if (url != '/api/om/user/login' && url != '/api/om/user/register' && url != '/api/om/user/getPassport' && url != '/api/om/user/resetPassword' ) {
     let token = appUtil.getCurrentUser().token;
     param.token = token;
   }
@@ -38,7 +38,7 @@ var getReq = function (url, param) {
 // -- 用户相关  --
 export const login = param => { return postReq('/api/om/user/login', param) }; // 登录接口, 注意箭头函数返回对象是要加小括号的知识点
 export const registerApi = param => { return postReq('/api/om/user/register', param) };
-export const findUser = param => { return axios.get(`${baseUrl}/api/om/user/find`, {params: param}).then(res => res.data).catch(res => ({errcode: null})); }; // 注意get和post的传递参数方式的不同
+// export const findUser = param => { return axios.get(`${baseUrl}/api/om/user/find`, {params: param}).then(res => res.data).catch(res => ({errcode: null})); }; // 注意get和post的传递参数方式的不同
 export const findUserList = param => { return getReq('/api/om/user/find', param)};
 
 // -- 案例相关  --
@@ -66,5 +66,13 @@ export const auditProApi = param => { return postReq('/api/bs/project/auditPro',
 
 // -- 问题相关  --
 export const auditIssueApi = param => { return postReq('/api/bs/issue/auditIssue', param)};
+
+// --超级管理员--
+export const queryAllUserListApi = param => { return getReq('/api/om/user/find', param)};
+export const updateUserApi = param => { return postReq('/api/om/user/auditUser', param)};
+export const getPassportApi = param => { return getReq('/api/om/user/getPassport', param)};
+export const resetPwdApi = param => { return postReq('/api/om/user/resetPassword', param)};
+
+
 
 
