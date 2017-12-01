@@ -51,12 +51,12 @@ UserController.prototype.register = function () {
 	this.model.password = crypto.createHash('sha1').update(this.model.password).digest('hex');
 	// 判断用户是否存在；
   let requestData = {where: {
-    $or: [{userName: this.model.userName}, {email: this.model.email}]
+    $or: [{userName: this.model.userName}]
   }};
   requestData.attributes = {exclude: ['passport']};
 	return userModel.findOne(requestData)
   .then(result => {
-    if(result) return this.res.json({errorCode: -1, message: '该用户/邮箱已存在'});
+    if(result) return this.res.json({errorCode: -1, message: '该用户已存在'});
     return userModel.create(this.model)
       .then(userData => {
         if (userData) {
@@ -242,11 +242,11 @@ UserController.prototype.auditUser = function () {
  */
 UserController.prototype.getPassport = function () {
   let mailTransport = nodemailer.createTransport({
-    host : 'smtp.qq.com',
-    secureConnection: true,
+    host : config.EMAIL_HOST,
+    port: config.EMAIL_PORT,
     auth : {
-      user : '793588344@qq.com',
-      pass : 'pljkbnjjslgsbfgd'
+      user : config.EMAIL_USER,
+      pass : config.EMAIL_PWD
     }
   });
   return userModel.findOne({where: {userName: this.req.query.userName}})
@@ -262,7 +262,7 @@ UserController.prototype.getPassport = function () {
       .then(affectedCount => {
         if (affectedCount[0]) {
           let options = {
-            from: '793588344@qq.com',
+            from: config.EMAIL_NAME,
             to: result.email,
             subject: '来自“审图平台”的邮件',
             text: '密码重置',
