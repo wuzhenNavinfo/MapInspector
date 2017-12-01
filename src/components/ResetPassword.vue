@@ -8,9 +8,6 @@
         <el-form-item prop="userName">
           <el-input type="text" v-model="ruleForm.userName" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
-        <el-form-item prop="password">
-          <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="原始密码"></el-input>
-        </el-form-item>
         <el-form-item prop="newPassword">
           <el-input type="password" v-model="ruleForm.newPassword" auto-complete="off" placeholder="新密码"></el-input>
         </el-form-item>

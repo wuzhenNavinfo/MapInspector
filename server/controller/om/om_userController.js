@@ -202,6 +202,9 @@ UserController.prototype.auditUser = function () {
         let updateData = { status: this.req.body.status };
         if (this.req.body.status == 99) {
           updateData = {expiredAt: userData.createdAt};
+        } else if (this.req.body.status == 1) {
+          let now = new Date();
+          updateData.expiredAt = now.setMonth(now.getMonth() + 3);
         }
         return userModel.update(updateData, where)
         .then(affectedCount => {
