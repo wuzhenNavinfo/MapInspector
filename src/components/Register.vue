@@ -70,6 +70,7 @@ export default {
       registerRules: {
         userName: [
           { required: true, message: '请输入账号', trigger: 'blur' },
+          { pattern: /^[a-zA-Z0-9]{4,16}$/, message: '用户名必须由为字母/数字组成的4-32位字符' }
         ],
         fullName: [
           { required: true, message: '请输入全称', trigger: 'blur' },
@@ -82,13 +83,14 @@ export default {
           { validator: validateCellphone,  trigger: 'blur,change' }
         ],
         company:[
-          { required: true, message: '请输入所属公司', trigger: 'blur' },
+          { required: true, message: '请输入所属公司', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 32, message: '密码必须为长度6-32位字符', trigger: 'blur' }
         ],
         rePassword: [
-          { validator: validatePass,  trigger: 'blur' },
+          { validator: validatePass,  trigger: 'blur' }
         ]
       },
       checked: true
