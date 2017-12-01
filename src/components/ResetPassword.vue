@@ -8,9 +8,6 @@
         <el-form-item prop="userName">
           <el-input type="text" v-model="ruleForm.userName" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
-        <el-form-item prop="password">
-          <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="原始密码"></el-input>
-        </el-form-item>
         <el-form-item prop="newPassword">
           <el-input type="password" v-model="ruleForm.newPassword" auto-complete="off" placeholder="新密码"></el-input>
         </el-form-item>
@@ -53,15 +50,11 @@ export default {
     return {
       logining: false,
       ruleForm: {
-        userName: '',
-        password: ''
+        userName: ''
       },
       rules: {
         userName: [
           { required: true, message: '请输入账号', trigger: 'blur' },
-        ],
-        password: [
-          { required: true, message: '请输入原始密码', trigger: 'blur' },
         ],
         newPassword: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
@@ -100,7 +93,6 @@ export default {
         if (valid) {
           var loginParams = {
             userName: _.trim(that.ruleForm.userName),
-            password1: _.trim(that.ruleForm.password),
             password: _.trim(that.ruleForm.newPassword),
             passport: _.trim(that.ruleForm.checkNo)
           };
