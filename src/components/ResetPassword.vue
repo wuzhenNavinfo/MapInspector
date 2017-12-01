@@ -50,15 +50,11 @@ export default {
     return {
       logining: false,
       ruleForm: {
-        userName: '',
-        password: ''
+        userName: ''
       },
       rules: {
         userName: [
           { required: true, message: '请输入账号', trigger: 'blur' },
-        ],
-        password: [
-          { required: true, message: '请输入原始密码', trigger: 'blur' },
         ],
         newPassword: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
@@ -97,7 +93,6 @@ export default {
         if (valid) {
           var loginParams = {
             userName: _.trim(that.ruleForm.userName),
-            password1: _.trim(that.ruleForm.password),
             password: _.trim(that.ruleForm.newPassword),
             passport: _.trim(that.ruleForm.checkNo)
           };
