@@ -9,7 +9,9 @@
 
 export const appConfig = {
   appName: 'mapInspector',
-  serviceUrl: 'http://192.168.15.220:3000' // 服务的地址
+  // serviceUrl: 'http://192.168.15.220:3000' // 正式环境的服务地址
+  // serviceUrl: 'http://192.168.4.189:3000' // 开发环境的服务地址
+  serviceUrl: 'http://localhost:3000' // 开发环境的服务地址
 }
 
 export const appUtil = {
