@@ -19,3 +19,7 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+#项目发布时注意修改的地方：
+  1：修改/MapInspector/config.js文件，将appConfig.serverUrl改成正式生产的域名地址
+  2：修改/MapInspector/server/config.js文件,将数据库地址配置成正式的生产地址
