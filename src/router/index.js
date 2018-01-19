@@ -56,7 +56,8 @@ let routes = [
   { path: '/manager/caseList', component: ManagerCaseList, name: 'ManagerCaseList' },
   { path: '/manager/auditIssue', component: AuditIssue, name: 'AuditIssue'},
   { path: '/worker/enterIssue', component: enterIssue, name: 'enterIssue'},
-  { path: '/worker/caseList', component: WorkerCaseList, name: 'WorkerCaseList' }
+  { path: '/worker/caseList', component: WorkerCaseList, name: 'WorkerCaseList' },
+  { path: '*', component: Login, name:'Login' }
 ];
 
 export default routes;

@@ -38,7 +38,8 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
-        fallback: 'vue-style-loader'
+        fallback: 'vue-style-loader',
+        publicPath: '../../'  // 解决打包后部署到tomcat等服务器下面 样式和图片等路径找不到的问题
       })
     } else {
       return ['vue-style-loader'].concat(loaders)
