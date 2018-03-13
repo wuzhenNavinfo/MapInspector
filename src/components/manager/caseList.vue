@@ -86,7 +86,7 @@
     <div>
       <el-dialog custom-class="my-dialog" :visible.sync="imageDialogVisible">
          <el-carousel ref="imagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
-            <el-carousel-item v-for="image in caseForm.images" :key="image" style="text-align:center">
+            <el-carousel-item v-for="image in imagesTemp" :key="image" style="text-align:center">
               <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
             </el-carousel-item>
           </el-carousel>
@@ -125,6 +125,7 @@ export default {
       currentPage1: 1,
       pageCtrl:{},
       allCaseList:[], // 存储所有的案例
+      imagesTemp: [],
       ctrl: {
         curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
@@ -311,10 +312,14 @@ export default {
     },
     showImages(index) {
       this.imageDialogVisible = true;
+      this.imagesTemp = [];
       let that = this;
       setTimeout(function(){
-        that.$refs.imagesCarousel.setActiveItem(index);
-      })
+        that.imagesTemp = that.caseForm.images;
+        setTimeout(function () {
+          that.$refs.imagesCarousel.setActiveItem(index);
+        }, 50);
+      }, 50)
     },
     selectedRow(row) {
       let that = this;

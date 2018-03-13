@@ -41,9 +41,9 @@
         </div>
         <div class="scroll_style list-group">
           <ul>
-            <li>
-              <label>案例编号:</label><div>{{caseForm.caseCode}}</div>
-            </li>
+            <!--<li>-->
+              <!--<label>案例编号:</label><div>{{caseForm.caseCode}}</div>-->
+            <!--</li>-->
             <li>
               <label>案例概述:</label><div>{{caseForm.caseSnap}}</div>
             </li>
@@ -85,14 +85,14 @@
     <div>
       <el-dialog :visible.sync="imageDialogVisible">
          <el-carousel ref="imagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
-            <el-carousel-item v-for="image in caseForm.caseImages" :key="image" style="text-align:center">
+            <el-carousel-item v-for="image in caseImagesTemp" :key="image" style="text-align:center">
               <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
             </el-carousel-item>
           </el-carousel>
       </el-dialog>
       <el-dialog :visible.sync="issueImageDialogVisible">
          <el-carousel ref="issueImagesCarousel" height="56vh" indicator-position="outside" :autoplay="false">
-            <el-carousel-item v-for="image in caseForm.issueImages" :key="image" style="text-align:center">
+            <el-carousel-item v-for="image in issueImagesTemp" :key="image" style="text-align:center">
               <img :src="ctrl.baseUrl+'/'+image" style="max-width:100%;max-height:100%;">
             </el-carousel-item>
           </el-carousel>
@@ -129,6 +129,8 @@ export default {
       currentPage1: 1,
       pageCtrl:{},
       selectedRowData:{},
+      caseImagesTemp: [],
+      issueImagesTemp: [],
       ctrl: {
         curentUser: appUtil.getCurrentUser(),
         baseUrl: appConfig.serviceUrl,
@@ -231,16 +233,24 @@ export default {
     showImages(index) {
       this.imageDialogVisible = true;
       let that = this;
-      setTimeout(function(){
-        that.$refs.imagesCarousel.setActiveItem(index);
-      })
+      this.caseImagesTemp = [];
+      setTimeout(function () {
+        that.caseImagesTemp = that.caseForm.caseImages;
+        setTimeout(function () {
+          that.$refs.imagesCarousel.setActiveItem(index);
+        }, 50);
+      }, 50);
     },
     showIssueImages(index) {
       this.issueImageDialogVisible = true;
+      this.issueImagesTemp = [];
       let that = this;
       setTimeout(function(){
-        that.$refs.issueImagesCarousel.setActiveItem(index);
-      })
+        that.issueImagesTemp = that.caseForm.issueImages;
+        setTimeout(function () {
+          that.$refs.issueImagesCarousel.setActiveItem(index);
+        }, 50);
+      }, 50)
     },
     selectedRow(row, event) {
       this.selectedRowData = row;
